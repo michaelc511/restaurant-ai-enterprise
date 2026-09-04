@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Menu-4AP Feature Checklist</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --stripe: #f9fafb;
+    --header-bg: #111827;
+    --header-fg: #ffffff;
+    --done-bg: #d1fae5;
+    --done-fg: #065f46;
+    --notstarted-bg: #fee2e2;
+    --notstarted-fg: #991b1b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 0.25rem;
+  }
+  p.subtitle {
+    margin: 0 0 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1200px;
+    font-size: 0.85rem;
+  }
+  thead th {
+    background: var(--header-bg);
+    color: var(--header-fg);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) {
+    background: var(--stripe);
+  }
+  tbody tr:hover {
+    background: #eef2ff;
+  }
+  td.num, th.num {
+    text-align: center;
+    white-space: nowrap;
+  }
+  td.status { white-space: nowrap; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge.done { background: var(--done-bg); color: var(--done-fg); }
+  .badge.not-started { background: var(--notstarted-bg); color: var(--notstarted-fg); }
+  tr.phase-row td {
+    background: var(--header-bg);
+    color: var(--header-fg);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    padding: 0.55rem 0.75rem;
+  }
+  tr.phase-row td .phase-num { color: #93c5fd; margin-right: 0.4rem; }
+  code {
+    font-size: 0.8rem;
+    background: #f3f4f6;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <h1>Menu-4AP Feature Checklist</h1>
+  <p class="subtitle">Converted from checklist.csv</p>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="num">Day #</th>
+        <th class="num">#</th>
+        <th>Feature Name</th>
+        <th>Status</th>
+        <th>Buzzwords &amp; Concepts</th>
+        <th>Primary Tools &amp; Libraries</th>
+        <th>Target Location</th>
+        <th class="num">New .py File?</th>
+        <th>Est. Time (With AI)</th>
+        <th>Complexity</th>
+        <th class="num">Hiring Value</th>
+        <th>Performance &amp; Metrics Measured</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 1</span>Mach 1 (Baseline Proof-of-Concept & Serving)</td></tr>
+      <tr><td class="num">0</td><td class="num">0</td><td>App Idea</td><td class="status"><span class="badge done">Done</span></td><td>Doc</td><td></td><td></td><td class="num">N</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr><td class="num">1</td><td class="num">1</td><td>Prototype</td><td class="status"><span class="badge done">Done</span></td><td>Python Notebook</td><td></td><td></td><td class="num">Y</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr><td class="num">2</td><td class="num">2</td><td>LLM Selector</td><td class="status"><span class="badge done">Done</span></td><td>Ollama, OpenAI, Gemini, Claude</td><td></td><td></td><td class="num">Y</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr><td class="num">3</td><td class="num">3</td><td>RAG &amp; Vectorstore</td><td class="status"><span class="badge done">Done</span></td><td>RAG, FAISS, Chroma, Pinecone</td><td></td><td></td><td class="num">Y</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr><td class="num">3.1</td><td class="num">3.1</td><td>RAG System Prompt &amp; Persona</td><td class="status"><span class="badge done">Done</span></td><td>Prompt Engineering, Persona Design, Hallucination Guardrails</td><td>ChatPromptTemplate, SystemMessagePromptTemplate</td><td><code>menu_api.py</code></td><td class="num">N</td><td>15 mins</td><td>Very Easy</td><td class="num">6 / 10</td><td>Off-Topic Redirect Rate, Answer Tone Consistency, Hallucination Rate</td></tr>
+      <tr><td class="num">4</td><td class="num">4</td><td>FastAPI</td><td class="status"><span class="badge done">Done</span></td><td>FastAPI</td><td></td><td></td><td class="num">Y</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr><td class="num">5</td><td class="num">5</td><td>Web Interfaces</td><td class="status"><span class="badge done">Done</span></td><td>Gradio, Streamlit</td><td></td><td></td><td class="num">Y</td><td>30 min</td><td>Very Easy</td><td class="num">5</td><td></td></tr>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 2</span>Bullitt (Observability, Context & Data Foundation)</td></tr>
+      <tr><td class="num">6</td><td class="num">6</td><td>In-Code Token &amp; Cost Accounting</td><td class="status"><span class="badge done">Done</span></td><td>Cost Optimization, AI Governance, Financial FinOps, Bedrock/OpenAI Decoupling</td><td>get_openai_callback, Pydantic, langchain-aws</td><td><code>core/telemetry.py</code></td><td class="num">N</td><td>25 mins</td><td>Very Easy</td><td class="num">7 / 10</td><td>Prompt/Completion Tokens, USD Cost / Request</td></tr>
+      <tr><td class="num">7</td><td class="num">7</td><td>Ephemeral Chat Memory</td><td class="status"><span class="badge done">Done</span></td><td>Memory Layers, Working Context Window</td><td>RunnableWithMessageHistory</td><td><code>engines/langgraph_engine.py</code></td><td class="num">N</td><td>30 mins</td><td>Easy</td><td class="num">6 / 10</td><td>Context Window Token Overhead, Turn Latency</td></tr>
+      <tr><td class="num">8</td><td class="num">8</td><td>FastMCP Server Endpoint</td><td class="status"><span class="badge done">Done</span></td><td>Model Context Protocol, Stateless MCP</td><td>FastMCP</td><td><code>api/mcp_server.py</code></td><td class="num">Y</td><td>35 mins</td><td>Easy</td><td class="num">9 / 10</td><td>Tool Discovery Latency, Invocation Success Rate</td></tr>
+      <tr><td class="num">9</td><td class="num">9</td><td>Observability &amp; Tracing</td><td class="status"><span class="badge done">Done</span></td><td>LLMOps, Tracing, Audit Trails, AI Governance</td><td>Langfuse / LangSmith</td><td><code>core/telemetry.py</code></td><td class="num">N</td><td>35 mins</td><td>Easy</td><td class="num">9 / 10</td><td>Step Latency Breakdown, Retriever vs LLM Lag, Error Rate</td></tr>
+      <tr><td class="num">10</td><td class="num">10</td><td>Cross-Encoder Re-ranking</td><td class="status"><span class="badge done">Done</span></td><td>Context Engineering, Two-Stage Retrieval</td><td>FlashRank / Cross-Encoders</td><td><code>core/vectorstore.py</code></td><td class="num">N</td><td>35 mins</td><td>Easy</td><td class="num">8 / 10</td><td>Hit Rate, Context Density, Lost-in-the-Middle Reduction</td></tr>
+      <tr><td class="num">11</td><td class="num">11</td><td>Relational DB &amp; Text-to-SQL Tool</td><td class="status"><span class="badge done">Done</span></td><td>Tool Use, Function Calling, Structured Data Grounding</td><td>SQLite, SQLAlchemy, SQLDatabaseChain</td><td><code>core/database.py</code></td><td class="num">Y</td><td>45 mins</td><td>Medium</td><td class="num">9.5 / 10</td><td>SQL Query Accuracy, Numerical Calculation Exactness</td></tr>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 3</span>Fox Body (Multi-Engine & Agent Frameworks)</td></tr>
+      <tr><td class="num">12</td><td class="num">12</td><td>Modular Engine Strategy Factory</td><td class="status"><span class="badge done">Done</span></td><td>Software Architecture, Strategy Pattern, Multi-Engine Harness</td><td>BaseMenuEngine / Factory</td><td><code>engines/base.py</code></td><td class="num">Y</td><td>35 mins</td><td>Medium</td><td class="num">8.5 / 10</td><td>Framework Switching Latency, Engine Throughput</td></tr>
+      <tr><td class="num">12.1</td><td class="num">12.1</td><td>Parallel Entry Point (engine_api.py)</td><td class="status"><span class="badge done">Done</span></td><td>Software Architecture, Backward Compatibility, Strangler Fig Pattern</td><td>FastAPI / get_engine() factory</td><td><code>engine_api.py</code></td><td class="num">Y</td><td>20 mins</td><td>Easy</td><td class="num">7 / 10</td><td>menu_api.py Diff Count (0), Response Parity vs menu_api.py</td></tr>
+      <tr><td class="num">13</td><td class="num">13</td><td>LangGraph State Machine Engine</td><td class="status"><span class="badge done">Done</span></td><td>Graph Engineering, Loop Engineering, Agentic AI</td><td>StateGraph / Conditional Edges</td><td><code>engines/langgraph_engine.py</code></td><td class="num">Y</td><td>50 mins</td><td>Medium</td><td class="num">10 / 10</td><td>Routing Accuracy, Loop Count, Self-Correction Rate</td></tr>
+      <tr><td class="num">14</td><td class="num">14</td><td>CrewAI Multi-Role Engine</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Multi-Agent Systems, Persona Delegation</td><td>CrewAI (Crew / Agent / Task)</td><td><code>engines/crewai_engine.py</code></td><td class="num">Y</td><td>45 mins</td><td>Medium</td><td class="num">6.5 / 10</td><td>Multi-Agent Token Overhead, Turnaround Time</td></tr>
+      <tr><td class="num">15</td><td class="num">15</td><td>AutoGen Multi-Agent Engine</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Multi-Agent Consensus, Conversational Loop Engineering</td><td>AutoGen (UserProxyAgent / AssistantAgent)</td><td><code>engines/autogen_engine.py</code></td><td class="num">Y</td><td>50 mins</td><td>Medium–Hard</td><td class="num">6 / 10</td><td>Multi-Round Latency, Convergence Rate</td></tr>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 4</span>Coyote 5.0 (Resilience, Evals & Hybrid Retrieval)</td></tr>
+      <tr><td class="num">16</td><td class="num">16</td><td>Persistent Thread Checkpointing</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Memory Layers, State Persistence, Crash Resilience</td><td>SqliteSaver / Checkpointers</td><td><code>engines/langgraph_engine.py</code></td><td class="num">N</td><td>30 mins</td><td>Medium</td><td class="num">7.5 / 10</td><td>State Restoration Latency, Session Durability</td></tr>
+      <tr><td class="num">17</td><td class="num">17</td><td>Automated RAG Evals Harness</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Evaluation Frameworks, Agent Harness, Ground Truth</td><td>Ragas / DeepEval</td><td><code>evaluation/run_evals.py</code></td><td class="num">Y</td><td>45 mins</td><td>Medium</td><td class="num">9.5 / 10</td><td>Faithfulness (Grounding), Answer Relevancy, Context Precision</td></tr>
+      <tr><td class="num">18</td><td class="num">18</td><td>Hybrid Search (BM25 + FAISS)</td><td class="status"><span class="badge not-started">Not Started</span></td><td>RAG 2.0, Context Engineering, Hybrid Dense/Sparse</td><td>BM25Retriever, FAISS, EnsembleRetriever</td><td><code>core/vectorstore.py</code></td><td class="num">N</td><td>35 mins</td><td>Medium</td><td class="num">8 / 10</td><td>Mean Reciprocal Rank (MRR), Context Recall</td></tr>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 5</span>Dark Horse (Enterprise Production Hardening)</td></tr>
+      <tr><td class="num">19</td><td class="num">19</td><td>Query Guardrails &amp; Intent Gating</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Guardrails, AI Governance, Input Sanitization</td><td>Pydantic Classifier / Intent Routing Node</td><td><code>engines/langgraph_engine.py</code></td><td class="num">N</td><td>45 mins</td><td>Medium</td><td class="num">7 / 10</td><td>Out-of-Scope Rejection Rate, False Rejection Rate</td></tr>
+      <tr><td class="num">20</td><td class="num">20</td><td>CI/CD Eval Regression Gate</td><td class="status"><span class="badge not-started">Not Started</span></td><td>Harness Engineering, Enterprise SDLC, Quality Gate</td><td>GitHub Actions, pytest, Ragas CLI</td><td><code>.github/workflows/eval_gate.yml</code></td><td class="num">N</td><td>40 mins</td><td>Medium–Hard</td><td class="num">8.5 / 10</td><td>Build-time Eval Pass/Fail Score, Regression Delta</td></tr>
+      <tr class="phase-row"><td colspan="12"><span class="phase-num">Phase 6</span>Shelby Cobra (Security &amp; Quality Hardening)</td></tr>
+      <tr><td class="num">21</td><td class="num">21</td><td>API Authentication &amp; Rate Limiting</td><td class="status"><span class="badge not-started">Not Started</span></td><td>API Security, Authentication, Rate Limiting, Abuse Prevention</td><td>FastAPI Security / slowapi</td><td><code>core/auth.py</code></td><td class="num">Y</td><td>30 mins</td><td>Easy</td><td class="num">7 / 10</td><td>Unauthorized Request Rejection Rate, Requests Throttled / Min</td></tr>
+      <tr><td class="num">22</td><td class="num">22</td><td>Prompt-Injection Defense</td><td class="status"><span class="badge not-started">Not Started</span></td><td>AI Security, Prompt Injection, Adversarial Robustness, Content Sanitization</td><td>Delimiter-based Context Isolation</td><td><code>core/prompt_guard.py</code></td><td class="num">Y</td><td>40 mins</td><td>Medium</td><td class="num">8 / 10</td><td>Injection Detection Rate, False Positive Rate on Benign Content</td></tr>
+      <tr><td class="num">23</td><td class="num">23</td><td>Unit Tests for Core Modules</td><td class="status"><span class="badge done">Done</span></td><td>Unit Testing, Test Coverage, Software Quality</td><td>pytest, unittest.mock</td><td><code>tests/</code></td><td class="num">Y</td><td>45 mins</td><td>Medium</td><td class="num">7.5 / 10</td><td>Test Coverage %, Test Pass Rate</td></tr>
+    </tbody>
+  </table>
+  </div>
+</body>
+</html>

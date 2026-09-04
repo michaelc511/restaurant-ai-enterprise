@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What's on the Margherita Pizza and how much is it?",
+    "expected_answer": "The Margherita Pizza ($18.00) is a wood-fired thin crust pizza with San Marzano tomato sauce, fresh mozzarella di bufala, basil, and extra virgin olive oil."
+  },
+  {
+    "question": "What time do you close on Saturday?",
+    "expected_answer": "Saturday hours are 11:30 AM to 10:30 PM."
+  },
+  {
+    "question": "What's your corkage fee?",
+    "expected_answer": "The corkage fee is $25 per 750ml bottle, with a maximum of 2 bottles."
+  },
+  {
+    "question": "Do you deliver?",
+    "expected_answer": "Yes, delivery is supported via DoorDash and Uber Eats within an 8-mile radius; online curbside takeout is also available."
+  },
+  {
+    "question": "What gluten-free entrees do you have?",
+    "expected_answer": "Gluten-free entrees include Osso Buco alla Milanese, the Grilled Prime Ribeye, Wild Mushroom Risotto, Grilled Chilean Sea Bass, Pan-Seared Salmon Piccante, and the Tuscan Braised Pork Chop."
+  }
+]

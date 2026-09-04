@@ -1,0 +1,22 @@
+[
+  {
+    "question": "How much is the Tomahawk Ribeye Chop and how many ounces is it?",
+    "expected_answer": "The Tomahawk Ribeye Chop is 38 oz and costs $145.00."
+  },
+  {
+    "question": "What's the dress code?",
+    "expected_answer": "Elegant business casual to formal attire is strictly enforced. Collared shirts are required for gentlemen; no athletic attire, flip-flops, or baseball caps."
+  },
+  {
+    "question": "Do you accept cash?",
+    "expected_answer": "No, it's a strictly cashless establishment - Visa, MasterCard, American Express, Diner's Club, Apple Pay, and Google Pay are accepted."
+  },
+  {
+    "question": "What's in the Surf and Turf Duo and what does it cost?",
+    "expected_answer": "The Surf and Turf Duo ($82.00) pairs a 6 oz USDA Prime Filet Mignon with an 8 oz broiled South African cold-water lobster tail and clarified butter."
+  },
+  {
+    "question": "What's the cancellation policy if I need to cancel my reservation?",
+    "expected_answer": "A $25 per person fee applies for cancellations made within 24 hours of the reservation."
+  }
+]

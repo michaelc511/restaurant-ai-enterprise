@@ -1,0 +1,128 @@
+Menu App — RAG-Powered FAQ Agent
+Project Report
+
+================================================================
+INTRODUCTION
+================================================================
+
+The objective of this project is to build a Retrieval-Augmented
+Generation (RAG) pipeline that can answer natural-language questions
+about a restaurant's menu using its PDF menu documents as the source
+of truth.
+
+RAG is relevant here because a plain LLM has no knowledge of this
+specific restaurant's dishes, prices, or ingredients. By chunking the
+menu PDFs, embedding those chunks, and retrieving the most relevant
+ones for a given question, the LLM can ground its answers in the
+actual menu content instead of guessing or hallucinating.
+
+================================================================
+IMPLEMENTATION OVERVIEW
+================================================================
+
+Tools used:
+- Python (3.11, see "Conclusion" for why)
+- LangChain (langchain, langchain-openai, langchain-community,
+  langchain-classic, langchain-text-splitters)
+- FAISS (faiss-cpu) for the vector store
+- OpenAI API (chat + embeddings). I used this instead of Azure to make
+  it standalone and not dependent on the class lab.
+- python-dotenv for credential management
+- pypdf (via PyPDFLoader) for PDF parsing
+
+Pipeline summary:
+1. Load credentials from a shared .env file at the repo root
+2. Connect to OpenAI (or Azure OpenAI as a fallback) and run a quick
+   connectivity test prompt
+3. Prompt the user to choose a menu (sushi, steak, or italian)
+4. Load the chosen PDF with PyPDFLoader as we have 3 menu pdfs in the
+   'menus' folder
+5. Split it into chunks with RecursiveCharacterTextSplitter
+   (chunk_size=500, chunk_overlap=50)
+6. Embed the chunks and store them in a FAISS vectorstore
+7. Build a RetrievalQA chain (LLM + retriever) with source documents
+   returned
+8. Print chunking metrics (total chunks, average chunk size)
+9. Run a sample query and show the top matching result
+10. Loop, letting the user ask their own questions about the menu
+    until they type "q" to quit
+
+Setup for local dev:
+1. Create a Python 3.11 virtual environment inside this folder:
+     /opt/homebrew/bin/python3.11 -m venv venv
+2. Activate it:
+     source venv/bin/activate
+3. Install dependencies:
+     pip install -r requirements.txt
+4. Add your API key to the shared .env file at the repo root
+   (serverapp-llm-apis/.env):
+     OPENAI_API_KEY=your-key-here
+
+Running:
+1. From this folder, with the venv activated:
+     python3 menu_rag.py
+2. Or open menu_rag.ipynb in VS Code / Cursor, select the venv as
+   the kernel, and run all cells
+3. The metrics and sample query will run. Addtional questions will 
+   prompt the user for more info if needed.
+
+================================================================
+METRICS
+================================================================
+
+Total chunks: 31
+Average chunk size: 376
+Sample query: "What sushi rolls are on the menu?"
+Sample query output: What sushi rolls are on the menu?
+
+================================================================
+ADDITIONAL FEATURES
+================================================================
+
+- Converted the original prototype notebook into a standalone
+  menu_rag.py script (and back into a matching menu_rag.ipynb), so
+  the pipeline can run either as a notebook or a plain script
+- Wired up OpenAI API credentials via a shared .env file at the repo
+  root (instead of hardcoding a key in the script), with a fallback
+  path to Azure OpenAI if only an Azure key is set
+- Interactive cuisine selection (sushi/steak/italian) instead of a
+  single hardcoded menu
+- Interactive question loop so the user can ask multiple questions
+  about the selected menu in one run, exiting with "q"
+- Implemented all requirements and added a query for the user to 
+  question the menu items and restaurant information (hours, payments and more)
+
+================================================================
+CONCLUSION
+================================================================
+
+The main issue faced during this project was a Python version
+mismatch. The system's default Python was 3.9.6, but langchain-classic
+(which supplies RetrievalQA) requires Python 3.10 or higher. This
+meant the shared virtual environment used by other modules in this
+repo (../venv, built on 3.9.6) could not be reused here. The fix was
+installing Homebrew, installing Python 3.11 via Homebrew, and building
+a dedicated virtual environment for this module on that newer version.
+
+Insight gained: dependency version requirements can silently force an
+environment change partway through a project, so it's worth checking
+a package's minimum Python version before committing to a shared venv
+across multiple modules.
+
+Possible improvements:
+- Implement the FastAPI + Gradio/Streamlit stretch goals so the app
+  is usable outside the terminal
+- Support querying across multiple menus at once instead of picking
+  just one cuisine per run
+- Standardize on Azure OpenAI (as the course rubric specifies) rather
+  than falling back to plain OpenAI, once Azure credentials are
+  confirmed working
+
+Stretch Goals, Planned for the future, not yet implemented:
+- Wrap the RAG pipeline as an HTTP API using FastAPI, exposing an
+  endpoint (e.g. POST /ask) that accepts a cuisine + question and
+  returns the RAG answer as JSON
+- Build a Gradio and/or Streamlit front end on top of that API,
+  following the same pattern already used elsewhere in this repo
+  (see ../4.3.1), so the menu assistant is usable from a browser UI
+  instead of only the terminal

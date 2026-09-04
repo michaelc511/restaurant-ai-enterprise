@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What's in the Dragon Roll and how much does it cost?",
+    "expected_answer": "The Dragon Roll ($18.50) has BBQ freshwater eel and crisp cucumber inside, topped with thinly sliced avocado, sweet unagi glaze, and toasted sesame seeds."
+  },
+  {
+    "question": "What are your hours on Friday?",
+    "expected_answer": "Friday hours are 12:00 PM to 11:00 PM."
+  },
+  {
+    "question": "Is there a corkage fee if I bring my own wine?",
+    "expected_answer": "Yes, the corkage fee is $30 per 720ml bottle."
+  },
+  {
+    "question": "What vegan options do you have?",
+    "expected_answer": "Vegan options include the Sea Salt Edamame ($6.50), Spicy Garlic Edamame ($8.00), and the Yuzu Citrus Sorbet ($7.00) for dessert."
+  },
+  {
+    "question": "How much is valet parking?",
+    "expected_answer": "Valet parking is a $12 flat fee; validated garage parking across the street is also available for up to 3 hours."
+  }
+]
