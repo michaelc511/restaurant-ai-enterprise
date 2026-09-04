@@ -642,12 +642,11 @@ Authentication, Rate Limiting, Prompt Injection, Adversarial Robustness, Unit Te
 <h2 id="getting-started">Getting Started</h2>
 
 <h3 class="hl-title">1) Install requirements &amp; set up .env</h3>
-<pre class="cmd"><code>cd menu-4ap
-python3 -m venv venv                  # skip if venv/ already exists
+<pre class="cmd"><code>python3 -m venv venv                  # skip if venv/ already exists
 source venv/bin/activate
 pip install -r requirements.txt</code></pre>
-<p>Then create a <code>.env</code> file at the <strong>repo root</strong> (one level up from
-<code>menu-4ap/</code>, alongside this project folder) with one of the following:</p>
+<p>Then create a <code>.env</code> file at the <strong>repo root</strong> (alongside this
+<code>features.html</code> and <code>requirements.txt</code>) with one of the following:</p>
 <pre class="cmd"><code># OpenAI
 OPENAI_API_KEY=sk-...
 
@@ -658,30 +657,26 @@ AZURE_OPENAI_API_KEY=...</code></pre>
 <code>DEBUG_MODE</code> gets set later (step 6 below).</p>
 
 <h3 class="hl-title">2) Run with Python (CLI, no server)</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Builds/loads the FAISS vectorstores, then prompts you to pick a cuisine (sushi/steak/italian) and drops
 into an interactive Q&amp;A loop (<code>q</code> to quit). Good for a quick check, but this path never hits
 the <code>/ask</code> endpoint.</p>
 
 <h3 class="hl-title">3) Run with uvicorn (FastAPI server)</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 uvicorn menu_api:app --reload --port 8000</code></pre>
 <p>Leave this running in its own terminal — it's required before testing via curl/Postman/Streamlit/Gradio,
 since all of them send HTTP requests to <code>http://127.0.0.1:8000</code>.</p>
 
 <h3 class="hl-title">4) Test in Streamlit</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 streamlit run web-demo/streamlit_app.py</code></pre>
 <p>Requires the uvicorn server above to already be running. Opens a browser UI to pick a cuisine and ask
 questions against the <code>/ask</code> endpoint.</p>
 
 <h3 class="hl-title">5) Test in Gradio</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 web-demo/gradio_app.py</code></pre>
 <p>Also requires the uvicorn server above to already be running. Launches a Gradio UI in the browser, same
 idea as Streamlit, hitting the same <code>/ask</code> endpoint.</p>
@@ -740,8 +735,7 @@ No code to run for this one; it's a doc, not a runtime feature.</p>
 </ul>
 
 <p><strong class="hl-title">How to review:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-open project-notes.txt   # or any text editor</code></pre>
+<pre class="cmd"><code>open project-notes.txt   # or any text editor</code></pre>
 <p>Read the <code>INTRODUCTION</code> section — everything else in this file (and every other feature below) is
 built on top of that one idea.</p>
 
@@ -801,8 +795,7 @@ section.</p>
 </ul>
 
 <p><strong class="hl-title">How to run:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_rag.py</code></pre>
 <p>Or open <code>prototype/Demo_01_...ipynb</code> or <code>menu_rag.ipynb</code> in VS Code/Cursor (Jupyter +
 Python extensions), select this folder's <code>venv</code> as the kernel, and run all cells. Either way you get
@@ -1129,8 +1122,7 @@ selected provider is actually reachable before the app does any real work.</p>
 </ul>
 
 <p><strong class="hl-title">How to test:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 uvicorn menu_api:app --reload --port 8000</code></pre>
 <p>Watch the terminal at startup — you'll see the provider line and the connectivity test response before the
 "Application startup complete" log. Same output appears if you run <code>python3 menu_api.py</code> instead.
@@ -2013,8 +2005,7 @@ right after <code>build_qa_chain(cuisine)</code> runs for the cuisine you picked
 </ul>
 
 <p><strong class="hl-title">How to test:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine — the two chunk-stat lines print immediately after the vectorstore is built/loaded, before
 the sample answer. This only runs in the CLI path (not <code>/ask</code>), since that's the only place
@@ -2881,8 +2872,7 @@ date — which matters now that F8 feeds this same chain resolved dates for hour
 </ul>
 
 <p><strong class="hl-title">How to test:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 uvicorn menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "what is the capital of France"}'</code></pre>
@@ -3005,8 +2995,7 @@ endpoint.</p>
 </ul>
 
 <p><strong class="hl-title">How to test:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 uvicorn menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask \
   -H "Content-Type: application/json" \
@@ -3902,8 +3891,7 @@ call <code>/ask</code> over HTTP; neither talks to the RAG chain directly.</p>
 </ul>
 
 <p><strong class="hl-title">How to test:</strong></p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 uvicorn menu_api:app --reload --port 8000   # must be running first</code></pre>
 <pre class="cmd"><code>streamlit run web-demo/streamlit_app.py</code></pre>
 <p>or</p>
@@ -4389,8 +4377,7 @@ the <code>[F6] Tokens - ...</code> and <code>[F6] Session Total - ...</code> lin
 
 <p class="back-to-top"><a href="#f6">↑ Back to F6</a></p>
 <h3 class="hl-title" id="f6-9">F6:9 Usage Guide: How to run</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate                       # if using the project venv
+<pre class="cmd"><code>source venv/bin/activate                       # if using the project venv
 uvicorn menu_api:app --reload --port 8000       # starts the FastAPI server</code></pre>
 
 <div class="note">
@@ -4434,8 +4421,7 @@ Response body.</p>
 <p>The Response tab shows the full JSON, including <code>usage</code> and <code>session_totals</code>.</p>
 
 <p><strong>5) CLI</strong> — no server needed:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine, then after the sample query AND after every question you type in the interactive loop, two
 lines print: <code>[F6] Tokens - ...</code> (this call) and <code>[F6] Session Total - ...</code>
@@ -5904,8 +5890,7 @@ and prepended to the question rather than injected as structured messages.</p>
 <h3 class="hl-title" id="f7-4">F7:4 Testing Guide: How to test Ephemeral Chat Memory (F7)</h3>
 
 <p><strong>1) CLI</strong> — simplest, one continuous session per run:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <ol>
   <li>Pick a cuisine, e.g. <code>sushi</code>.</li>
@@ -7433,10 +7418,10 @@ console-only view can't provide. It's opt-in via three lines in the repo-root <c
 
 <pre class="cmd"><code>LANGSMITH_TRACING=true
 LANGSMITH_API_KEY=ls__...your-key-here...
-LANGSMITH_PROJECT=menu-4ap</code></pre>
+LANGSMITH_PROJECT=restaurant-ai-platform</code></pre>
 
 <p>Once those are set, every call — CLI or <code>/ask</code> — shows up automatically at
-<a href="https://smith.langchain.com">smith.langchain.com</a>, under the <strong><code>menu-4ap</code></strong>
+<a href="https://smith.langchain.com">smith.langchain.com</a>, under the <strong><code>restaurant-ai-platform</code></strong>
 project, with the retriever and LLM steps broken out per run. No dashboard setup beyond picking that project
 name; LangChain creates it the first time a trace is sent.</p>
 
@@ -7445,7 +7430,7 @@ name; LangChain creates it the first time a trace is sent.</p>
 <ol>
   <li>Log in at <a href="https://smith.langchain.com">smith.langchain.com</a> and open the
   <strong>Projects</strong> list in the left sidebar.</li>
-  <li>Click into <strong><code>menu-4ap</code></strong> — every call made since <code>LANGSMITH_TRACING</code>
+  <li>Click into <strong><code>restaurant-ai-platform</code></strong> — every call made since <code>LANGSMITH_TRACING</code>
   was turned on lives here, newest run at the top.</li>
   <li>Each row is one <code>chain.invoke()</code> call (one CLI question, or one <code>/ask</code> request).
   The columns show <strong>latency</strong> and <strong>token cost</strong> at a glance, so a slow or
@@ -7580,8 +7565,7 @@ lines (CLI path only), same pattern as In-Code Token &amp; Cost Accounting (F6)'
 <h3 class="hl-title" id="f9-4">F9:4 Testing Guide: How to test F9</h3>
 
 <p><strong>1) Local metrics only</strong> — no external account needed:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine and ask a question — right after the In-Code Token &amp; Cost Accounting (F6)/Relational DB
 &amp; Text-to-SQL Tool (F11) lines, look for:</p>
@@ -7601,11 +7585,11 @@ python3 menu_api.py</code></pre>
   <li>Add to the repo-root <code>.env</code> (same file as <code>OPENAI_API_KEY</code>):
 <pre class="cmd"><code>LANGSMITH_TRACING=true
 LANGSMITH_API_KEY=ls__...your-key-here...
-LANGSMITH_PROJECT=menu-4ap</code></pre>
+LANGSMITH_PROJECT=restaurant-ai-platform</code></pre>
   A Personal Access Token from <a href="https://smith.langchain.com">smith.langchain.com</a> is the right key
   type here (local single-developer use) — Service Keys are for shared/production integrations.</li>
   <li>Restart uvicorn or the CLI, and make a request (curl, CLI question, or either web UI).</li>
-  <li>Open the <code>menu-4ap</code> project at <code>smith.langchain.com</code> — a new run appears with the
+  <li>Open the <code>restaurant-ai-platform</code> project at <code>smith.langchain.com</code> — a new run appears with the
   retriever and LLM steps broken out, matching the local <code>[F9]</code>/<code>trace</code> numbers.</li>
 </ol>
 <p>Without those three env vars set, everything above still works exactly the same — LangSmith tracing is
@@ -8882,8 +8866,7 @@ This has to be a genuine <code>BaseRetriever</code> subclass, not a bare functio
 
 <p class="back-to-top"><a href="#f10">↑ Back to F10</a></p>
 <h3 class="hl-title" id="f10-4">F10:4 Testing Guide: How to test Cross-Encoder Re-ranking (F10)</h3>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine and ask a question. There's no separate debug print for this one (re-ranking happens silently inside retrieval) — the way to actually see the effect is to compare answer quality/relevance before and after, since the underlying mechanism is: FAISS retrieves a handful of candidate chunks per question, and the cross-encoder picks the best <code>top_k</code> (default 3) of those to actually hand to the LLM.</p>
 <p>To directly verify the re-ranking mechanics without spending any API tokens, this was tested standalone during development with a stub retriever returning 3 fake passages (an irrelevant "weather" sentence plus two menu-relevant ones) — the reranker consistently pushed the irrelevant one out and ordered the relevant two by actual query relevance, and a full <code>RetrievalQA</code> chain construction with a fake LLM confirmed <code>RerankingRetriever</code> passes Pydantic validation and works end-to-end through the real chain-building code path.</p>
@@ -9986,8 +9969,7 @@ Neither UI currently handles the <code>tt</code> shortcut gracefully — both un
 <h3 class="hl-title" id="f11-4">F11:4 Testing Guide: How to test Relational DB &amp; Text-to-SQL Tool (F11)</h3>
 
 <p><strong>1) CLI</strong> — writes + prints on every question:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine, ask a question. After the sample query and every interactive question, you'll see
 <code>[F6] Tokens - ...</code> (this call) followed by <code>[F11] Session Total (DB) - ...</code>
@@ -11153,9 +11135,9 @@ account credential.</p>
       key</strong>.</li>
       <li>Select <strong>JSON</strong> and click <strong>Create</strong> to download your key file.</li>
       <li>Open the downloaded file, copy the <code>"client_email"</code> address, and place the file inside
-      this project as <code>menu-4ap/secrets/service_account.json</code> — scoped inside the project (not the
-      shared repo-root <code>.env</code> pattern), since this credential is specific to this one feature. See the
-      note below about <code>.gitignore</code>.</li>
+      this project as <code>secrets/service_account.json</code>, and add <code>secrets/</code> to
+      <code>.gitignore</code> if it isn't already — a service-account key is a real credential, same
+      as <code>.env</code>.</li>
     </ul>
   </li>
   <li><strong>Share the Google Sheet:</strong>
@@ -11181,12 +11163,11 @@ implementation, two consumers" pattern already used for In-Code Token &amp; Cost
 <code>UsageInfo</code> and Cross-Encoder Re-ranking (F10)'s <code>wrap_with_reranking</code>.</p>
 
 <p><strong>Credential path:</strong> <code>secrets/service_account.json</code>, resolved via
-<code>Path(__file__).resolve().parent.parent</code> rather than a bare relative string — scoped inside
-<code>menu-4ap/</code> (not the shared repo-root <code>.env</code> pattern), since this credential is specific to
-this one feature, unlike <code>OPENAI_API_KEY</code> which multiple sibling projects in the repo share. The
-<code>secrets/</code> directory is <code>.gitignore</code>d at the repo root — a service account private key is a
-real credential leak risk, same class of concern as an API key, just worse since it doesn't expire the way a
-short-lived token would.</p>
+<code>Path(__file__).resolve().parent.parent</code> rather than a bare relative string, so it works the same
+whether <code>core/sheets.py</code> is imported from the project root or from <code>api/mcp_server.py</code>
+one directory down. The <code>secrets/</code> directory is <code>.gitignore</code>d at the repo root — a
+service account private key is a real credential leak risk, same class of concern as an API key, just worse
+since it doesn't expire the way a short-lived token would.</p>
 
 <p><strong>Function: <code>_get_client() -&gt; gspread.Client</code></strong> (in <code>core/sheets.py</code>) —
 authenticates once and caches the client at module level, the same "cache once, reuse after" pattern
@@ -11227,7 +11208,7 @@ reality after <code>test_mcp_connection.py</code> caught the mismatch as a live 
   a local MCP client like Claude Desktop launches a server — it spawns the script as a subprocess and talks to it
   over its stdin/stdout, not HTTP.</li>
   <li><strong>Path gotcha, fixed:</strong> running <code>python3 api/mcp_server.py</code> directly only puts
-  <code>api/</code> on <code>sys.path</code>, not <code>menu-4ap/</code>, so <code>from core.sheets import ...</code>
+  <code>api/</code> on <code>sys.path</code>, not the project root, so <code>from core.sheets import ...</code>
   would fail with <code>ModuleNotFoundError</code> for any real MCP client launching it this way (confirmed by
   actually running <code>test_mcp_connection.py</code> before the fix). <code>api/mcp_server.py</code> now
   inserts the project root onto <code>sys.path</code> at the top of the file, before the <code>core</code>
@@ -12066,8 +12047,7 @@ same as they already do for <code>/ask</code>:</p>
 
 <p><strong>1) Standalone MCP verification</strong> — spawns the real server over stdio and calls both tools
 against the live sheet, exactly like a real MCP client would:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 test_mcp_connection.py</code></pre>
 <p>Confirms both tools are discovered (name + description, generated from the docstrings) and that each returns
 real rows from the <code>sushi</code> spreadsheet — including a day-filtered call
@@ -12082,8 +12062,7 @@ curl "http://127.0.0.1:8000/hours?date=2026-09-07"</code></pre>
 confirm the change shows up immediately, with no restart needed (nothing is cached beyond the auth session).</p>
 
 <p><strong>3) CLI</strong> — no server needed, calls <code>core/sheets.py</code> directly:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 menu_api.py</code></pre>
 <p>Pick a cuisine, then at the question prompt type <code>specials</code> or <code>hours</code> instead of a real
 question — each prints the live rows and loops back for another question, same as <code>tt</code> does for
@@ -12581,7 +12560,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 <dd><code>Path(__file__).resolve().parent.parent / "secrets" / "service_account.json"</code> — resolved relative to
 this module's own file location, not the process's current working directory. This is deliberate: the same
 authentication has to work identically whether the module is imported by <code>menu_api.py</code> (cwd is
-<code>menu-4ap/</code>), run standalone as <code>python3 api/mcp_server.py</code> (cwd could be anywhere), or
+the project root), run standalone as <code>python3 api/mcp_server.py</code> (cwd could be anywhere), or
 spawned directly by an MCP client as a subprocess (cwd is whatever the client happens to use).</dd>
 <dt>sheets.py L17-18 <code>DAILY_SPECIALS_TAB = "specials"</code> / <code>HOURS_AND_EVENTS_TAB = "dates"</code></dt>
 <dd>Named constants instead of inline string literals repeated at each call site — and the comments flag a real
@@ -12952,8 +12931,7 @@ Modular Engine Strategy Factory (F12) doesn't replace any prior work — <code>P
 <h3 class="hl-title" id="f12-sec4">F12:4 Testing Guide: How to test Modular Engine Strategy Factory (F12) / Parallel Entry Point (F12.1)</h3>
 
 <p><strong>1) CLI</strong> — same interactive loop as <code>menu_api.py</code>, answering through the factory:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 engine_api.py</code></pre>
 <p>Pick a cuisine and, if <code>DEBUG_MODE</code> is on, an engine (Enter for <code>DEFAULT_ENGINE</code>, or
 <code>2</code> for LangGraph), then ask a question. Run <code>python3 menu_api.py</code> separately (before or
@@ -13981,8 +13959,7 @@ The off-topic HTTP test caught a real bug this way: <code>engine_api.py</code>'s
 <h3 class="hl-title" id="f13-4">F13:4 Testing Guide: How to test LangGraph State Machine Engine (F13)</h3>
 
 <p><strong>Setup</strong> — install the new dependency (already added to <code>requirements.txt</code>):</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 pip install langgraph</code></pre>
 
 <p><strong>1) CLI, as the default engine</strong> — the CLI always uses <code>DEFAULT_ENGINE</code>, with no
@@ -13991,8 +13968,7 @@ is on, the interactive prompt lets you pick <code>2) LangGraph</code> for one ru
 <code>.env</code> at all — otherwise, add one line to the repo-root <code>.env</code> (same file as
 <code>OPENAI_API_KEY</code>):</p>
 <pre class="cmd"><code>DEFAULT_ENGINE=langgraph</code></pre>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python3 engine_api.py</code></pre>
 <p>Pick a cuisine (and, in <code>DEBUG_MODE</code>, engine <code>2</code>) and ask a question — the CLI now
 answers through the graph instead of <code>PlainRagEngine</code>'s single chain. Remove the <code>.env</code>
@@ -14971,8 +14947,7 @@ live provider and hit the F17:8 cache bug in the first place.</p>
 
 <p><strong class="hl-title">1) Offline unit tests</strong> — the scoring/loading logic, with the LLM judge mocked
 out (same shape as Unit Tests for Core Modules (F23)'s suite): no <code>.env</code>, no API key, no network.</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 pytest tests/test_evaluation.py -v</code></pre>
 
 <p><strong class="hl-title">2) The real eval run</strong> — this one is <em>not</em> offline: every fixture
@@ -14980,8 +14955,7 @@ question goes through a real <code>get_engine("plain_rag").answer(...)</code> ca
 completion round trip) and then three more chat completion calls to the judge LLM, so it needs the same
 <code>OPENAI_API_KEY</code>/<code>AZURE_OPENAI_API_KEY</code> in the repo-root <code>.env</code> every other
 engine uses:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 python -m evaluation.run_evals</code></pre>
 <p>Runs all 15 fixture questions (5 per cuisine) against the <code>plain_rag</code> engine. Narrower runs while
 iterating:</p>
@@ -15788,8 +15762,7 @@ and <code>rerank_documents()</code>'s cross-encoder re-scoring.</p>
 <h4>How to Run It</h4>
 
 <p>No <code>.env</code>, no API key, no running server — just the venv and pytest:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 pip install -r requirements.txt   # pulls in pytest
 pytest tests/ -v</code></pre>
 <p>That runs all 41 tests and finishes in well under a second, since nothing here waits on a network call, a
@@ -15928,8 +15901,7 @@ functions that take their dependencies as arguments (<code>db_path</code>, <code
 
 <p><strong class="hl-title">1) Install and run the whole suite</strong> — no <code>.env</code>, no API key, no
 running server:</p>
-<pre class="cmd"><code>cd menu-4ap
-source venv/bin/activate
+<pre class="cmd"><code>source venv/bin/activate
 pip install -r requirements.txt
 pytest tests/ -v</code></pre>
 <p>Expect <code>41 passed</code> in well under a second — the suite touches nothing outside the process
