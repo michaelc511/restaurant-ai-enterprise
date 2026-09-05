@@ -68,11 +68,11 @@
   .pyhl .c1 { color: #959077; } /* comment */
   .pyhl .k  { color: #66D9EF; } /* keyword: def, class, return, if, with, ... */
   .pyhl .kn { color: #FF4689; } /* keyword: import, from */
-  .pyhl .mi, .pyhl .mf { color: #AE81FF; } /* numbers */
-  .pyhl .nb, .pyhl .nn, .pyhl .w, .pyhl .bp { color: #F8F8F2; } /* builtin types, module names, whitespace, self */
+  .pyhl .mi, .pyhl .mf, .pyhl .l { color: #AE81FF; } /* numbers, YAML literal scalars */
+  .pyhl .nb, .pyhl .nn, .pyhl .w, .pyhl .bp, .pyhl .nv { color: #F8F8F2; } /* builtin types, module names, whitespace, self, YAML name-variable */
   .pyhl .nc, .pyhl .nd, .pyhl .nf { color: #A6E22E; } /* class name, decorator, function name */
-  .pyhl .o, .pyhl .ow { color: #FF4689; } /* operators: ->, +=, and/or/not/in */
-  .pyhl .s1, .pyhl .s2, .pyhl .sa, .pyhl .sd, .pyhl .si { color: #E6DB74; } /* strings, docstrings, f-string braces */
+  .pyhl .o, .pyhl .ow, .pyhl .nt { color: #FF4689; } /* operators: ->, +=, and/or/not/in; YAML key (name.tag) */
+  .pyhl .s1, .pyhl .s2, .pyhl .sa, .pyhl .sd, .pyhl .si, .pyhl .s { color: #E6DB74; } /* strings, docstrings, f-string braces, YAML strings */
   .pyhl .se { color: #AE81FF; } /* string escapes: \n */
   .pyhl .p  { color: #F8F8F2; } /* punctuation: (), [], :, , */
   .pyhl .kc { color: #AE81FF; } /* keyword constants: True, False, None */
@@ -460,7 +460,7 @@ benchmarking.</p>
 trusted" — gating what questions get answered and what changes get shipped.</p>
 <ul>
   <li><a href="#f19">F19 — Query Guardrails &amp; Intent Gating</a>: A Pydantic-structured classifier that labels each question's intent up front, replacing ad hoc keyword routing with consistent, measurable off-topic rejection.</li>
-  <li><a href="#f20">F20 — CI/CD Eval Regression Gate</a>: Automated GitHub Actions workflows executing evaluation suites on pull requests to block merges if accuracy or faithfulness regresses.</li>
+  <li><strong><a href="#f20">F20 — CI/CD Eval Regression Gate</a>:</strong> Automated GitHub Actions workflow executing Automated RAG Evaluation Suite (F17) on every pull request to block merges if accuracy or faithfulness regresses. <em>Done</em> — see F20's full write-up below.</li>
 </ul>
 
 <h3>Phase 6: Shelby Cobra (Security &amp; Quality Hardening)</h3>
@@ -474,9 +474,9 @@ adversarial input, and proving the supporting code holds up under test, independ
 
 <div class="note">
 <strong>Status note:</strong> bold items above are actually built and verified — Phases 1 and 2 (F0&ndash;F11) in
-full, plus F12/F12.1, F13, F16, F17, and F23. The unbolded items (F14, F15, F18&ndash;F22) are detailed, planned
-write-ups — architecture and intent decided, not yet implemented — same distinction the individual F-sections
-below make in their own Status lines.
+full, plus F12/F12.1, F13, F16, F17, F20, and F23. The unbolded items (F14, F15, F18, F19, F21, F22) are detailed,
+planned write-ups — architecture and intent decided, not yet implemented — same distinction the individual
+F-sections below make in their own Status lines.
 </div>
 
 <h2 id="ai-dev-areas">Main Areas of AI Dev</h2>
@@ -15565,48 +15565,371 @@ are consistent and measurable instead of ad hoc.</div>
 
 <p class="f-toc">
 Jump to:
-<a href="#f20-1">F20:1 CI/CD Eval Regression Gate: TBA</a> ·
-<a href="#f20-2">F20:2 Architecture Summary: TBA</a> ·
-<a href="#f20-3">F20:3 Integration Guide: TBA</a> ·
-<a href="#f20-4">F20:4 Testing Guide: TBA</a> ·
-<a href="#f20-5">F20:5 Source Code Reference: TBA</a> ·
-<a href="#f20-6">F20:6 Source Code Reference: TBA</a> ·
-<a href="#f20-7">F20:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f20-8">F20:8 Technical Deep Dive: TBA</a>
+<a href="#f20-1">F20:1 CI/CD Eval Regression Gate</a> ·
+<a href="#f20-2">F20:2 Architecture Summary</a> ·
+<a href="#f20-3">F20:3 Integration Guide</a> ·
+<a href="#f20-4">F20:4 Testing Guide</a> ·
+<a href="#f20-5">F20:5 Source Code Reference (.github/workflows/eval_gate.yml)</a> ·
+<a href="#f20-6">F20:6 What a Real Gate Run Looks Like</a> ·
+<a href="#f20-7">F20:7 Line-by-Line Deep Dive</a> ·
+<a href="#f20-8">F20:8 Technical Deep Dive</a>
 </p>
 
-<h3 id="f20-1">F20:1 CI/CD Eval Regression Gate: TBA</h3>
-
-<h3 id="f20-2">F20:2 Architecture Summary: TBA</h3>
-
-<h3 id="f20-3">F20:3 Integration Guide: TBA</h3>
-
-<h3 id="f20-4">F20:4 Testing Guide: TBA</h3>
-
-<h3 id="f20-5">F20:5 Source Code Reference: TBA</h3>
-
-<h3 id="f20-6">F20:6 Source Code Reference: TBA</h3>
-
-<h3 id="f20-7">F20:7 Line-by-Line Deep Dive: TBA</h3>
-
-<h3 id="f20-8">F20:8 Technical Deep Dive: TBA</h3>
-
 <div class="note">
-<strong>Status: Not started (planned). Why this matters, in plain English:</strong> right now, nothing stops a
-change that quietly makes answers worse from being merged and shipped. This wires Automated RAG Evals Harness
-(F17)'s eval suite into the actual build pipeline, so every pull request is automatically checked for answer-quality
-regressions before it can be merged — the same way a broken unit test already blocks a bad code change.</div>
+<strong>Status: Implemented.</strong> Every pull request now runs Unit Tests for Core Modules (F23)'s pytest suite,
+then Automated RAG Evals Harness (F17)'s real eval run, automatically — no one has to remember to run either by
+hand before merging, and a merge only stays blocked if a repository maintainer has separately turned on branch
+protection (see <a href="#f20-3">F20:3</a>).</div>
 
 <p>Maps to <code>checklist.csv</code> day 20, "CI/CD Eval Regression Gate" — target location
 <code>.github/workflows/eval_gate.yml</code>.</p>
 
-<p><strong>What we'll build:</strong></p>
+<table class="blog-box">
+<tr><td>
+
+<p class="back-to-top"><a href="#f20">↑ Back to F20</a></p>
+<h3 id="f20-1">F20:1 CI/CD Eval Regression Gate: Turning F17's Eval Suite From "Available" Into "Enforced"</h3>
+
+<p>Automated RAG Evals Harness (F17) already turns "did that change help or hurt?" into a number — but only for
+whoever remembers to type <code>python -m evaluation.run_evals</code> before merging. Nothing stops a pull request
+that quietly makes answers worse from being merged and shipped anyway, the same gap Unit Tests for Core Modules
+(F23) closed for the database/sheets/re-ranking modules but couldn't close for answer <em>quality</em>, since F23's
+suite mocks the LLM out entirely (see F23's own testing guide). CI/CD Eval Regression Gate closes that last gap:
+every pull request now runs both suites automatically, in GitHub's cloud, the moment it's opened or updated — no
+local step for a contributor to forget.</p>
+
+<h4>The Big Picture: Two Jobs, Chained</h4>
+
 <ul>
-  <li>a GitHub Actions workflow that runs <code>pytest</code> plus the Ragas CLI on every pull request</li>
-  <li>a defined quality threshold — the build fails if eval scores drop below it, not just if the code fails to run</li>
-  <li>turns "is this still good?" into an automatic build-time gate instead of a manual review judgment call</li>
-  <li>the closing piece that makes Automated RAG Evals Harness (F17) actually enforced, not just available to run by hand</li>
+  <li><strong><code>unit-tests</code></strong> — checks out the repo, installs <code>requirements.txt</code>, runs
+  <code>pytest</code> (Unit Tests for Core Modules (F23)'s 48 tests). Fully mocked, no API key, no network — runs
+  on every PR, including ones opened from a fork.</li>
+  <li><strong><code>eval-gate</code></strong> — only starts once <code>unit-tests</code> finishes green
+  (<code>needs: unit-tests</code>). Installs the same dependencies, then runs
+  <code>python -m evaluation.run_evals</code> — Automated RAG Evals Harness (F17)'s real suite, a genuine
+  embeddings + chat-completion round trip against OpenAI for all 15 fixture questions across all three cuisines.
+  Skipped entirely on a fork's pull request, since GitHub never exposes this repo's <code>OPENAI_API_KEY</code>
+  secret to a fork-triggered run (see <a href="#f20-7">F20:7</a>).</li>
 </ul>
+
+<p>Gating one job on the other isn't just cost-saving (real LLM calls cost real money and take real time — see
+<a href="#f20-8">F20:8</a>) — it's a correctness call: if <code>tests/test_evaluation.py</code> is failing, the
+scoring logic itself (<code>evaluation/scoring.py</code>'s thresholds, <code>EvalScore.passed</code>'s
+all-three-must-pass rule) can't be trusted, so a green eval run wouldn't mean anything yet.</p>
+
+<h4>What Each Job Actually Runs</h4>
+<ul>
+  <li><code>actions/checkout@v4</code> — clones the PR's branch onto the runner</li>
+  <li><code>actions/setup-python@v5</code> (<code>python-version: "3.11"</code>, matching the local
+  <code>venv/pyvenv.cfg</code>) with <code>cache: pip</code> — caches <code>requirements.txt</code>'s resolved
+  wheels between runs so repeat PRs don't redownload FAISS/flashrank/langchain from scratch every time</li>
+  <li><code>pip install -r requirements.txt</code> — the exact same dependency set every engine (Modular Engine
+  Strategy Factory (F12), LangGraph State Machine Engine (F13)) already runs against locally, not a
+  CI-only subset</li>
+  <li><code>pytest</code> / <code>python -m evaluation.run_evals</code> — the same two commands F23's and F17's own
+  Testing Guides already tell a human to run by hand; the workflow doesn't reimplement either, it just automates
+  invoking them</li>
+</ul>
+
+<p>For the full, step-by-step workflow definition, please refer to the GitHub Repository &amp; Code Details link.</p>
+
+<p class="tags">Tags: CI/CD, GitHub Actions, Quality Gate, F20</p>
+
+</td></tr>
+</table>
+
+<div class="toolbox">
+<strong>Tools &amp; Libraries</strong> (per <code>checklist.csv</code>'s "Primary Tools &amp; Libraries" for #20):
+<ul>
+  <li><code>GitHub Actions</code> — <span class="used">used,</span> as <code>.github/workflows/eval_gate.yml</code>
+  — no separate CI product evaluated or needed, since the repo is already hosted on GitHub.</li>
+  <li><code>pytest</code> — <span class="used">used,</span> exactly as Unit Tests for Core Modules (F23) already
+  runs it locally — the <code>unit-tests</code> job, no new configuration beyond installing it.</li>
+  <li><code>Ragas CLI</code> — <span class="not-used">not used,</span> for the same reason Automated RAG Evals
+  Harness (F17) didn't add the <code>ragas</code> package in the first place: it backtracks this repo's
+  <code>openai</code>/<code>langchain-openai</code> pins hard enough to break every engine sharing the venv — see
+  F17:2's toolbox and F17:8 for the confirmed dependency resolution. F20 gates on <code>evaluation/run_evals.py</code>'s
+  exit code instead, which is already shaped like a CLI's pass/fail exit code without needing a CLI.</li>
+</ul>
+</div>
+
+<h3 id="f20-2">F20:2 Architecture Summary: One New File, Nothing Else Touched</h3>
+
+<p>No production code changed to make this possible — <code>evaluation/run_evals.py</code>'s <code>main()</code>
+(F17) already exits <code>0</code> on an all-pass run and <code>1</code> otherwise, and <code>pytest</code>'s exit
+code needs no extra wiring at all. GitHub Actions already treats a non-zero exit code from any <code>run:</code>
+step as a failed job, and a failed job as a failed check on the PR — the entire gate is one YAML file describing
+which commands to run and in what order, not new application logic.</p>
+
+<ul>
+  <li><strong><code>.github/workflows/eval_gate.yml</code></strong> — the only new file. Two jobs
+  (<code>unit-tests</code>, <code>eval-gate</code>), triggered on <code>pull_request</code> targeting
+  <code>main</code> and on <code>workflow_dispatch</code> (a manual "Run workflow" button in GitHub's UI, for
+  checking the gate without opening a PR).</li>
+</ul>
+
+<h4>Why <code>eval-gate</code> Is Conditioned On the PR's Source Repo</h4>
+
+<p><code>if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name ==
+'workflow_dispatch'</code> — GitHub Actions never hands a base repository's secrets to a workflow run triggered by
+a <em>fork's</em> pull request (a deliberate GitHub security boundary, not a choice made here); without this guard,
+<code>eval-gate</code> would still attempt to run on a fork PR, find <code>OPENAI_API_KEY</code> empty, and fail
+every fork contribution's check for a reason that has nothing to do with their change. The condition lets
+<code>unit-tests</code> — which needs no secret — still run and gate every PR including fork ones, while
+<code>eval-gate</code> only runs where the secret is actually available: same-repo branches, and manual
+<code>workflow_dispatch</code> runs (always triggered from within the repo, never from a fork).</p>
+
+<h3 id="f20-3">F20:3 Integration Guide: What Actually Got Touched</h3>
+
+<ul>
+  <li><code>.github/workflows/eval_gate.yml</code> (new) — the workflow itself, see <a href="#f20-5">F20:5</a> for
+  the full file.</li>
+  <li><code>evaluation/run_evals.py</code>, <code>evaluation/scoring.py</code>, <code>tests/</code> — read, not
+  modified. The gate calls the exact commands Automated RAG Evals Harness (F17) and Unit Tests for Core Modules
+  (F23) already defined; nothing about either suite needed to change to become CI-runnable.</li>
+  <li><code>requirements.txt</code> — unchanged. No new dependency: <code>pytest</code> was already in it (F23),
+  and the eval harness reuses what F17 already installed.</li>
+</ul>
+
+<h4>One-Time Setup This Repo Still Needs, Outside the Codebase</h4>
+
+<p>A workflow file alone doesn't fully activate the gate — two settings live in GitHub's UI, not in git, so they
+survive independently of any commit:</p>
+
+<ul>
+  <li><strong>Add the <code>OPENAI_API_KEY</code> repository secret</strong> — Settings → Secrets and variables →
+  Actions → New repository secret, same key name the local <code>.env</code> file already uses in
+  <code>core/llm.py</code>'s <code>build_llm_and_embeddings()</code>. Without it, <code>eval-gate</code> runs and
+  fails immediately on the same <code>RuntimeError("Set OPENAI_API_KEY or AZURE_OPENAI_API_KEY...")</code> a local
+  run would raise with no <code>.env</code> present — not a bug in the workflow, just the secret not being set yet.</li>
+  <li><strong>Turn on branch protection for <code>main</code></strong> — Settings → Branches → add a rule requiring
+  the <code>unit-tests</code> and <code>eval-gate</code> status checks to pass before merging. Until this is
+  turned on, the workflow still runs and still reports a red/green check on every PR, but a red check is purely
+  informational — it doesn't block the "Merge pull request" button. This is the one part of F20 that genuinely
+  can't be committed as a file; it's a one-time click-through (or a one-time <code>gh api</code> call) a repository
+  maintainer does once.</li>
+</ul>
+
+<h3 class="hl-title" id="f20-4">F20:4 Testing Guide: How to Verify CI/CD Eval Regression Gate (F20)</h3>
+
+<p><strong class="hl-title">1) Prove the underlying commands pass locally first</strong> — the exact two commands
+the workflow runs, in the exact order it runs them:</p>
+<pre class="cmd"><code>source venv/bin/activate
+pytest                          # unit-tests job
+python -m evaluation.run_evals  # eval-gate job (needs OPENAI_API_KEY in .env)</code></pre>
+<p>A real local run of the first command: <code>48 passed, 1 warning in 0.99s</code> — all of Unit Tests for Core
+Modules (F23)'s suite, unchanged by anything F20 adds. The second command's real output is already captured in
+Automated RAG Evals Harness (F17)'s own Testing Guide (F17:4) — <a href="#f20-6">F20:6</a> below reproduces the
+relevant lines in the context of what shows up in the Actions log specifically.</p>
+
+<p><strong class="hl-title">2) Validate the workflow file itself without pushing</strong> — YAML syntax and
+GitHub's own schema, both checkable before ever opening a PR:</p>
+<pre class="cmd"><code>python3 -c "import yaml; yaml.safe_load(open('.github/workflows/eval_gate.yml'))"  # parses clean</code></pre>
+
+<p><strong class="hl-title">3) See it actually gate a PR</strong> — push a branch, open a pull request against
+<code>main</code>, and the "Checks" section on the PR shows both jobs running automatically: <code>unit-tests</code>
+first, then <code>eval-gate</code> once it's green. A <code>workflow_dispatch</code> run (Actions tab → "Eval
+Regression Gate" → "Run workflow") exercises the exact same two jobs without needing an open PR at all — useful
+for checking the gate still works after a dependency bump, independent of any specific change under review.</p>
+
+<div class="note">
+<strong>Verification:</strong> ran <code>pytest</code> locally (the exact command <code>unit-tests</code> runs) —
+<code>48 passed, 1 warning in 0.99s</code>, confirming the job's only step succeeds against this repo's current
+state. <code>eval_gate.yml</code> parses clean with <code>yaml.safe_load</code>. The <code>eval-gate</code> job's
+own command (<code>python -m evaluation.run_evals</code>) was already verified live, against all three cuisines'
+real menus, in Automated RAG Evals Harness (F17)'s own Testing Guide — F20 doesn't change that command, only
+automates calling it, so that verification carries over rather than needing to be re-spent here. What hasn't been
+exercised yet from inside this session: an actual GitHub-hosted run, since that needs the
+<code>OPENAI_API_KEY</code> repository secret and branch protection set up in GitHub's UI first (<a
+href="#f20-3">F20:3</a>) — a one-time step for whoever administers this repository on GitHub.
+</div>
+
+<p class="back-to-top"><a href="#f20">↑ Back to F20</a></p>
+<h3 id="f20-5">F20:5 Source Code Reference: .github/workflows/eval_gate.yml — full file</h3>
+<div class="code-block">
+<div class="code-block-title"><span>.github/workflows/eval_gate.yml</span><span class="role">Defines the two-job CI gate (F20) — pytest (F23) then the live eval suite (F17) — 48 lines</span></div>
+<div class="pyhl"><table class="pyhltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><span class="c1"># F20: CI/CD Eval Regression Gate.</span>
+<span class="c1">#</span>
+<span class="c1"># Two jobs, chained:</span>
+<span class="c1">#   1. unit-tests - the F23 pytest suite (tests/). Fully mocked, no API key, no network.</span>
+<span class="c1">#      Runs on every PR, including ones from forks.</span>
+<span class="c1">#   2. eval-gate  - only after unit-tests passes. Runs the F17 harness</span>
+<span class="c1">#      (`python -m evaluation.run_evals`) against real ground-truth fixtures through a real</span>
+<span class="c1">#      OpenAI call, and fails the build if any question drops below scoring.py's thresholds.</span>
+<span class="c1">#      Skipped on fork PRs, which don't have access to this repo's OPENAI_API_KEY secret -</span>
+<span class="c1">#      GitHub Actions never exposes a base repo's secrets to a workflow run triggered by a</span>
+<span class="c1">#      fork's pull request.</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Eval Regression Gate</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"> </span><span class="c1"># manual "Run workflow" button, for checking the gate without opening a PR</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">unit-tests</span><span class="p">:</span><span class="w"> </span><span class="c1"># F23</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v5</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">"3.11"</span>
+<span class="w">          </span><span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip</span>
+<span class="w">          </span><span class="nt">cache-dependency-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requirements.txt</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest</span>
+
+<span class="w">  </span><span class="nt">eval-gate</span><span class="p">:</span><span class="w"> </span><span class="c1"># F17, gated on F23 passing first - a broken unit means the eval numbers can't be trusted either</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unit-tests</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch'</span>
+<span class="w">    </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OPENAI_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.OPENAI_API_KEY }}</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v5</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">"3.11"</span>
+<span class="w">          </span><span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip</span>
+<span class="w">          </span><span class="nt">cache-dependency-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requirements.txt</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
+<span class="w">      </span><span class="c1"># menus/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh</span>
+<span class="w">      </span><span class="c1"># FAISS index from PDF on every run - see core/vectorstore.py's get_retriever().</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m evaluation.run_evals</span>
+</pre></div></td></tr></table></div>
+</div>
+
+<h3 id="f20-6">F20:6 What a Real Gate Run Looks Like</h3>
+
+<p><strong class="hl-title">The <code>unit-tests</code> job</strong> — a real local run of the exact command it
+executes:</p>
+<pre class="cmd"><code>$ pytest -q
+................................................                         [100%]
+48 passed, 1 warning in 0.99s</code></pre>
+
+<p><strong class="hl-title">The <code>eval-gate</code> job</strong> — its one step is
+<code>python -m evaluation.run_evals</code>, the identical command whose real output against the live
+<code>plain_rag</code> engine and the real sushi menu is already shown in full in Automated RAG Evals Harness
+(F17)'s Testing Guide (<a href="#f17-4">F17:4</a>). The shape that matters for this gate specifically is the last
+line of that output:</p>
+<pre class="cmd"><code>4/5 passed</code></pre>
+<p>and the process exit code behind it — <code>sys.exit(0 if all_passed else 1)</code> in
+<code>evaluation/run_evals.py</code>'s <code>main()</code>. A <code>4/5</code> result exits <code>1</code>, which
+GitHub Actions reports as a failed step, which marks the <code>eval-gate</code> job — and therefore the PR's
+"Eval Regression Gate" check — red. Nothing about F20 changes what F17 scores or how; F20's only contribution is
+turning that exit code into a check on a pull request instead of a number a person has to remember to look at.</p>
+
+<h3 id="f20-7">F20:7 Line-by-Line Deep Dive: What eval_gate.yml Is Actually Doing</h3>
+
+<p><strong>.github/workflows/eval_gate.yml</strong> (full file at <a href="#f20-5">F20:5</a>):</p>
+<ul>
+  <li><strong>Lines 13&ndash;15 (<code>on:</code>)</strong> &mdash; <code>pull_request: branches: [main]</code>
+  scopes the trigger to PRs <em>targeting</em> <code>main</code>, not every push to every branch; pushing commits
+  to an open PR re-triggers the same two jobs automatically, which is what makes this a true gate rather than a
+  one-time check at PR open. <code>workflow_dispatch: {}</code> is a second, independent trigger — an empty input
+  set, since this gate needs no parameters to run the same thing a PR run would.</li>
+  <li><strong>Line 24 (<code>cache: pip</code>)</strong> &mdash; keys the cache off
+  <code>cache-dependency-path: requirements.txt</code>, so a run only redownloads FAISS/flashrank/langchain's
+  wheels when that file's contents actually change, not on every single PR — the same
+  install-once-reuse-often shape <code>core/vectorstore.py</code>'s <code>get_retriever()</code> already applies
+  to the FAISS index itself (F12), just at the dependency-install layer instead of the data layer.</li>
+  <li><strong>Line 33 (<code>needs: unit-tests</code>)</strong> &mdash; the only line establishing the two jobs'
+  order; without it, GitHub Actions would run both jobs in parallel by default, which would let a real OpenAI bill
+  get spent scoring answers from a build whose own unit tests are broken.</li>
+  <li><strong>Line 35 (<code>if:</code>)</strong> &mdash; evaluated once, before the job's runner is even
+  provisioned; if it resolves false the job shows as "skipped" (not "failed") on the PR, which matters for branch
+  protection — a required check that's skipped for a structural reason (fork PR) doesn't behave the same as one
+  that ran and failed. See <a href="#f20-2">F20:2</a> for why this condition exists at all.</li>
+  <li><strong>Lines 36&ndash;37 (<code>env: OPENAI_API_KEY</code>)</strong> &mdash; set at the job level, not the
+  step level, so every step in <code>eval-gate</code> (not just the final <code>run</code>) has it available; in
+  practice only the last step reads it, but scoping it to the job rather than one step keeps it available if a
+  future step (a cache warm, a smoke-test call) needed it too, without having to duplicate the line.</li>
+  <li><strong>Line 45 (the vectorstores comment)</strong> &mdash; documents, not enforces: <code>vectorstores/</code>
+  is in <code>.gitignore</code> (Test the chunking (RAG &amp; Vectorstore) (F3)), so every single
+  <code>eval-gate</code> run rebuilds all three cuisines' FAISS indexes from <code>menus/*.pdf</code> from scratch
+  &mdash; there's no persisted-index cache step in this workflow, unlike the pip cache two lines above. See <a
+  href="#f20-8">F20:8</a> for why that's a deliberate omission, not an oversight.</li>
+</ul>
+
+<h3 id="f20-8">F20:8 Technical Deep Dive: What This Gate Costs, and What It Deliberately Doesn't Guarantee</h3>
+
+<p><strong>This gate spends real money on every PR update, on purpose.</strong> Unlike <code>unit-tests</code>,
+<code>eval-gate</code> is not free or instant: <code>python -m evaluation.run_evals</code> makes one embeddings
+call plus one chat-completion call per fixture question against the live engine (15 questions), plus three more
+judge chat-completion calls per question (Automated RAG Evals Harness (F17)'s faithfulness / answer-relevancy /
+context-precision), and rebuilds three FAISS indexes from PDF from a cold cache every time (see F20:7's last
+bullet) &mdash; roughly 75 LLM calls and a minute or two of runner time per push to an open PR. That's the direct,
+accepted cost of the thing F20 actually buys: an answer-quality regression gets caught by a machine on the PR
+itself, instead of by a person noticing a worse answer after it's already merged. Caching the FAISS indexes between
+runs (an <code>actions/cache</code> step keyed on the PDFs' hash, mirroring the pip cache already in the workflow)
+would cut the rebuild cost but not the ~60 judge/answer LLM calls, which is where nearly all of the per-run cost
+actually is &mdash; left as a follow-up rather than built speculatively here, the same "don't build for a
+hypothetical" call Modular Engine Strategy Factory (F12) made about skipping a formal Abstract Factory class for
+one engine.</p>
+
+<p><strong>A red check is not the same as a blocked merge &mdash; and that's a GitHub platform boundary, not a
+gap in this workflow.</strong> As <a href="#f20-3">F20:3</a> covers, nothing in <code>eval_gate.yml</code> itself
+can force a merge to wait; GitHub Actions' only lever is reporting a pass/fail status back to the PR, and whether
+that status actually blocks the merge button is a separate, UI-configured branch-protection rule scoped to the
+whole repository, not to this one workflow file. A workflow can't enable branch protection on itself &mdash; that
+would mean a file inside the repo controlling a permission boundary <em>around</em> the repo, which GitHub
+deliberately keeps outside of what any committed file can touch. Practically: this file alone gets you visibility
+(a red X shows up); a maintainer's one-time settings change gets you enforcement (a red X blocks merging).</p>
+
+<p><strong>Non-determinism is inherited, not introduced.</strong> <code>evaluation/scoring.py</code>'s judge LLM
+calls are graded by another LLM call, and <code>core/llm.py</code>'s <code>ChatOpenAI(temperature=0)</code> makes
+that "best-effort deterministic," not guaranteed &mdash; the same caveat <code>core/llm.py</code>'s own comment
+block already notes about <code>seed=42</code> not being fully guaranteed either. In practice this means a PR that
+changed nothing relevant to answer quality could, rarely, flip a borderline <code>context_precision</code> score
+across its <code>0.6</code> threshold between two runs of the identical code &mdash; a flaky-test failure mode this
+gate shares with any LLM-judged CI check, not something F20's own YAML introduces or could fix by itself.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-num">Phase 6</span>Shelby Cobra (Security &amp; Quality Hardening)</h1>

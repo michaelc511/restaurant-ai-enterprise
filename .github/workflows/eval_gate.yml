@@ -1,0 +1,48 @@
+# F20: CI/CD Eval Regression Gate.
+#
+# Two jobs, chained:
+#   1. unit-tests - the F23 pytest suite (tests/). Fully mocked, no API key, no network.
+#      Runs on every PR, including ones from forks.
+#   2. eval-gate  - only after unit-tests passes. Runs the F17 harness
+#      (`python -m evaluation.run_evals`) against real ground-truth fixtures through a real
+#      OpenAI call, and fails the build if any question drops below scoring.py's thresholds.
+#      Skipped on fork PRs, which don't have access to this repo's OPENAI_API_KEY secret -
+#      GitHub Actions never exposes a base repo's secrets to a workflow run triggered by a
+#      fork's pull request.
+name: Eval Regression Gate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {} # manual "Run workflow" button, for checking the gate without opening a PR
+
+jobs:
+  unit-tests: # F23
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - run: pytest
+
+  eval-gate: # F17, gated on F23 passing first - a broken unit means the eval numbers can't be trusted either
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch'
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      # menus/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh
+      # FAISS index from PDF on every run - see core/vectorstore.py's get_retriever().
+      - run: python -m evaluation.run_evals
