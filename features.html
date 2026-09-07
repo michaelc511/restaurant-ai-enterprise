@@ -427,21 +427,21 @@ delivering an interactive interface for early validation.</p>
 <p>Once the baseline pipeline operates, the focus shifts toward runtime visibility, context refinement, and
 structured tool integration.</p>
 <ul>
-  <li><strong><a href="#f6">F6 — Token &amp; Cost Accounting</a>:</strong> In-code telemetry tracking prompt/completion tokens and dollar costs per invocation.</li>
-  <li><strong><a href="#f7">F7 — Conversational Memory Buffering</a>:</strong> Short-term conversational context layers for multi-turn disambiguation.</li>
-  <li><strong><a href="#f9">F9 — Distributed Tracing</a>:</strong> End-to-end latency profiling and error tracking across the retriever and LLM steps.</li>
-  <li><strong><a href="#f10">F10 — FlashRank Cross-Encoder Re-ranking</a>:</strong> Two-stage retrieval using models like FlashRank to maximize chunk density and precision.</li>
-  <li><strong><a href="#f11">F11 — Deterministic Text-to-SQL Engine</a>:</strong> Queryable SQLite integration (<code>usage_log</code>) for deterministic arithmetic and historical aggregations.</li>
-  <li><strong><a href="#f8">F8 — FastMCP Server Integration</a>:</strong> Exposing backend operational data (such as live Google Sheets for daily specials and holiday hours) via the Model Context Protocol.</li>
+  <li><strong><a href="#f6">F6 — Token &amp; Cost Accounting</a>:</strong> In-code telemetry tracking prompt/completion tokens and dollar costs per invocation. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/in-code-token-cost-accounting-smart.html" target="_blank" rel="noopener">Blog article: In-Code Token &amp; Cost Accounting - F6</a>)</li>
+  <li><strong><a href="#f7">F7 — Conversational Memory Buffering</a>:</strong> Short-term conversational context layers for multi-turn disambiguation. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/multi-turn-conversational-memory.html" target="_blank" rel="noopener">Blog article: Ephemeral Chat Memory - F7</a>)</li>
+  <li><strong><a href="#f9">F9 — Distributed Tracing</a>:</strong> End-to-end latency profiling and error tracking across the retriever and LLM steps. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/f9-observability-tracing.html" target="_blank" rel="noopener">Blog article: Observability &amp; Tracing - F9</a>)</li>
+  <li><strong><a href="#f10">F10 — FlashRank Cross-Encoder Re-ranking</a>:</strong> Two-stage retrieval using models like FlashRank to maximize chunk density and precision. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/f10-cross-encoder-re-ranking.html" target="_blank" rel="noopener">Blog article: Cross-Encoder Re-ranking - F10</a>)</li>
+  <li><strong><a href="#f11">F11 — Deterministic Text-to-SQL Engine</a>:</strong> Queryable SQLite integration (<code>usage_log</code>) for deterministic arithmetic and historical aggregations. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/f11-relational-db-text-to-sql-tool.html" target="_blank" rel="noopener">Blog article: Relational DB &amp; Text-to-SQL Tool - F11</a>)</li>
+  <li><strong><a href="#f8">F8 — FastMCP Server Integration</a>:</strong> Exposing backend operational data (such as live Google Sheets for daily specials and holiday hours) via the Model Context Protocol. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/fastmcp-server-endpoint-f8.html" target="_blank" rel="noopener">Blog article: FastMCP Server Endpoint - F8</a>)</li>
 </ul>
 
 <h3>Phase 3: Fox Body (Multi-Engine &amp; Agent Frameworks)</h3>
 <p>This layer introduces protocol interoperability and modular multi-agent architectures, separating execution
 strategies behind clean interfaces.</p>
 <ul>
-  <li><strong><a href="#f12">F12 — Strategy Factory Pattern</a>:</strong> A shared base interface allowing seamless runtime switching between execution engines.</li>
+  <li><strong><a href="#f12">F12 — Strategy Factory Pattern</a>:</strong> A shared base interface allowing seamless runtime switching between execution engines. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/f12-one-fixed-chain-isnt-enough-anymore.html" target="_blank" rel="noopener">Blog article: Modular Engine Strategy Factory: One Fixed Chain Isn't Enough Anymore: Building the Plug Before the Appliances - F12</a>)</li>
   <li><strong><a href="#f12-1">F12.1 — Parallel Entry Point</a>:</strong> A backward-compatible second entry point built on the same factory, proving the multi-engine architecture via the Strangler Fig pattern without touching the original API.</li>
-  <li><strong><a href="#f13">F13 — LangGraph StateGraph Engine</a>:</strong> Graph-based cyclical reasoning, conditional branching, and retry logic.</li>
+  <li><strong><a href="#f13">F13 — LangGraph StateGraph Engine</a>:</strong> Graph-based cyclical reasoning, conditional branching, and retry logic. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f13-langgraph.html" target="_blank" rel="noopener">Blog article: LangGraph - F13</a>)</li>
   <li><a href="#f14">F14 — CrewAI Multi-Agent Coordination</a>: Collaborative task delegation between specialized role-based personas.</li>
   <li><a href="#f15">F15 — AutoGen Collaborative Swarm</a>: Conversational consensus loops between user proxy and assistant agents.</li>
 </ul>
@@ -450,8 +450,8 @@ strategies behind clean interfaces.</p>
 <p>Scaling production workloads requires durable session storage, hybrid search recall, and objective quality
 benchmarking.</p>
 <ul>
-  <li><strong><a href="#f16">F16 — SQLite Persistent Checkpointing</a>:</strong> Disk-backed state persistence so a session survives a server restart.</li>
-  <li><strong><a href="#f17">F17 — Automated RAG Evaluation Suite</a>:</strong> Quantitative scoring of faithfulness, answer relevance, and context precision via LLM-as-judge, run against every cuisine's real menu.</li>
+  <li><strong><a href="#f16">F16 — SQLite Persistent Checkpointing</a>:</strong> Disk-backed state persistence so a session survives a server restart. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f16-persistent-chat-history-surviving.html" target="_blank" rel="noopener">Blog article: Persistent Thread Checkpointing: Chat History: Surviving Server Restarts with SQLite - F16</a>)</li>
+  <li><strong><a href="#f17">F17 — Automated RAG Evaluation Suite</a>:</strong> Quantitative scoring of faithfulness, answer relevance, and context precision via LLM-as-judge, run against every cuisine's real menu. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f17-automated-rag-evals-harness-turning.html" target="_blank" rel="noopener">Blog article: Automated RAG Evals Harness: Turning "Did That Change Help or Hurt?" Into a Number - F17</a>)</li>
   <li><a href="#f18">F18 — Hybrid Search Fusion (BM25 + FAISS)</a>: Blending sparse keyword matching with dense semantic search for maximum retrieval recall.</li>
 </ul>
 
@@ -460,7 +460,7 @@ benchmarking.</p>
 trusted" — gating what questions get answered and what changes get shipped.</p>
 <ul>
   <li><a href="#f19">F19 — Query Guardrails &amp; Intent Gating</a>: A Pydantic-structured classifier that labels each question's intent up front, replacing ad hoc keyword routing with consistent, measurable off-topic rejection.</li>
-  <li><strong><a href="#f20">F20 — CI/CD Eval Regression Gate</a>:</strong> Automated GitHub Actions workflow executing Automated RAG Evaluation Suite (F17) on every pull request to block merges if accuracy or faithfulness regresses. <em>Done</em> — see F20's full write-up below.</li>
+  <li><strong><a href="#f20">F20 — CI/CD Eval Regression Gate</a>:</strong> Automated GitHub Actions workflow executing Automated RAG Evaluation Suite (F17) on every pull request to block merges if accuracy or faithfulness regresses. <em>Done</em> — see F20's full write-up below. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/cicd-eval-regression-gate-turning-f17s.html" target="_blank" rel="noopener">Blog article: CI/CD Eval Regression Gate: Turning F17's Eval Suite From 'Available' Into 'Enforced' - F20</a>)</li>
 </ul>
 
 <h3>Phase 6: Shelby Cobra (Security &amp; Quality Hardening)</h3>
@@ -469,7 +469,7 @@ adversarial input, and proving the supporting code holds up under test, independ
 <ul>
   <li><a href="#f21">F21 — API Authentication &amp; Rate Limiting</a>: Request-layer authentication and throttling to block unauthorized access and abuse before it reaches the pipeline.</li>
   <li><a href="#f22">F22 — Prompt-Injection Defense</a>: Delimiter-based isolation and pattern filtering that treats retrieved content as data, not instructions, blocking commands hidden inside a menu PDF or a sheet row.</li>
-  <li><strong><a href="#f23">F23 — Unit Tests for Core Modules</a>:</strong> A <code>pytest</code> suite covering the database, sheets, and re-ranking modules in isolation — every external dependency (Google Sheets, the cross-encoder model, disk) mocked at the boundary, so the logic is proven independent of any LLM call. <em>Done</em> — see F23's full write-up below.</li>
+  <li><strong><a href="#f23">F23 — Unit Tests for Core Modules</a>:</strong> A <code>pytest</code> suite covering the database, sheets, and re-ranking modules in isolation — every external dependency (Google Sheets, the cross-encoder model, disk) mocked at the boundary, so the logic is proven independent of any LLM call. <em>Done</em> — see F23's full write-up below. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/concept-explainer-testing-logic-not.html" target="_blank" rel="noopener">Blog article: Unit Tests for Core Modules: Testing the Logic, Not the Vibes - F23</a>)</li>
 </ul>
 
 <div class="note">
