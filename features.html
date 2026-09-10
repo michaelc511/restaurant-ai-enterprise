@@ -15525,10 +15525,11 @@ no other file needed to change — every caller gets the fused retriever automat
 question's meaning — it's very good at "what's a mild, dairy-free option" matching a chunk that never uses either
 word. What it's not reliably good at is an exact token: a specific dish name, a price, an allergen term, a
 policy phrase — a string that either is or isn't in the text, no interpretation needed, but that an embedding can
-still place slightly off in vector space next to something more thematically similar. BM25 is the mirror image:
-a classic term-frequency keyword scorer with no notion of meaning at all, so it nails an exact match FAISS blurs
-past, and misses a paraphrase FAISS would have caught easily. Hybrid Search runs both against the same chunk set
-and lets a fused ranking cover more questions than either retriever running alone.</p>
+still place slightly off in vector space next to something more thematically similar. BM25 ("Best Matching 25" —
+an improved TF-IDF, term-frequency/inverse-document-frequency, scoring formula) is the mirror image: a classic
+keyword scorer with no notion of meaning at all, so it nails an exact match FAISS blurs past, and misses a
+paraphrase FAISS would have caught easily. Hybrid Search runs both against the same chunk set and lets a fused
+ranking cover more questions than either retriever running alone.</p>
 
 <h4>The Big Picture: Fuse Before Re-rank, Don't Replace Re-rank</h4>
 
