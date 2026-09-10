@@ -195,10 +195,39 @@
     font-size: 1.4em;
     font-weight: 700;
     letter-spacing: 0.02em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
   .phase-header .phase-num {
     color: #9ad1ff;
     margin-right: 8px;
+  }
+  .phase-header .phase-title {
+    flex: 1;
+    min-width: 0;
+  }
+  .phase-header-img {
+    flex-shrink: 0;
+    width: 25%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #444;
+  }
+
+  .roadmap-h3 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .roadmap-h3-img {
+    flex-shrink: 0;
+    width: 25%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #ccc;
   }
 
   .blog-box {
@@ -410,7 +439,7 @@ benchmarking retrieval quality objectively, and enforcing automated regression b
 proof-of-concept into a resilient, enterprise-ready agent architecture. The build is organized into six phases,
 each one adding a layer the previous phase didn't have.</p>
 
-<h3>Phase 1: Mach 1 (Baseline Proof-of-Concept &amp; Serving)</h3>
+<h3 class="roadmap-h3"><span>Phase 1: Shuttlecraft (Baseline Proof-of-Concept &amp; Serving)</span><img class="roadmap-h3-img" src="images/thumbs/shuttle.jpg" alt="Starfleet shuttlecraft"></h3>
 <p>The foundation centers on proving core retrieval feasibility, establishing vendor-agnostic access, and
 delivering an interactive interface for early validation.</p>
 <ul>
@@ -423,7 +452,7 @@ delivering an interactive interface for early validation.</p>
   <li><strong><a href="#f5">F5 — Interactive Web Interfaces</a>:</strong> Web-based browser playgrounds powered by Streamlit and Gradio.</li>
 </ul>
 
-<h3>Phase 2: Bullitt (Observability, Context &amp; Data Foundation)</h3>
+<h3 class="roadmap-h3"><span>Phase 2: Archer (Observability, Context &amp; Data Foundation)</span><img class="roadmap-h3-img" src="images/thumbs/archer.jpg" alt="Archer, NX-01 era vessel"></h3>
 <p>Once the baseline pipeline operates, the focus shifts toward runtime visibility, context refinement, and
 structured tool integration.</p>
 <ul>
@@ -435,7 +464,7 @@ structured tool integration.</p>
   <li><strong><a href="#f8">F8 — FastMCP Server Integration</a>:</strong> Exposing backend operational data (such as live Google Sheets for daily specials and holiday hours) via the Model Context Protocol. (<a href="https://michaelc511fullstack.blogspot.com/2026/08/fastmcp-server-endpoint-f8.html" target="_blank" rel="noopener">Blog article: FastMCP Server Endpoint - F8</a>)</li>
 </ul>
 
-<h3>Phase 3: Fox Body (Multi-Engine &amp; Agent Frameworks)</h3>
+<h3 class="roadmap-h3"><span>Phase 3: D7 (Multi-Engine &amp; Agent Frameworks)</span><img class="roadmap-h3-img" src="images/thumbs/Klingon_D-7_class.jpg" alt="Klingon vessel"></h3>
 <p>This layer introduces protocol interoperability and modular multi-agent architectures, separating execution
 strategies behind clean interfaces.</p>
 <ul>
@@ -446,16 +475,16 @@ strategies behind clean interfaces.</p>
   <li><a href="#f15">F15 — AutoGen Collaborative Swarm</a>: Conversational consensus loops between user proxy and assistant agents.</li>
 </ul>
 
-<h3>Phase 4: Coyote 5.0 (Resilience, Evals &amp; Hybrid Retrieval)</h3>
+<h3 class="roadmap-h3"><span>Phase 4: NCC-1701 (Resilience, Evals &amp; Hybrid Retrieval)</span><img class="roadmap-h3-img" src="images/thumbs/enterprisetos.jpg" alt="USS Enterprise, original series era"></h3>
 <p>Scaling production workloads requires durable session storage, hybrid search recall, and objective quality
 benchmarking.</p>
 <ul>
   <li><strong><a href="#f16">F16 — SQLite Persistent Checkpointing</a>:</strong> Disk-backed state persistence so a session survives a server restart. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f16-persistent-chat-history-surviving.html" target="_blank" rel="noopener">Blog article: Persistent Thread Checkpointing: Chat History: Surviving Server Restarts with SQLite - F16</a>)</li>
   <li><strong><a href="#f17">F17 — Automated RAG Evaluation Suite</a>:</strong> Quantitative scoring of faithfulness, answer relevance, and context precision via LLM-as-judge, run against every cuisine's real menu. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f17-automated-rag-evals-harness-turning.html" target="_blank" rel="noopener">Blog article: Automated RAG Evals Harness: Turning "Did That Change Help or Hurt?" Into a Number - F17</a>)</li>
-  <li><a href="#f18">F18 — Hybrid Search Fusion (BM25 + FAISS)</a>: Blending sparse keyword matching with dense semantic search for maximum retrieval recall.</li>
+  <li><strong><a href="#f18">F18 — Hybrid Search Fusion (BM25 + FAISS)</a>:</strong> Blending sparse keyword matching with dense semantic search for maximum retrieval recall. <em>Done</em> — see F18's full write-up below.</li>
 </ul>
 
-<h3>Phase 5: Dark Horse (Enterprise Production Hardening)</h3>
+<h3 class="roadmap-h3"><span>Phase 5: Enterprise Retrofit (Enterprise Production Hardening)</span><img class="roadmap-h3-img" src="images/thumbs/enterprise-movie.jpg" alt="USS Enterprise, movie-era refit"></h3>
 <p>With the multi-engine and resilience layers in place, this phase moves from "does it work" to "can it be
 trusted" — gating what questions get answered and what changes get shipped.</p>
 <ul>
@@ -463,7 +492,7 @@ trusted" — gating what questions get answered and what changes get shipped.</p
   <li><strong><a href="#f20">F20 — CI/CD Eval Regression Gate</a>:</strong> Automated GitHub Actions workflow executing Automated RAG Evaluation Suite (F17) on every pull request to block merges if accuracy or faithfulness regresses. <em>Done</em> — see F20's full write-up below. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/cicd-eval-regression-gate-turning-f17s.html" target="_blank" rel="noopener">Blog article: CI/CD Eval Regression Gate: Turning F17's Eval Suite From 'Available' Into 'Enforced' - F20</a>)</li>
 </ul>
 
-<h3>Phase 6: Shelby Cobra (Security &amp; Quality Hardening)</h3>
+<h3 class="roadmap-h3"><span>Phase 6: Enterprise Next Generation (Security &amp; Quality Hardening)</span><img class="roadmap-h3-img" src="images/thumbs/tng.jpg" alt="Enterprise Next Generation"></h3>
 <p>The final milestone locks down the perimeter and the core logic itself — authenticating requests, screening
 adversarial input, and proving the supporting code holds up under test, independent of any LLM call.</p>
 <ul>
@@ -474,7 +503,7 @@ adversarial input, and proving the supporting code holds up under test, independ
 
 <div class="note">
 <strong>Status note:</strong> bold items above are actually built and verified — Phases 1 and 2 (F0&ndash;F11) in
-full, plus F12/F12.1, F13, F16, F17, F20, and F23. The unbolded items (F14, F15, F18, F19, F21, F22) are detailed,
+full, plus F12/F12.1, F13, F16, F17, F18, F20, and F23. The unbolded items (F14, F15, F19, F21, F22) are detailed,
 planned write-ups — architecture and intent decided, not yet implemented — same distinction the individual
 F-sections below make in their own Status lines.
 </div>
@@ -601,7 +630,7 @@ Hybrid Search (BM25 + Dense), Query Guardrails &amp; Intent Gating, CI/CD, GitHu
 Authentication, Rate Limiting, Prompt Injection, Adversarial Robustness, Unit Testing, pytest</p>
 
 <nav class="toc">
-  <span class="toc-phase-label">Phase 1 — Mach 1 (Baseline Proof-of-Concept & Serving)</span>
+  <span class="toc-phase-label">Phase 1 — Shuttlecraft (Baseline Proof-of-Concept & Serving)</span>
   <a href="#getting-started">Getting Started</a>
   <a href="#debug-mode">DEBUG_MODE</a>
   <a href="#f0">App Idea (F0)</a>
@@ -611,33 +640,33 @@ Authentication, Rate Limiting, Prompt Injection, Adversarial Robustness, Unit Te
   <a href="#f3-1">RAG System Prompt &amp; Persona (F3.1)</a>
   <a href="#f4">Test the API (F4)</a>
   <a href="#f5">Test the web UIs (F5)</a>
-  <span class="toc-phase-label">Phase 2 — Bullitt (Observability, Context & Data Foundation)</span>
+  <span class="toc-phase-label">Phase 2 — Archer (Observability, Context & Data Foundation)</span>
   <a href="#f6">In-Code Token &amp; Cost Accounting (F6)</a>
   <a href="#f7">Ephemeral Chat Memory (F7)</a>
   <a href="#f9">Observability &amp; Tracing (F9)</a>
   <a href="#f10">Cross-Encoder Re-ranking (F10)</a>
   <a href="#f11">Relational DB &amp; Text-to-SQL Tool (F11)</a>
   <a href="#f8">FastMCP Server Endpoint (F8)</a>
-  <span class="toc-phase-label">Phase 3 — Fox Body (Multi-Engine & Agent Frameworks)</span>
+  <span class="toc-phase-label">Phase 3 — D7 (Multi-Engine & Agent Frameworks)</span>
   <a href="#f12">Modular Engine Strategy Factory (F12)</a>
   <a href="#f12-1">Parallel Entry Point (F12.1)</a>
   <a href="#f13">LangGraph State Machine Engine (F13)</a>
   <a href="#f14">CrewAI Multi-Role Engine (F14)</a>
   <a href="#f15">AutoGen Multi-Agent Engine (F15)</a>
-  <span class="toc-phase-label">Phase 4 — Coyote 5.0 (Resilience, Evals & Hybrid Retrieval)</span>
+  <span class="toc-phase-label">Phase 4 — NCC-1701 (Resilience, Evals & Hybrid Retrieval)</span>
   <a href="#f16">Persistent Thread Checkpointing (F16)</a>
   <a href="#f17">Automated RAG Evals Harness (F17)</a>
   <a href="#f18">Hybrid Search (BM25 + FAISS) (F18)</a>
-  <span class="toc-phase-label">Phase 5 — Dark Horse (Enterprise Production Hardening)</span>
+  <span class="toc-phase-label">Phase 5 — Enterprise Retrofit (Enterprise Production Hardening)</span>
   <a href="#f19">Query Guardrails &amp; Intent Gating (F19)</a>
   <a href="#f20">CI/CD Eval Regression Gate (F20)</a>
-  <span class="toc-phase-label">Phase 6 — Shelby Cobra (Security & Quality Hardening)</span>
+  <span class="toc-phase-label">Phase 6 — Enterprise Next Generation (Security & Quality Hardening)</span>
   <a href="#f21">API Authentication &amp; Rate Limiting (F21)</a>
   <a href="#f22">Prompt-Injection Defense (F22)</a>
   <a href="#f23">Unit Tests for Core Modules (F23)</a>
 </nav>
 
-<h1 class="phase-header"><span class="phase-num">Phase 1</span>Mach 1 (Baseline Proof-of-Concept & Serving)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 1</span>Shuttlecraft (Baseline Proof-of-Concept & Serving)</span><img class="phase-header-img" src="images/thumbs/shuttle.jpg" alt="Starfleet shuttlecraft"></h1>
 
 <h2 id="getting-started">Getting Started</h2>
 
@@ -4254,7 +4283,7 @@ accidentally leaking frontend assumptions into the backend.
 </div>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h1 class="phase-header"><span class="phase-num">Phase 2</span>Bullitt (Observability, Context & Data Foundation)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 2</span>Archer (Observability, Context & Data Foundation)</span><img class="phase-header-img" src="images/thumbs/archer.jpg" alt="Archer, NX-01 era vessel"></h1>
 
 <h2 id="f6">F6 — In-Code Token &amp; Cost Accounting</h2>
 
@@ -12622,7 +12651,7 @@ agent runtimes — rather than forcing every consumer through the same protocol 
 </div>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h1 class="phase-header"><span class="phase-num">Phase 3</span>Fox Body (Multi-Engine & Agent Frameworks)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 3</span>D7 (Multi-Engine & Agent Frameworks)</span><img class="phase-header-img" src="images/thumbs/Klingon_D-7_class.jpg" alt="Klingon vessel"></h1>
 
 <h2 id="f12">F12 — Modular Engine Strategy Factory</h2>
 
@@ -14462,7 +14491,7 @@ back-and-forth catches mistakes a single pass would miss.</div>
 </ul>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h1 class="phase-header"><span class="phase-num">Phase 4</span>Coyote 5.0 (Resilience, Evals & Hybrid Retrieval)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 4</span>NCC-1701 (Resilience, Evals & Hybrid Retrieval)</span><img class="phase-header-img" src="images/thumbs/enterprisetos.jpg" alt="USS Enterprise, original series era"></h1>
 
 <h2 id="f16">F16 &mdash; Persistent Thread Checkpointing</h2>
 
@@ -15465,51 +15494,655 @@ cache directory," not "corrupt install."</p>
 
 <p class="f-toc">
 Jump to:
-<a href="#f18-1">F18:1 Hybrid Search (BM25 + FAISS): TBA</a> ·
-<a href="#f18-2">F18:2 Architecture Summary: TBA</a> ·
-<a href="#f18-3">F18:3 Integration Guide: TBA</a> ·
-<a href="#f18-4">F18:4 Testing Guide: TBA</a> ·
-<a href="#f18-5">F18:5 Source Code Reference: TBA</a> ·
-<a href="#f18-6">F18:6 Source Code Reference: TBA</a> ·
-<a href="#f18-7">F18:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f18-8">F18:8 Technical Deep Dive: TBA</a>
+<a href="#f18-1">F18:1 Hybrid Search (BM25 + FAISS)</a> ·
+<a href="#f18-2">F18:2 Architecture Summary</a> ·
+<a href="#f18-3">F18:3 Integration Guide</a> ·
+<a href="#f18-4">F18:4 Testing Guide</a> ·
+<a href="#f18-5">F18:5 Source Code Reference (core/vectorstore.py)</a> ·
+<a href="#f18-6">F18:6 Source Code Reference (tests/test_vectorstore.py)</a> ·
+<a href="#f18-7">F18:7 Line-by-Line Deep Dive</a> ·
+<a href="#f18-8">F18:8 Technical Deep Dive</a>
 </p>
 
-<h3 id="f18-1">F18:1 Hybrid Search (BM25 + FAISS): TBA</h3>
-
-<h3 id="f18-2">F18:2 Architecture Summary: TBA</h3>
-
-<h3 id="f18-3">F18:3 Integration Guide: TBA</h3>
-
-<h3 id="f18-4">F18:4 Testing Guide: TBA</h3>
-
-<h3 id="f18-5">F18:5 Source Code Reference: TBA</h3>
-
-<h3 id="f18-6">F18:6 Source Code Reference: TBA</h3>
-
-<h3 id="f18-7">F18:7 Line-by-Line Deep Dive: TBA</h3>
-
-<h3 id="f18-8">F18:8 Technical Deep Dive: TBA</h3>
-
 <div class="note">
-<strong>Status: Not started (planned). Why this matters, in plain English:</strong> FAISS's semantic search is
-great at understanding meaning, but it can occasionally miss an exact keyword match (a specific dish name, say)
-if the phrasing doesn't line up well in vector space. Adding a classic keyword search alongside it, and blending
-the two rankings, means an exact match and a semantic match both get a fair shot at surfacing the right chunk.</div>
+<strong>Status: Implemented.</strong> <code>core/vectorstore.py</code>'s <code>get_retriever()</code> — the one
+shared retrieval chokepoint every engine (Modular Engine Strategy Factory (F12), LangGraph State Machine Engine
+(F13)) already funnels through — now runs a <code>BM25Retriever</code> (keyword search) alongside the existing
+FAISS retriever (semantic search) and fuses their two rankings with LangChain's <code>EnsembleRetriever</code>,
+before Cross-Encoder Re-ranking (F10) narrows the fused pool down to <code>top_k</code>. No engine, no route, and
+no other file needed to change — every caller gets the fused retriever automatically.</div>
 
 <p>Maps to <code>checklist.csv</code> day 18, "Hybrid Search (BM25 + FAISS)" — target location
 <code>core/vectorstore.py</code>.</p>
 
-<p><strong>What we'll build:</strong></p>
+<table class="blog-box">
+<tr><td>
+
+<p class="back-to-top"><a href="#f18">↑ Back to F18</a></p>
+<h3 id="f18-1">F18:1 Hybrid Search (BM25 + FAISS): Two Ways to Be Wrong, Fused Into One Way to Be Right</h3>
+
+<p>Semantic RAG &amp; Vector Store (F3)'s FAISS retriever finds chunks whose <em>meaning</em> is close to the
+question's meaning — it's very good at "what's a mild, dairy-free option" matching a chunk that never uses either
+word. What it's not reliably good at is an exact token: a specific dish name, a price, an allergen term, a
+policy phrase — a string that either is or isn't in the text, no interpretation needed, but that an embedding can
+still place slightly off in vector space next to something more thematically similar. BM25 is the mirror image:
+a classic term-frequency keyword scorer with no notion of meaning at all, so it nails an exact match FAISS blurs
+past, and misses a paraphrase FAISS would have caught easily. Hybrid Search runs both against the same chunk set
+and lets a fused ranking cover more questions than either retriever running alone.</p>
+
+<h4>The Big Picture: Fuse Before Re-rank, Don't Replace Re-rank</h4>
+
 <ul>
-  <li>a <code>BM25Retriever</code> (keyword-based) running alongside the existing FAISS retriever</li>
-  <li>both combined via LangChain's <code>EnsembleRetriever</code>, with a tunable weighting between the two</li>
-  <li>feeds into the same Cross-Encoder Re-ranking (F10) step afterward — this adds a better candidate pool, it doesn't replace re-ranking</li>
-  <li>tracked via Mean Reciprocal Rank (MRR) and Context Recall, compared against FAISS alone</li>
+  <li><strong><code>BM25Retriever</code></strong> (<code>langchain_community.retrievers</code>, wrapping the
+  <code>rank_bm25</code> package) — built fresh from the cuisine's chunked <code>Document</code> list every call;
+  BM25 has no on-disk index of its own the way FAISS does, so there's nothing to load-or-build here, only build.</li>
+  <li><strong><code>vectorstore.as_retriever()</code></strong> — the exact same FAISS retriever Semantic RAG &amp;
+  Vector Store (F3) already built, load-or-build from disk unchanged.</li>
+  <li><strong><code>EnsembleRetriever</code></strong> (<code>langchain_classic.retrievers</code>, already a
+  dependency) — takes both retrievers plus a <code>weights</code> list and merges their two ranked result lists
+  with <em>reciprocal rank fusion</em>: each document's fused score is the sum of <code>weight / (rank + c)</code>
+  across every list it appears in (<code>c=60</code>, LangChain's default), not a comparison of FAISS's cosine
+  distance against BM25's TF-IDF score — those two numbers live on incompatible scales, so RRF only ever looks at
+  <em>rank position</em>, never the raw score itself.</li>
+  <li><strong>Cross-Encoder Re-ranking (F10) still runs last</strong>, on the fused pool — Hybrid Search only
+  changes what candidates F10 gets to choose from, it doesn't touch how the final <code>top_k</code> gets picked.</li>
 </ul>
 
+<p>For the full, step-by-step code implementation, please refer to the GitHub Repository &amp; Code Details link.</p>
+
+<p class="tags">Tags: RAG 2.0, Context Engineering, Hybrid Dense/Sparse Retrieval, Reciprocal Rank Fusion, F18</p>
+
+</td></tr>
+</table>
+
+<div class="toolbox">
+<strong>Tools &amp; Libraries</strong> (per <code>checklist.csv</code>'s "Primary Tools &amp; Libraries" for #18):
+<ul>
+  <li><code>BM25Retriever</code> — <span class="used">used,</span> from <code>langchain_community.retrievers</code>.
+  It wraps the <code>rank_bm25</code> package (new to <code>requirements.txt</code>) — <code>BM25Retriever</code>
+  itself ships no BM25 math of its own, it's a thin LangChain <code>Retriever</code> adapter around that package.</li>
+  <li><code>FAISS</code> — <span class="used">used,</span> unchanged from Test the chunking (RAG &amp; Vectorstore)
+  (F3) — it's now one half of the fused pair instead of the whole retriever.</li>
+  <li><code>EnsembleRetriever</code> — <span class="used">used,</span> from <code>langchain_classic.retrievers</code>
+  — already a dependency this repo pulls in via <code>langchain-classic</code>, so no new package for the fusion
+  logic itself, only for BM25's underlying scorer.</li>
+  <li><code>Mean Reciprocal Rank (MRR)</code> / <code>Context Recall</code> — <span class="not-used">not built as
+  separate named metrics,</span> because computing either honestly needs a ground-truth label for "which exact
+  chunk is the correct one" per fixture question, and Automated RAG Evals Harness (F17)'s
+  <code>evaluation/ground_truth.py</code> only stores <code>question</code> / <code>expected_answer</code> pairs —
+  no chunk-level labels exist to score against. F18:4 below instead reuses F17's existing
+  faithfulness / answer-relevancy / context-precision harness as a before/after regression check, the same
+  substitution call CI/CD Eval Regression Gate (F20) made when it gated on <code>evaluation/run_evals.py</code>'s
+  exit code instead of adding a <code>Ragas CLI</code> dependency.</li>
+</ul>
+</div>
+
+<h3 id="f18-2">F18:2 Architecture Summary: One Function Changed, Every Caller Inherits It</h3>
+
+<p>No new file, and no engine touched directly — <code>get_retriever(cuisine, embeddings, top_k)</code>'s
+signature and return type (<code>RerankingRetriever</code>) are unchanged, only what's <em>inside</em> it. Every
+caller — <a href="#f12">Modular Engine Strategy Factory (F12)</a>'s <code>plain_rag_engine.py</code>, <a
+href="#f13">LangGraph State Machine Engine (F13)</a>'s <code>langgraph_engine.py</code>, and Automated RAG Evals
+Harness (F17)'s <code>evaluation/run_evals.py</code> — gets hybrid retrieval automatically, the same
+share-one-chokepoint design Modular Engine Strategy Factory (F12) already relied on to add Cross-Encoder
+Re-ranking (F10) to every engine without touching any of them individually.</p>
+
+<ul>
+  <li><strong><code>core/vectorstore.py</code></strong> — the only production file changed. <code>get_retriever()</code>
+  now unconditionally parses and chunks the cuisine's PDF (BM25 needs the raw chunk list every call — it has no
+  on-disk index to load the way FAISS does), builds or loads the FAISS index exactly as before, then builds a
+  <code>BM25Retriever</code> from the same chunks and fuses it with the FAISS retriever via
+  <code>EnsembleRetriever</code> before handing the result to <code>wrap_with_reranking()</code> (F10) unchanged.</li>
+  <li><strong><code>requirements.txt</code></strong> — one new line, <code>rank_bm25</code>.</li>
+</ul>
+
+<h3 id="f18-3">F18:3 Integration Guide: What Actually Got Touched</h3>
+
+<ul>
+  <li><code>core/vectorstore.py</code> — modified; see <a href="#f18-5">F18:5</a> for the full file.</li>
+  <li><code>requirements.txt</code> — added <code>rank_bm25</code>.</li>
+  <li><code>tests/test_vectorstore.py</code> — two new tests covering the fusion wiring; see <a
+  href="#f18-6">F18:6</a>.</li>
+  <li><code>checklist.csv</code>, <code>checklist.html</code> — day 18's status flipped from "Not Started" to
+  "Done".</li>
+  <li><code>engines/plain_rag_engine.py</code>, <code>engines/langgraph_engine.py</code>,
+  <code>evaluation/run_evals.py</code> — read, not modified. All three call <code>get_retriever()</code> and
+  inherit hybrid retrieval for free.</li>
+</ul>
+
+<h3 class="hl-title" id="f18-4">F18:4 Testing Guide: How to Verify Hybrid Search (F18)</h3>
+
+<p><strong class="hl-title">1) Run the unit suite</strong> — the two new tests mock every external boundary
+(PDF parsing, FAISS, BM25) so they check the fusion wiring itself, not real retrieval quality:</p>
+<pre class="cmd"><code>source venv/bin/activate
+pytest tests/test_vectorstore.py -v</code></pre>
+<p>Then the full suite, to confirm nothing else regressed:</p>
+<pre class="cmd"><code>$ pytest -q
+..................................................                       [100%]
+50 passed, 1 warning in 0.78s</code></pre>
+
+<p><strong class="hl-title">2) Prove it live against a real menu</strong> — no mocks, a real FAISS index already
+on disk and a real OpenAI embeddings call for the query:</p>
+<pre class="cmd"><code>python -c "
+from dotenv import load_dotenv; load_dotenv()
+from core.llm import build_llm_and_embeddings
+from core.vectorstore import get_retriever
+
+llm, embeddings = build_llm_and_embeddings()
+retriever = get_retriever('italian', embeddings, top_k=3)
+print(type(retriever).__name__, '/', type(retriever.base_retriever).__name__)
+for d in retriever.invoke('What pasta dishes do you have and what is the price?'):
+    print('---'); print(d.page_content[:150])
+"</code></pre>
+<pre class="cmd"><code>RerankingRetriever / EnsembleRetriever
+---
+●  Spaghetti  Carbonara  ($21.00)  [Mild]  -  Traditional  pasta  tossed  with  crisp  guanciale, ...
+---
+sauce, topped with grilled chicken breast. ● Classic Lasagna Bolognese ($22.00) [Mild] - Layered fresh pasta sheets ...
+---
+[Mild] - Layered fresh pasta sheets with slow-simmered beef and pork ragù, creamy bechamel, ricotta, and melted Penne ...</code></pre>
+
+<p><strong class="hl-title">3) Compare against Automated RAG Evals Harness (F17)'s existing suite, before and
+after</strong> — the real regression check, since F18:1's toolbox note explains why a standalone MRR/Context
+Recall number wasn't built. Same 15 fixture questions across all three cuisines, run once against the unmodified
+<code>get_retriever()</code> (FAISS-only) and once against the fused version:</p>
+<pre class="cmd"><code>python -m evaluation.run_evals</code></pre>
+<table class="pyhltable" style="width:100%; margin:10px 0;">
+<tr><th style="text-align:left; padding:4px 8px;">Version</th><th style="text-align:left; padding:4px 8px;">Result</th></tr>
+<tr><td style="padding:4px 8px;">Baseline (FAISS only, pre-F18)</td><td style="padding:4px 8px;"><code>11/15 passed</code></td></tr>
+<tr><td style="padding:4px 8px;">Hybrid (BM25 + FAISS, F18)</td><td style="padding:4px 8px;"><code>12/15 passed</code></td></tr>
+</table>
+
+<div class="note">
+<strong>Which entry point actually gets hybrid search:</strong> <code>get_retriever()</code> is only called by
+<code>engines/plain_rag_engine.py</code> and <code>engines/langgraph_engine.py</code> — the two engines behind
+Modular Engine Strategy Factory (F12)'s <code>get_engine()</code>, reached through <strong><code>engine_api.py</code></strong>.
+The original <code>menu_api.py</code> (F1&ndash;F11) builds its own FAISS index inline in <code>build_qa_chain()</code>
+and never calls <code>core/vectorstore.py</code>'s <code>get_retriever()</code> at all — so F18 does not apply
+there. Methods 4&ndash;6 below all go through <code>engine_api.py</code> for that reason.</div>
+
+<p><strong class="hl-title">4) CLI</strong> — no server needed, exercises <code>get_retriever()</code> through
+<code>engine_api.py</code>'s <code>__main__</code> block and <a href="#f12">Modular Engine Strategy Factory
+(F12)</a>'s factory:</p>
+<pre class="cmd"><code>source venv/bin/activate
+python engine_api.py</code></pre>
+<pre class="cmd"><code>Which menu cuisine would you like (sushi/steak/italian)? italian
+
+Which engine? 1) plain_rag [default, press Enter]  2) LangGraph:
+[DEBUG] DEFAULT_ENGINE is 'plain_rag' - using engine: plain_rag
+
+What would you like to know about the italian menu? (q to quit) What pasta dishes do you have and what is the price?
+
+Answer: We have several pasta dishes on the menu:
+
+1. Spaghetti Carbonara - $21.00
+2. Fettuccine Alfredo con Pollo - $23.50
+3. Classic Lasagna Bolognese - $22.00
+4. Penne alla Vodka - $19.50
+5. Chicken Parmigiana - $24.00
+...</code></pre>
+
+<p><strong class="hl-title">5) Streamlit UI</strong> (needs <code>engine_api.py</code> served via uvicorn first —
+not run as a script, since the CLI block above and the FastAPI app are two different ways of using the same file):</p>
+<pre class="cmd"><code>source venv/bin/activate
+uvicorn engine_api:app --reload --port 8000    # in one terminal
+streamlit run web-demo/streamlit_app.py         # in another</code></pre>
+<p>Try one of the questions Testing Guide step 3 shows flipping from fail to pass under hybrid search — "What
+vegan options do you have?" — and watch the answer/top-match; nothing in the UI labels which retriever fired, so
+this is about the answer quality itself, not a visibly different field.</p>
+
+<p><strong class="hl-title">6) Gradio UI</strong> (same prerequisite — <code>engine_api.py</code> served via
+uvicorn, not run directly):</p>
+<pre class="cmd"><code>python web-demo/gradio_app.py</code></pre>
+<p>Same caveat as Streamlit — same underlying <code>POST /ask</code> call, same fused retriever behind it, no
+separate hybrid-search indicator in the UI.</p>
+
+<div class="note">
+<strong>Verification:</strong> ran <code>pytest -q</code> — <code>50 passed, 1 warning in 0.78s</code>. Ran the
+live snippet above against the real <code>italian.pdf</code> menu — <code>RerankingRetriever / EnsembleRetriever</code>,
+correct pasta dishes with prices returned. Ran <code>python -m evaluation.run_evals</code> twice against the same
+15 real fixture questions and three real menus: once with <code>core/vectorstore.py</code> stashed back to its
+pre-F18 state (<code>11/15 passed</code>), once with F18 applied (<code>12/15 passed</code>) — a net improvement,
+not a regression, so the change clears CI/CD Eval Regression Gate (F20)'s bar. It is not a strict win on every
+question, though — see <a href="#f18-8">F18:8</a> for the one new failure this comparison surfaced and why it
+happened, reported here rather than left out. Also ran method 4 (CLI) for real, piping
+<code>italian</code> / Enter / the pasta question / <code>q</code> into <code>python engine_api.py</code> — the
+transcript above is that actual run, not a mock-up — and method 5/6's underlying HTTP call directly via
+<code>curl</code> against a real <code>uvicorn engine_api:app</code> process (the "vegan options" question, which
+Testing Guide step 3 shows flipping from fail to pass under hybrid search), confirming the same fused retriever
+answers requests coming through the FastAPI route, not just the CLI path.
+</div>
+
+<p class="back-to-top"><a href="#f18">↑ Back to F18</a></p>
+<h3 id="f18-5">F18:5 Source Code Reference: core/vectorstore.py — full file</h3>
+<div class="code-block">
+<div class="code-block-title"><span>core/vectorstore.py</span><span class="role">Defines wrap_with_reranking, RerankingRetriever (F10), get_retriever (F12/F18 — now fuses BM25 + FAISS) — 87 lines</span></div>
+<div class="pyhl"><table class="pyhltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F10: Cross-encoder re-ranking - re-scores retrieved chunks for actual relevance</span>
+<span class="sd">before they reach the LLM, instead of trusting FAISS's raw similarity ranking alone.</span>
+<span class="sd">F12: also holds get_retriever(), the shared FAISS load-or-build pipeline every engine uses.</span>
+<span class="sd">F18: get_retriever() now fuses that FAISS (dense/semantic) search with a BM25 (sparse/keyword)</span>
+<span class="sd">search via reciprocal rank fusion, so an exact term FAISS's embeddings blur past (a dish name,</span>
+<span class="sd">a price, an allergen) still surfaces, before F10's cross-encoder re-ranks the merged results.</span>
+<span class="sd">"""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flashrank</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ranker</span><span class="p">,</span> <span class="n">RerankRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_classic.retrievers</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnsembleRetriever</span>  <span class="c1"># F18: reciprocal rank fusion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.document_loaders</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyPDFLoader</span>  <span class="c1"># F3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.retrievers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BM25Retriever</span>  <span class="c1"># F18</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.vectorstores</span><span class="w"> </span><span class="kn">import</span> <span class="n">FAISS</span>  <span class="c1"># F3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackManagerForRetrieverRun</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">Document</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.retrievers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRetriever</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_text_splitters</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecursiveCharacterTextSplitter</span>  <span class="c1"># F3</span>
+
+<span class="n">_ranker</span> <span class="o">=</span> <span class="n">Ranker</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">"ms-marco-MiniLM-L-12-v2"</span><span class="p">)</span>  <span class="c1"># F10: cross-encoder re-ranking model</span>
+
+<span class="n">VECTORSTORE_DIR</span> <span class="o">=</span> <span class="s2">"vectorstores"</span>  <span class="c1"># F12: shared by every engine's get_retriever() call</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rerank_documents</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">docs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Document</span><span class="p">],</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Document</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""F10: re-score retrieved docs against the query with a cross-encoder, return the top_k most relevant."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">docs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">docs</span>
+    <span class="n">passages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">page_content</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">docs</span><span class="p">)]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">_ranker</span><span class="o">.</span><span class="n">rerank</span><span class="p">(</span><span class="n">RerankRequest</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">passages</span><span class="o">=</span><span class="n">passages</span><span class="p">))</span>  <span class="c1"># sorted best-first</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">docs</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[:</span><span class="n">top_k</span><span class="p">]]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RerankingRetriever</span><span class="p">(</span><span class="n">BaseRetriever</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""F10: wraps a base retriever, re-ranking its results with a cross-encoder before returning them."""</span>
+
+    <span class="n">base_retriever</span><span class="p">:</span> <span class="n">BaseRetriever</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_relevant_documents</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_manager</span><span class="p">:</span> <span class="n">CallbackManagerForRetrieverRun</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Document</span><span class="p">]:</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_retriever</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rerank_documents</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_with_reranking</span><span class="p">(</span><span class="n">base_retriever</span><span class="p">:</span> <span class="n">BaseRetriever</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RerankingRetriever</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""F10: wrap an existing retriever so its results get cross-encoder re-ranked before use.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        retriever = wrap_with_reranking(vectorstore.as_retriever())</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">RerankingRetriever</span><span class="p">(</span><span class="n">base_retriever</span><span class="o">=</span><span class="n">base_retriever</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_retriever</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RerankingRetriever</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""F3/F10/F12/F18: load a cuisine's FAISS index from disk if it's already built, or build +</span>
+<span class="sd">    save one, then fuse it with a BM25 keyword retriever and wrap the fused result with</span>
+<span class="sd">    cross-encoder re-ranking. Shared by every engine (plain_rag today, langgraph/crewai/autogen</span>
+<span class="sd">    later) instead of each duplicating this load-or-build pipeline.</span>
+<span class="sd">    """</span>
+    <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
+
+    <span class="c1"># F18: BM25 has no on-disk index of its own (langchain rebuilds it in memory from the raw</span>
+    <span class="c1"># chunks each run), so parse + split the PDF unconditionally. This is cheap/local/no API</span>
+    <span class="c1"># calls - the FAISS embedding step below is the expensive part the on-disk index still saves.</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">)</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">index_path</span><span class="p">):</span>  <span class="c1"># F3: load a previously saved FAISS index...</span>
+        <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">index_path</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">allow_dangerous_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># ...or build one from the PDF and save it</span>
+        <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+        <span class="n">vectorstore</span><span class="o">.</span><span class="n">save_local</span><span class="p">(</span><span class="n">index_path</span><span class="p">)</span>
+
+    <span class="n">faiss_retriever</span> <span class="o">=</span> <span class="n">vectorstore</span><span class="o">.</span><span class="n">as_retriever</span><span class="p">(</span><span class="n">search_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"k"</span><span class="p">:</span> <span class="n">top_k</span><span class="p">})</span>  <span class="c1"># F3: dense/semantic</span>
+    <span class="n">bm25_retriever</span> <span class="o">=</span> <span class="n">BM25Retriever</span><span class="o">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span>  <span class="c1"># F18: sparse/keyword</span>
+    <span class="n">bm25_retriever</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">top_k</span>
+
+    <span class="n">hybrid_retriever</span> <span class="o">=</span> <span class="n">EnsembleRetriever</span><span class="p">(</span>  <span class="c1"># F18: reciprocal rank fusion across both result lists</span>
+        <span class="n">retrievers</span><span class="o">=</span><span class="p">[</span><span class="n">bm25_retriever</span><span class="p">,</span> <span class="n">faiss_retriever</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrap_with_reranking</span><span class="p">(</span><span class="n">hybrid_retriever</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>  <span class="c1"># F10</span>
+</pre></div></td></tr></table></div>
+</div>
+
+<p class="back-to-top"><a href="#f18">↑ Back to F18</a></p>
+<h3 id="f18-6">F18:6 Source Code Reference: tests/test_vectorstore.py — full file, F23's original 5 tests plus F18's 2 new fusion tests</h3>
+<div class="code-block">
+<div class="code-block-title"><span>tests/test_vectorstore.py</span><span class="role">Unit tests for core/vectorstore.py (F23), plus two new tests covering get_retriever()'s BM25+FAISS fusion wiring (F18) — 184 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  &quot;&quot;&quot;F23: unit tests for core/vectorstore.py - re-ranking logic, with the
+<span class="ln">  2</span>  cross-encoder model itself mocked out so tests don&#x27;t download/load a real
+<span class="ln">  3</span>  model or need a GPU/network to run.
+<span class="ln">  4</span>  &quot;&quot;&quot;
+<span class="ln">  5</span>  import sys
+<span class="ln">  6</span>  from types import ModuleType
+<span class="ln">  7</span>  from typing import List
+<span class="ln">  8</span>  from unittest.mock import MagicMock
+<span class="ln">  9</span>
+<span class="ln"> 10</span>  import pytest
+<span class="ln"> 11</span>  from langchain_core.documents import Document
+<span class="ln"> 12</span>  from langchain_core.retrievers import BaseRetriever
+<span class="ln"> 13</span>  from pydantic import Field
+<span class="ln"> 14</span>
+<span class="ln"> 15</span>
+<span class="ln"> 16</span>  @pytest.fixture
+<span class="ln"> 17</span>  def vectorstore(monkeypatch):
+<span class="ln"> 18</span>      &quot;&quot;&quot;Import core.vectorstore with flashrank.Ranker faked out (module-level
+<span class="ln"> 19</span>      `_ranker = Ranker(...)` would otherwise load a real model on import).&quot;&quot;&quot;
+<span class="ln"> 20</span>      fake_flashrank = ModuleType(&quot;flashrank&quot;)
+<span class="ln"> 21</span>      fake_flashrank.Ranker = MagicMock(return_value=MagicMock())
+<span class="ln"> 22</span>      fake_flashrank.RerankRequest = lambda query, passages: {&quot;query&quot;: query, &quot;passages&quot;: passages}
+<span class="ln"> 23</span>      monkeypatch.setitem(sys.modules, &quot;flashrank&quot;, fake_flashrank)
+<span class="ln"> 24</span>      sys.modules.pop(&quot;core.vectorstore&quot;, None)
+<span class="ln"> 25</span>
+<span class="ln"> 26</span>      import core.vectorstore as module
+<span class="ln"> 27</span>
+<span class="ln"> 28</span>      yield module
+<span class="ln"> 29</span>
+<span class="ln"> 30</span>      sys.modules.pop(&quot;core.vectorstore&quot;, None)
+<span class="ln"> 31</span>
+<span class="ln"> 32</span>
+<span class="ln"> 33</span>  def docs(*texts):
+<span class="ln"> 34</span>      return [Document(page_content=t) for t in texts]
+<span class="ln"> 35</span>
+<span class="ln"> 36</span>
+<span class="ln"> 37</span>  class FakeRetriever(BaseRetriever):
+<span class="ln"> 38</span>      &quot;&quot;&quot;A real BaseRetriever (not a MagicMock) - RerankingRetriever is a pydantic
+<span class="ln"> 39</span>      model whose base_retriever field is typed as BaseRetriever, so a bare mock
+<span class="ln"> 40</span>      fails validation.&quot;&quot;&quot;
+<span class="ln"> 41</span>
+<span class="ln"> 42</span>      docs_to_return: List[Document] = Field(default_factory=list)
+<span class="ln"> 43</span>      calls: List[str] = Field(default_factory=list)
+<span class="ln"> 44</span>      k: int = 4  # F18: BM25Retriever exposes a settable `k`; get_retriever() sets it to top_k
+<span class="ln"> 45</span>
+<span class="ln"> 46</span>      def _get_relevant_documents(self, query, *, run_manager=None):
+<span class="ln"> 47</span>          self.calls.append(query)
+<span class="ln"> 48</span>          return self.docs_to_return
+<span class="ln"> 49</span>
+<span class="ln"> 50</span>
+<span class="ln"> 51</span>  def test_rerank_documents_returns_empty_list_unchanged(vectorstore):
+<span class="ln"> 52</span>      assert vectorstore.rerank_documents(&quot;query&quot;, []) == []
+<span class="ln"> 53</span>      vectorstore._ranker.rerank.assert_not_called()
+<span class="ln"> 54</span>
+<span class="ln"> 55</span>
+<span class="ln"> 56</span>  def test_rerank_documents_reorders_by_ranker_score(vectorstore):
+<span class="ln"> 57</span>      d = docs(&quot;irrelevant&quot;, &quot;relevant&quot;, &quot;somewhat relevant&quot;)
+<span class="ln"> 58</span>      # Ranker says doc 1 (&quot;relevant&quot;) is the best match, then doc 2, then doc 0.
+<span class="ln"> 59</span>      vectorstore._ranker.rerank.return_value = [
+<span class="ln"> 60</span>          {&quot;id&quot;: 1, &quot;score&quot;: 0.9},
+<span class="ln"> 61</span>          {&quot;id&quot;: 2, &quot;score&quot;: 0.5},
+<span class="ln"> 62</span>          {&quot;id&quot;: 0, &quot;score&quot;: 0.1},
+<span class="ln"> 63</span>      ]
+<span class="ln"> 64</span>
+<span class="ln"> 65</span>      result = vectorstore.rerank_documents(&quot;query&quot;, d, top_k=2)
+<span class="ln"> 66</span>
+<span class="ln"> 67</span>      assert [doc.page_content for doc in result] == [&quot;relevant&quot;, &quot;somewhat relevant&quot;]
+<span class="ln"> 68</span>
+<span class="ln"> 69</span>
+<span class="ln"> 70</span>  def test_rerank_documents_respects_top_k(vectorstore):
+<span class="ln"> 71</span>      d = docs(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+<span class="ln"> 72</span>      vectorstore._ranker.rerank.return_value = [
+<span class="ln"> 73</span>          {&quot;id&quot;: 0, &quot;score&quot;: 0.9},
+<span class="ln"> 74</span>          {&quot;id&quot;: 1, &quot;score&quot;: 0.8},
+<span class="ln"> 75</span>          {&quot;id&quot;: 2, &quot;score&quot;: 0.7},
+<span class="ln"> 76</span>      ]
+<span class="ln"> 77</span>
+<span class="ln"> 78</span>      result = vectorstore.rerank_documents(&quot;query&quot;, d, top_k=1)
+<span class="ln"> 79</span>
+<span class="ln"> 80</span>      assert len(result) == 1
+<span class="ln"> 81</span>      assert result[0].page_content == &quot;a&quot;
+<span class="ln"> 82</span>
+<span class="ln"> 83</span>
+<span class="ln"> 84</span>  def test_wrap_with_reranking_builds_retriever_with_given_top_k(vectorstore):
+<span class="ln"> 85</span>      base_retriever = FakeRetriever()
+<span class="ln"> 86</span>
+<span class="ln"> 87</span>      wrapped = vectorstore.wrap_with_reranking(base_retriever, top_k=5)
+<span class="ln"> 88</span>
+<span class="ln"> 89</span>      assert wrapped.base_retriever is base_retriever
+<span class="ln"> 90</span>      assert wrapped.top_k == 5
+<span class="ln"> 91</span>
+<span class="ln"> 92</span>
+<span class="ln"> 93</span>  def test_reranking_retriever_reranks_base_retriever_results(vectorstore, monkeypatch):
+<span class="ln"> 94</span>      base_retriever = FakeRetriever(docs_to_return=docs(&quot;x&quot;, &quot;y&quot;))
+<span class="ln"> 95</span>
+<span class="ln"> 96</span>      called = {}
+<span class="ln"> 97</span>
+<span class="ln"> 98</span>      def fake_rerank(query, docs_in, top_k=3):
+<span class="ln"> 99</span>          called[&quot;query&quot;] = query
+<span class="ln">100</span>          called[&quot;docs&quot;] = docs_in
+<span class="ln">101</span>          called[&quot;top_k&quot;] = top_k
+<span class="ln">102</span>          return docs_in[:top_k]
+<span class="ln">103</span>
+<span class="ln">104</span>      monkeypatch.setattr(vectorstore, &quot;rerank_documents&quot;, fake_rerank)
+<span class="ln">105</span>      retriever = vectorstore.wrap_with_reranking(base_retriever, top_k=1)
+<span class="ln">106</span>
+<span class="ln">107</span>      result = retriever._get_relevant_documents(&quot;what&#x27;s good?&quot;, run_manager=MagicMock())
+<span class="ln">108</span>
+<span class="ln">109</span>      assert base_retriever.calls == [&quot;what&#x27;s good?&quot;]
+<span class="ln">110</span>      assert called[&quot;query&quot;] == &quot;what&#x27;s good?&quot;
+<span class="ln">111</span>      assert called[&quot;top_k&quot;] == 1
+<span class="ln">112</span>      assert len(result) == 1
+<span class="ln">113</span>
+<span class="ln">114</span>
+<span class="ln">115</span>  @pytest.fixture
+<span class="ln">116</span>  def patched_get_retriever(vectorstore, monkeypatch):
+<span class="ln">117</span>      &quot;&quot;&quot;F18: stub every external boundary get_retriever() touches - PDF parsing, splitting, FAISS,
+<span class="ln">118</span>      and BM25 - so the fusion wiring can be tested without a real PDF, embeddings, or BM25 math.
+<span class="ln">119</span>      &quot;&quot;&quot;
+<span class="ln">120</span>      split_docs = docs(&quot;chunk one&quot;, &quot;chunk two&quot;)
+<span class="ln">121</span>
+<span class="ln">122</span>      fake_loader = MagicMock()
+<span class="ln">123</span>      fake_loader.load.return_value = [&quot;raw page&quot;]
+<span class="ln">124</span>      monkeypatch.setattr(vectorstore, &quot;PyPDFLoader&quot;, MagicMock(return_value=fake_loader))
+<span class="ln">125</span>
+<span class="ln">126</span>      fake_splitter = MagicMock()
+<span class="ln">127</span>      fake_splitter.split_documents.return_value = split_docs
+<span class="ln">128</span>      monkeypatch.setattr(vectorstore, &quot;RecursiveCharacterTextSplitter&quot;, MagicMock(return_value=fake_splitter))
+<span class="ln">129</span>
+<span class="ln">130</span>      fake_vectorstore = MagicMock()
+<span class="ln">131</span>      fake_faiss_retriever = FakeRetriever()
+<span class="ln">132</span>      fake_vectorstore.as_retriever.return_value = fake_faiss_retriever
+<span class="ln">133</span>      fake_faiss_cls = MagicMock()
+<span class="ln">134</span>      fake_faiss_cls.load_local.return_value = fake_vectorstore
+<span class="ln">135</span>      fake_faiss_cls.from_documents.return_value = fake_vectorstore
+<span class="ln">136</span>      monkeypatch.setattr(vectorstore, &quot;FAISS&quot;, fake_faiss_cls)
+<span class="ln">137</span>
+<span class="ln">138</span>      fake_bm25_retriever = FakeRetriever()
+<span class="ln">139</span>      fake_bm25_cls = MagicMock()
+<span class="ln">140</span>      fake_bm25_cls.from_documents.return_value = fake_bm25_retriever
+<span class="ln">141</span>      monkeypatch.setattr(vectorstore, &quot;BM25Retriever&quot;, fake_bm25_cls)
+<span class="ln">142</span>
+<span class="ln">143</span>      fake_ensemble_cls = MagicMock(side_effect=lambda **kwargs: FakeRetriever())
+<span class="ln">144</span>      monkeypatch.setattr(vectorstore, &quot;EnsembleRetriever&quot;, fake_ensemble_cls)
+<span class="ln">145</span>
+<span class="ln">146</span>      return {
+<span class="ln">147</span>          &quot;split_docs&quot;: split_docs,
+<span class="ln">148</span>          &quot;faiss&quot;: fake_faiss_cls,
+<span class="ln">149</span>          &quot;faiss_retriever&quot;: fake_faiss_retriever,
+<span class="ln">150</span>          &quot;bm25&quot;: fake_bm25_cls,
+<span class="ln">151</span>          &quot;bm25_retriever&quot;: fake_bm25_retriever,
+<span class="ln">152</span>          &quot;ensemble&quot;: fake_ensemble_cls,
+<span class="ln">153</span>      }
+<span class="ln">154</span>
+<span class="ln">155</span>
+<span class="ln">156</span>  def test_get_retriever_fuses_bm25_and_faiss_with_reranking(vectorstore, patched_get_retriever, monkeypatch):
+<span class="ln">157</span>      monkeypatch.setattr(vectorstore.os.path, &quot;exists&quot;, lambda path: True)  # index already on disk
+<span class="ln">158</span>
+<span class="ln">159</span>      result = vectorstore.get_retriever(&quot;italian&quot;, embeddings=MagicMock(), top_k=2)
+<span class="ln">160</span>
+<span class="ln">161</span>      fakes = patched_get_retriever
+<span class="ln">162</span>      fakes[&quot;faiss&quot;].load_local.assert_called_once()
+<span class="ln">163</span>      fakes[&quot;faiss&quot;].from_documents.assert_not_called()  # already on disk - don&#x27;t rebuild
+<span class="ln">164</span>      fakes[&quot;bm25&quot;].from_documents.assert_called_once_with(fakes[&quot;split_docs&quot;])  # F18: fed the same chunks
+<span class="ln">165</span>      assert fakes[&quot;bm25_retriever&quot;].k == 2
+<span class="ln">166</span>
+<span class="ln">167</span>      ensemble_kwargs = fakes[&quot;ensemble&quot;].call_args.kwargs
+<span class="ln">168</span>      assert ensemble_kwargs[&quot;retrievers&quot;] == [fakes[&quot;bm25_retriever&quot;], fakes[&quot;faiss_retriever&quot;]]
+<span class="ln">169</span>      assert ensemble_kwargs[&quot;weights&quot;] == [0.5, 0.5]
+<span class="ln">170</span>
+<span class="ln">171</span>      assert isinstance(result, vectorstore.RerankingRetriever)
+<span class="ln">172</span>      assert result.top_k == 2
+<span class="ln">173</span>
+<span class="ln">174</span>
+<span class="ln">175</span>  def test_get_retriever_builds_and_saves_faiss_when_index_missing(vectorstore, patched_get_retriever, monkeypatch):
+<span class="ln">176</span>      monkeypatch.setattr(vectorstore.os.path, &quot;exists&quot;, lambda path: False)
+<span class="ln">177</span>      fake_embeddings = MagicMock()
+<span class="ln">178</span>
+<span class="ln">179</span>      vectorstore.get_retriever(&quot;mexican&quot;, embeddings=fake_embeddings, top_k=3)
+<span class="ln">180</span>
+<span class="ln">181</span>      fakes = patched_get_retriever
+<span class="ln">182</span>      fakes[&quot;faiss&quot;].load_local.assert_not_called()
+<span class="ln">183</span>      fakes[&quot;faiss&quot;].from_documents.assert_called_once_with(fakes[&quot;split_docs&quot;], fake_embeddings)
+<span class="ln">184</span>      fakes[&quot;faiss&quot;].from_documents.return_value.save_local.assert_called_once()</code></pre>
+</div>
+
+<h3 id="f18-7">F18:7 Line-by-Line Deep Dive: What get_retriever() Is Actually Doing Differently</h3>
+
+<p><strong>core/vectorstore.py</strong> (full file at <a href="#f18-5">F18:5</a>):</p>
+<ul>
+  <li><strong>Lines 65&ndash;71 (unconditional PDF parse + split)</strong> &mdash; moved outside the
+  <code>if os.path.exists(index_path)</code> branch entirely. Before F18, parsing only happened on a cold cache;
+  now it happens every call, because <code>BM25Retriever.from_documents(docs)</code> at line 80 needs the raw
+  chunk list whether or not FAISS's index was already on disk. The PDF parse itself makes no network call and
+  runs against small local files, so this trades a small, constant local cost for not having to persist a second,
+  parallel on-disk index just for BM25.</li>
+  <li><strong>Line 79 (<code>faiss_retriever</code>)</strong> &mdash; the exact same
+  <code>vectorstore.as_retriever()</code> call this function already made pre-F18, just assigned to a name instead
+  of passed inline, since it's now one of two inputs to <code>EnsembleRetriever</code> instead of the whole
+  return value.</li>
+  <li><strong>Lines 80&ndash;81 (<code>bm25_retriever</code>)</strong> &mdash; <code>BM25Retriever.from_documents()</code>
+  builds an in-memory BM25 index from the same chunk objects FAISS was built from (not from FAISS itself), so
+  both retrievers score the identical document set, just with two different scoring functions. <code>.k</code> is
+  set explicitly because <code>from_documents()</code>'s constructor doesn't accept it as a keyword argument the
+  way FAISS's <code>as_retriever(search_kwargs=...)</code> does.</li>
+  <li><strong>Lines 83&ndash;85 (<code>EnsembleRetriever</code>)</strong> &mdash; <code>weights=[0.5, 0.5]</code> is
+  an even split, not a tuned value; see <a href="#f18-8">F18:8</a> for why 50/50 was kept as the starting point
+  rather than optimized against this repo's 15-question eval set.</li>
+  <li><strong>Line 87 (<code>wrap_with_reranking(hybrid_retriever, ...)</code>)</strong> &mdash; unchanged call
+  shape from pre-F18; <code>RerankingRetriever</code> (F10) only requires its <code>base_retriever</code> be a
+  <code>BaseRetriever</code>, and <code>EnsembleRetriever</code> is one, so F10's code needed zero changes to
+  accept a fused retriever instead of a single FAISS one.</li>
+</ul>
+
+<h3 id="f18-8">F18:8 Technical Deep Dive: A Net Win, Not a Strict One</h3>
+
+<p><strong>Reciprocal rank fusion ignores the raw scores on purpose.</strong> FAISS returns a cosine distance,
+BM25 returns a term-frequency score — two numbers with no shared scale, so averaging or summing them directly
+would silently let whichever retriever happens to produce larger raw numbers dominate the fusion regardless of
+actual relevance. <code>EnsembleRetriever</code> sidesteps that by fusing on each document's <em>rank position</em>
+within its own list instead (<code>weight / (rank + c)</code>), which is why the constructor takes
+<code>retrievers</code> and <code>weights</code>, not anything resembling a score-normalization parameter.</p>
+
+<p><strong>The F17 before/after comparison surfaced a real, honest tradeoff, not just an improvement.</strong> The
+net score moved from <code>11/15</code> to <code>12/15</code> (see <a href="#f18-4">F18:4</a>), and two
+previously-failing questions ("What vegan options do you have?", "Do you deliver?") now pass — BM25 pulling in a
+chunk FAISS's embedding had ranked lower. But one question that passed before now fails:
+<strong>"What's in the Dragon Roll and how much does it cost?"</strong> dropped from
+<code>faithfulness=1.00</code> to <code>faithfulness=0.00</code> &mdash; the answer started naming ingredients
+(bigeye tuna, yellowtail) the retrieved context never mentioned, only the salmon topping it actually described.
+The most likely mechanism: BM25 changed <em>which</em> chunks made the fused candidate pool for that specific
+query, and the generation LLM filled a gap in that different context mix with outside knowledge instead of
+staying grounded. Hybrid Search trades away one specific failure mode for two others fixed elsewhere; it is not
+a strictly-dominant upgrade over FAISS alone, and this doc says so rather than only reporting the net-positive
+headline number.</p>
+
+<p><strong>50/50 weighting is a reasonable default, not a tuned one.</strong> With only 15 fixture questions total
+and no chunk-level relevance labels (see F18:1's toolbox note), sweeping <code>weights</code> against this
+specific eval set would risk overfitting a weighting choice to 15 questions rather than finding one that
+generalizes — the same trap a larger, labeled eval set would be needed to avoid responsibly. Left as an even
+split rather than tuned speculatively, the same "don't optimize against a hypothetical" restraint <a
+href="#f20">CI/CD Eval Regression Gate (F20)</a>'s own Technical Deep Dive applied to caching the FAISS index
+inside CI.</p>
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h1 class="phase-header"><span class="phase-num">Phase 5</span>Dark Horse (Enterprise Production Hardening)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 5</span>Enterprise Retrofit (Enterprise Production Hardening)</span><img class="phase-header-img" src="images/thumbs/enterprise-movie.jpg" alt="USS Enterprise, movie-era refit"></h1>
 
 <h2 id="f19">F19 — Query Guardrails &amp; Intent Gating</h2>
 
@@ -15932,7 +16565,7 @@ across its <code>0.6</code> threshold between two runs of the identical code &md
 gate shares with any LLM-judged CI check, not something F20's own YAML introduces or could fix by itself.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h1 class="phase-header"><span class="phase-num">Phase 6</span>Shelby Cobra (Security &amp; Quality Hardening)</h1>
+<h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 6</span>Enterprise Next Generation (Security &amp; Quality Hardening)</span><img class="phase-header-img" src="images/thumbs/tng.jpg" alt="Enterprise Next Generation"></h1>
 
 <h2 id="f21">F21 — API Authentication &amp; Rate Limiting</h2>
 

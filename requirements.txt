@@ -9,6 +9,7 @@ sqlalchemy
 langgraph
 faiss-cpu
 flashrank
+rank_bm25
 fastmcp
 gspread
 tiktoken

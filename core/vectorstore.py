@@ -1,12 +1,17 @@
 """F10: Cross-encoder re-ranking - re-scores retrieved chunks for actual relevance
 before they reach the LLM, instead of trusting FAISS's raw similarity ranking alone.
 F12: also holds get_retriever(), the shared FAISS load-or-build pipeline every engine uses.
+F18: get_retriever() now fuses that FAISS (dense/semantic) search with a BM25 (sparse/keyword)
+search via reciprocal rank fusion, so an exact term FAISS's embeddings blur past (a dish name,
+a price, an allergen) still surfaces, before F10's cross-encoder re-ranks the merged results.
 """
 import os
 from typing import List
 
 from flashrank import Ranker, RerankRequest
+from langchain_classic.retrievers import EnsembleRetriever  # F18: reciprocal rank fusion
 from langchain_community.document_loaders import PyPDFLoader  # F3
+from langchain_community.retrievers import BM25Retriever  # F18
 from langchain_community.vectorstores import FAISS  # F3
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
@@ -50,20 +55,33 @@ def wrap_with_reranking(base_retriever: BaseRetriever, top_k: int = 3) -> Rerank
 
 
 def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> RerankingRetriever:
-    """F3/F10/F12: load a cuisine's FAISS index from disk if it's already built, or build + save
-    one, then wrap it with cross-encoder re-ranking. Shared by every engine (plain_rag today,
-    langgraph/crewai/autogen later) instead of each duplicating this load-or-build pipeline.
+    """F3/F10/F12/F18: load a cuisine's FAISS index from disk if it's already built, or build +
+    save one, then fuse it with a BM25 keyword retriever and wrap the fused result with
+    cross-encoder re-ranking. Shared by every engine (plain_rag today, langgraph/crewai/autogen
+    later) instead of each duplicating this load-or-build pipeline.
     """
     index_path = f"{VECTORSTORE_DIR}/{cuisine}"
+
+    # F18: BM25 has no on-disk index of its own (langchain rebuilds it in memory from the raw
+    # chunks each run), so parse + split the PDF unconditionally. This is cheap/local/no API
+    # calls - the FAISS embedding step below is the expensive part the on-disk index still saves.
+    loader = PyPDFLoader(f"menus/{cuisine}.pdf")
+    documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    docs = text_splitter.split_documents(documents)
 
     if os.path.exists(index_path):  # F3: load a previously saved FAISS index...
         vectorstore = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
     else:  # ...or build one from the PDF and save it
-        loader = PyPDFLoader(f"menus/{cuisine}.pdf")
-        documents = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        docs = text_splitter.split_documents(documents)
         vectorstore = FAISS.from_documents(docs, embeddings)
         vectorstore.save_local(index_path)
 
-    return wrap_with_reranking(vectorstore.as_retriever(), top_k=top_k)  # F10
+    faiss_retriever = vectorstore.as_retriever(search_kwargs={"k": top_k})  # F3: dense/semantic
+    bm25_retriever = BM25Retriever.from_documents(docs)  # F18: sparse/keyword
+    bm25_retriever.k = top_k
+
+    hybrid_retriever = EnsembleRetriever(  # F18: reciprocal rank fusion across both result lists
+        retrievers=[bm25_retriever, faiss_retriever], weights=[0.5, 0.5]
+    )
+
+    return wrap_with_reranking(hybrid_retriever, top_k=top_k)  # F10

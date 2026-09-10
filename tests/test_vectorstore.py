@@ -41,6 +41,7 @@ class FakeRetriever(BaseRetriever):
 
     docs_to_return: List[Document] = Field(default_factory=list)
     calls: List[str] = Field(default_factory=list)
+    k: int = 4  # F18: BM25Retriever exposes a settable `k`; get_retriever() sets it to top_k
 
     def _get_relevant_documents(self, query, *, run_manager=None):
         self.calls.append(query)
@@ -109,3 +110,75 @@ def test_reranking_retriever_reranks_base_retriever_results(vectorstore, monkeyp
     assert called["query"] == "what's good?"
     assert called["top_k"] == 1
     assert len(result) == 1
+
+
+@pytest.fixture
+def patched_get_retriever(vectorstore, monkeypatch):
+    """F18: stub every external boundary get_retriever() touches - PDF parsing, splitting, FAISS,
+    and BM25 - so the fusion wiring can be tested without a real PDF, embeddings, or BM25 math.
+    """
+    split_docs = docs("chunk one", "chunk two")
+
+    fake_loader = MagicMock()
+    fake_loader.load.return_value = ["raw page"]
+    monkeypatch.setattr(vectorstore, "PyPDFLoader", MagicMock(return_value=fake_loader))
+
+    fake_splitter = MagicMock()
+    fake_splitter.split_documents.return_value = split_docs
+    monkeypatch.setattr(vectorstore, "RecursiveCharacterTextSplitter", MagicMock(return_value=fake_splitter))
+
+    fake_vectorstore = MagicMock()
+    fake_faiss_retriever = FakeRetriever()
+    fake_vectorstore.as_retriever.return_value = fake_faiss_retriever
+    fake_faiss_cls = MagicMock()
+    fake_faiss_cls.load_local.return_value = fake_vectorstore
+    fake_faiss_cls.from_documents.return_value = fake_vectorstore
+    monkeypatch.setattr(vectorstore, "FAISS", fake_faiss_cls)
+
+    fake_bm25_retriever = FakeRetriever()
+    fake_bm25_cls = MagicMock()
+    fake_bm25_cls.from_documents.return_value = fake_bm25_retriever
+    monkeypatch.setattr(vectorstore, "BM25Retriever", fake_bm25_cls)
+
+    fake_ensemble_cls = MagicMock(side_effect=lambda **kwargs: FakeRetriever())
+    monkeypatch.setattr(vectorstore, "EnsembleRetriever", fake_ensemble_cls)
+
+    return {
+        "split_docs": split_docs,
+        "faiss": fake_faiss_cls,
+        "faiss_retriever": fake_faiss_retriever,
+        "bm25": fake_bm25_cls,
+        "bm25_retriever": fake_bm25_retriever,
+        "ensemble": fake_ensemble_cls,
+    }
+
+
+def test_get_retriever_fuses_bm25_and_faiss_with_reranking(vectorstore, patched_get_retriever, monkeypatch):
+    monkeypatch.setattr(vectorstore.os.path, "exists", lambda path: True)  # index already on disk
+
+    result = vectorstore.get_retriever("italian", embeddings=MagicMock(), top_k=2)
+
+    fakes = patched_get_retriever
+    fakes["faiss"].load_local.assert_called_once()
+    fakes["faiss"].from_documents.assert_not_called()  # already on disk - don't rebuild
+    fakes["bm25"].from_documents.assert_called_once_with(fakes["split_docs"])  # F18: fed the same chunks
+    assert fakes["bm25_retriever"].k == 2
+
+    ensemble_kwargs = fakes["ensemble"].call_args.kwargs
+    assert ensemble_kwargs["retrievers"] == [fakes["bm25_retriever"], fakes["faiss_retriever"]]
+    assert ensemble_kwargs["weights"] == [0.5, 0.5]
+
+    assert isinstance(result, vectorstore.RerankingRetriever)
+    assert result.top_k == 2
+
+
+def test_get_retriever_builds_and_saves_faiss_when_index_missing(vectorstore, patched_get_retriever, monkeypatch):
+    monkeypatch.setattr(vectorstore.os.path, "exists", lambda path: False)
+    fake_embeddings = MagicMock()
+
+    vectorstore.get_retriever("mexican", embeddings=fake_embeddings, top_k=3)
+
+    fakes = patched_get_retriever
+    fakes["faiss"].load_local.assert_not_called()
+    fakes["faiss"].from_documents.assert_called_once_with(fakes["split_docs"], fake_embeddings)
+    fakes["faiss"].from_documents.return_value.save_local.assert_called_once()
