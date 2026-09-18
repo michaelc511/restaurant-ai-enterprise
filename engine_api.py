@@ -14,6 +14,8 @@ from pydantic import BaseModel
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.database import init_db, log_call, get_session_totals  # F11
 from core.sheets import get_daily_specials, get_hours_and_events, detect_ops_intent, resolve_target_days  # F8
+from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
+from core.llm import build_llm_and_embeddings  # F2/F12/F19
 from engines.base import get_engine  # F12
 
 load_dotenv(find_dotenv())
@@ -21,10 +23,13 @@ load_dotenv(find_dotenv())
 DEBUG_MODE = os.environ.get("DEBUG_MODE", "true").lower() != "false"
 METRICS = os.environ.get("METRICS", "true").lower() != "false"  # F6/F9/F11: track + persist regardless of DEBUG_MODE; DEBUG_MODE only gates the console prints
 DEFAULT_ENGINE = os.environ.get("DEFAULT_ENGINE", "plain_rag")  # F12: which engine answers by default
+GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "false"  # F19
 
 AVAILABLE_CUISINES = ["sushi", "steak", "italian"]
 
 app = FastAPI()
+
+guardrails_llm, _ = build_llm_and_embeddings()  # F19: same provider selection as every engine; embeddings unused here
 
 session_usage_totals = new_session_totals()  # F6
 session_trace_totals = new_trace_totals()  # F9
@@ -92,6 +97,13 @@ def ask(request: AskRequest):
 
     if request.question.strip().lower() == "tt":  # F11: totals-only shortcut, works regardless of DEBUG_MODE
         return {"cuisine": cuisine, "session_totals": get_session_totals(request.session_id)}
+
+    if GUARDRAILS_ENABLED:  # F19: reject off-topic questions before they ever reach retrieval/generation
+        classification = classify_intent(guardrails_llm, request.question)
+        if DEBUG_MODE:
+            print(f"\n[F19] Intent: {classification.intent} - {classification.reasoning}")
+        if is_off_topic(classification):
+            return {"cuisine": cuisine, "answer": OFF_TOPIC_MESSAGE, "top_match": "(F19) Rejected - off-topic"}
 
     ops_intent = detect_ops_intent(request.question)  # F8: route obvious specials/hours questions to the live sheet
     if ops_intent == "specials":  # F8: specials only ever live in the sheet, never in the PDF menus - go straight there

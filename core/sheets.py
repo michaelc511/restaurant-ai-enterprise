@@ -71,9 +71,10 @@ def detect_ops_intent(question: str) -> Optional[str]:
 
     Not real intent understanding - a simple substring match, good enough to
     catch obvious phrasing like "what are today's specials?" or "are you open on
-    Sunday?". Real intent classification is checklist item Query Guardrails &
-    Intent Gating (F19) / LangGraph State Machine Engine (F13)'s routing node -
-    this is a stopgap for F8, not a replacement for either.
+    Sunday?". Query Guardrails & Intent Gating (F19)'s classify_intent() (core/guardrails.py)
+    now runs before this, in menu_api.py/engine_api.py's ask(), and rejects off-topic
+    questions outright - but it doesn't replace this heuristic's specials-vs-hours-vs-menu
+    routing, so both still run.
 
     Returns:
         "specials", "hours", or None (fall through to the RAG chain as normal).
