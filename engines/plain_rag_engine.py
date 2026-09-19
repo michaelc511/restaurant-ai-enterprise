@@ -10,7 +10,8 @@ from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessag
 
 from core.llm import build_llm_and_embeddings  # F2/F12
 from core.memory import wrap_with_memory  # F7
-from core.vectorstore import get_retriever  # F3/F10/F12
+from core.sanitize import INJECTION_DEFENSE_NOTICE  # F22
+from core.vectorstore import get_retriever  # F3/F10/F12/F22
 from engines.base import BaseMenuEngine  # F12
 
 load_dotenv(find_dotenv())
@@ -37,6 +38,8 @@ Guidelines:
   context (fees, time limits, exceptions) rather than a vague paraphrase.
 - If asked about something outside the menu or restaurant policies, politely
   redirect back to what you can help with instead of answering off-topic.
+
+""" + INJECTION_DEFENSE_NOTICE + """
 ----------------
 {context}"""
 

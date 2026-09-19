@@ -168,8 +168,9 @@ def test_get_retriever_fuses_bm25_and_faiss_with_reranking(vectorstore, patched_
     assert ensemble_kwargs["retrievers"] == [fakes["bm25_retriever"], fakes["faiss_retriever"]]
     assert ensemble_kwargs["weights"] == [0.5, 0.5]
 
-    assert isinstance(result, vectorstore.RerankingRetriever)
-    assert result.top_k == 2
+    assert isinstance(result, vectorstore.SanitizingRetriever)  # F22: outermost wrapper now
+    assert isinstance(result.base_retriever, vectorstore.RerankingRetriever)
+    assert result.base_retriever.top_k == 2
 
 
 def test_get_retriever_builds_and_saves_faiss_when_index_missing(vectorstore, patched_get_retriever, monkeypatch):

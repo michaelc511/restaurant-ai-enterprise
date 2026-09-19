@@ -4,6 +4,9 @@ F12: also holds get_retriever(), the shared FAISS load-or-build pipeline every e
 F18: get_retriever() now fuses that FAISS (dense/semantic) search with a BM25 (sparse/keyword)
 search via reciprocal rank fusion, so an exact term FAISS's embeddings blur past (a dish name,
 a price, an allergen) still surfaces, before F10's cross-encoder re-ranks the merged results.
+F22: the final top_k chunks re-ranking picks are then delimiter-isolated (core/sanitize.py)
+before get_retriever() returns them, so retrieved menu content is never handed to an LLM
+prompt without an explicit data/instruction boundary around it.
 """
 import os
 from typing import List
@@ -17,6 +20,8 @@ from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_text_splitters import RecursiveCharacterTextSplitter  # F3
+
+from core.sanitize import SanitizingRetriever, wrap_with_sanitization  # F22
 
 _ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2")  # F10: cross-encoder re-ranking model
 
@@ -54,11 +59,11 @@ def wrap_with_reranking(base_retriever: BaseRetriever, top_k: int = 3) -> Rerank
     return RerankingRetriever(base_retriever=base_retriever, top_k=top_k)
 
 
-def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> RerankingRetriever:
-    """F3/F10/F12/F18: load a cuisine's FAISS index from disk if it's already built, or build +
-    save one, then fuse it with a BM25 keyword retriever and wrap the fused result with
-    cross-encoder re-ranking. Shared by every engine (plain_rag today, langgraph/crewai/autogen
-    later) instead of each duplicating this load-or-build pipeline.
+def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> SanitizingRetriever:
+    """F3/F10/F12/F18/F22: load a cuisine's FAISS index from disk if it's already built, or build +
+    save one, then fuse it with a BM25 keyword retriever, wrap the fused result with cross-encoder
+    re-ranking, and delimiter-isolate the final chunks. Shared by every engine (plain_rag today,
+    langgraph/crewai/autogen later) instead of each duplicating this load-or-build pipeline.
     """
     index_path = f"{VECTORSTORE_DIR}/{cuisine}"
 
@@ -84,4 +89,4 @@ def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> RerankingRetrieve
         retrievers=[bm25_retriever, faiss_retriever], weights=[0.5, 0.5]
     )
 
-    return wrap_with_reranking(hybrid_retriever, top_k=top_k)  # F10
+    return wrap_with_sanitization(wrap_with_reranking(hybrid_retriever, top_k=top_k))  # F10/F22

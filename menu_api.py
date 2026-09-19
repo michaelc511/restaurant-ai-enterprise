@@ -26,6 +26,7 @@ from pydantic import BaseModel
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.memory import wrap_with_memory  # F7
 from core.vectorstore import wrap_with_reranking  # F10
+from core.sanitize import wrap_with_sanitization, INJECTION_DEFENSE_NOTICE  # F22
 from core.database import init_db, log_call, get_session_totals  # F11
 from core.sheets import get_daily_specials, get_hours_and_events, detect_ops_intent, resolve_target_days  # F8
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
@@ -103,6 +104,8 @@ Guidelines:
   context (fees, time limits, exceptions) rather than a vague paraphrase.
 - If asked about something outside the menu or restaurant policies, politely
   redirect back to what you can help with instead of answering off-topic.
+
+""" + INJECTION_DEFENSE_NOTICE + """
 ----------------
 {context}"""
 
@@ -134,7 +137,7 @@ def build_qa_chain(cuisine: str):
         vectorstore.save_local(index_path)
 
     # 2.4 Run retrieval queries with GPT to fetch contextually relevant chunks
-    retriever = wrap_with_reranking(vectorstore.as_retriever())  # F10: cross-encoder re-ranks the retrieved chunks
+    retriever = wrap_with_sanitization(wrap_with_reranking(vectorstore.as_retriever()))  # F10/F22
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=retriever,
