@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Runtime and API</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>From Notebook to API: Building the Core Runtime of a Restaurant AI Assistant</h1>
+
+<p class="note">Category 1: Core Runtime &amp; API (#runtime, #api). Features covered: F1 (Prototype Execution), F2 (Dynamic LLM Selector), F4 (FastAPI Asynchronous Backend).</p>
+
+<p>Every AI feature in this project — memory, re-ranking, guardrails, multi-engine orchestration — runs on top of one small foundation: a model that can be reached, and an API that can be called. This post covers how that foundation was built in three steps: prove the idea in a notebook (F1), make the model provider swappable and verifiable (F2), and serve it over HTTP (F4).</p>
+
+<hr>
+
+<h2>Step 1: Prove the Idea in a Notebook (F1)</h2>
+
+<p>Before building a web server, a database, or a UI, one question needed an answer as cheaply as possible: <em>can an LLM answer questions correctly if you just hand it the right document?</em></p>
+
+<p>The prototype, <code>prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb</code>, answers that in nine notebook steps:</p>
+<ul>
+  <li>Load an FAQ text file with <code>TextLoader</code> and split it into 500-character chunks with a 50-character overlap (<code>CharacterTextSplitter</code>).</li>
+  <li>Embed the chunks with Azure OpenAI's <code>text-embedding-ada-002</code> and store them in a FAISS vector index.</li>
+  <li>Connect an Azure OpenAI chat model and wire everything into LangChain's <code>RetrievalQA</code> chain with <code>return_source_documents=True</code>.</li>
+  <li>Ask one question ("What is our return policy?") and print the answer next to the source chunks it came from.</li>
+</ul>
+
+<p>There's no error handling, no server, and no UI — on purpose. The notebook's only job was to show the approach works. Once it did, the same pattern was rebuilt for restaurant menus: <code>PyPDFLoader</code> reading <code>menus/sushi.pdf</code>, <code>steak.pdf</code>, and <code>italian.pdf</code> instead of a text file, first as <code>menu_rag.py</code> and then as <code>menu_api.py</code>.</p>
+
+<hr>
+
+<h2>Step 2: Make the Model Provider Swappable and Verifiable (F2)</h2>
+
+<p>The app can run on two providers: OpenAI directly, or Azure's hosted OpenAI. Which one it uses is decided by which API key is present in <code>.env</code>:</p>
+
+<pre><code>if os.environ.get("OPENAI_API_KEY"):
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+elif os.environ.get("AZURE_OPENAI_API_KEY"):
+    llm = AzureChatOpenAI(..., deployment_name="gpt-5-mini", temperature=0)
+    embeddings = AzureOpenAIEmbeddings(..., deployment="text-embedding-ada-002")
+else:
+    raise RuntimeError("Set OPENAI_API_KEY or AZURE_OPENAI_API_KEY in the .env file")</code></pre>
+
+<ul>
+  <li><strong>OpenAI first, Azure as a fallback.</strong> OpenAI was made the default so the project runs on its own, without depending on a class lab's Azure gateway.</li>
+  <li><strong><code>temperature=0</code> on both branches.</strong> A restaurant assistant should give the same price for the same dish every time, so answers are kept deterministic and focused.</li>
+  <li><strong>Fail fast with no key.</strong> If neither key is set, the app refuses to start with a clear error instead of failing later on a customer's first question.</li>
+  <li><strong>A connectivity check at startup.</strong> When <code>DEBUG_MODE</code> is on, <code>menu_api.py</code> prints which provider it picked and sends a plain test prompt ("Say 'connection ok' if you can read this.") before building any indexes. A bad or expired key shows up immediately, not halfway through embedding a menu.</li>
+</ul>
+
+<p>Later, this selection logic was extracted into <code>core/llm.py</code> as <code>build_llm_and_embeddings()</code>, so every engine shares one copy instead of duplicating it. <code>menu_api.py</code> deliberately keeps its own inline copy so it stays runnable as a standalone baseline.</p>
+
+<p><strong>What F2 isn't (yet):</strong> the selector chooses between two flavors of OpenAI models. Other vendors such as Ollama, Gemini, or Claude aren't wired in today.</p>
+
+<hr>
+
+<h2>Step 3: Serve It Over HTTP (F4)</h2>
+
+<p><code>menu_api.py</code> turns the RAG pipeline into a FastAPI app:</p>
+
+<pre><code>uvicorn menu_api:app --reload</code></pre>
+
+<ul>
+  <li><strong>Build once, reuse forever.</strong> At startup, a RAG chain is built for each of the three cuisines (sushi, steak, italian) and kept in a dictionary. FAISS indexes are loaded from the <code>vectorstores/</code> folder if they already exist, so restarts don't re-embed every menu.</li>
+  <li><strong><code>POST /ask</code></strong> takes <code>{"cuisine": "sushi", "question": "...", "session_id": "..."}</code> and returns the answer plus <code>top_match</code>, the menu chunk that best supported it. When metrics are on, the response also includes token usage, session cost totals, and a latency breakdown.</li>
+  <li><strong><code>GET /specials</code> and <code>GET /hours</code></strong> expose live restaurant-ops data from a Google Sheet.</li>
+  <li><strong>Validated input.</strong> The request body is a Pydantic model (<code>AskRequest</code>), and an unknown cuisine gets a clear error listing the valid choices.</li>
+  <li><strong>Two ways to run.</strong> <code>uvicorn</code> serves the API; running <code>python3 menu_api.py</code> directly starts an interactive terminal loop with the same pipeline.</li>
+</ul>
+
+<div class="dialogue">
+  <p>Request: <code>POST /ask {"cuisine": "sushi", "question": "Is there a corkage fee if I bring my own wine?"}</code></p>
+  <p>Answer: "Yes, the corkage fee is $30 per 720ml bottle."</p>
+  <p class="note">(The <code>top_match</code> field in the same response shows the menu-policy chunk the answer came from, so you can see why the model said it.)</p>
+</div>
+
+<p><strong>A note on "asynchronous":</strong> the route handlers are written as regular <code>def</code> functions, not <code>async def</code>. FastAPI runs plain <code>def</code> handlers in a worker thread pool, so a slow LLM call doesn't block the server's event loop. The responses aren't streamed; each answer is returned in one piece when it's ready.</p>
+
+<p>The repo also includes <code>flask_app.py</code>, a minimal Flask version of <code>/ask</code> that reuses the same chains. It's a useful side-by-side comparison, but FastAPI is the main backend that every later feature builds on.</p>
+
+<hr>
+
+<h2>Why This Foundation Matters</h2>
+
+<p>Each later feature plugs into one of these three pieces: the shared provider selection (F2), the per-cuisine chains built at startup, or the <code>/ask</code> request flow (F4). Because the API contract — cuisine and question in, answer and evidence out — stayed stable, two different web UIs, a second API entry point, and an evaluation harness could all be added later without rewriting it.</p>
+
+<p><strong>What's next (not yet built):</strong> streaming responses token by token, true <code>async</code> handlers, and additional model providers would each be natural upgrades to this runtime. None of them is implemented in this project yet.</p>
+
+</body>
+</html>

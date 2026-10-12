@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinOps and Governance</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>Knowing What Every AI Answer Costs: In-Code Token Accounting and a Durable Cost Ledger</h1>
+
+<p class="note">Category 5: FinOps &amp; Governance (#finops, #governance, #audit). Features covered: F6 (Token &amp; Cost Accounting), F11 (Relational DB usage ledger).</p>
+
+<p>Every question a guest asks costs real money: tokens in, tokens out, billed per call. A demo can ignore that. A business can't — it needs to know what each answer cost, which session spent it, and whether the monthly bill matches actual usage. This post covers how the project measures cost on every call (F6) and records it permanently (F11).</p>
+
+<hr>
+
+<h2>Step 1: Measure Every Call in Code (F6)</h2>
+
+<p>F6 lives in <code>core/telemetry.py</code>. Its core is a small context manager wrapped around each LLM call:</p>
+
+<pre><code>with track_usage(session_usage_totals) as cb:
+    result = chain.invoke(...)
+usage = UsageInfo(
+    prompt_tokens=cb.prompt_tokens,
+    completion_tokens=cb.completion_tokens,
+    total_tokens=cb.total_tokens,
+    total_cost_usd=cb.total_cost,
+)</code></pre>
+
+<ul>
+  <li><strong>The counter:</strong> <code>track_usage()</code> uses LangChain's <code>get_openai_callback()</code>, which captures the token counts and estimated dollar cost of every OpenAI call made inside the <code>with</code> block — including nested calls inside chains.</li>
+  <li><strong>The typed record:</strong> <code>UsageInfo</code> is a Pydantic model with four fields: prompt tokens, completion tokens, total tokens, and total cost in USD. Using a typed model means the API response and the database both get the same validated shape.</li>
+  <li><strong>The running total:</strong> each call's numbers are also added to an in-memory totals dictionary for the running process.</li>
+  <li><strong>Visible in every response:</strong> <code>/ask</code> returns a <code>usage</code> field, and the Gradio and Streamlit UIs display it in a Debug Metrics panel.</li>
+</ul>
+
+<h3>Two separate switches</h3>
+<ul>
+  <li><code>METRICS</code> (default on) controls whether tracking and persistence happen at all.</li>
+  <li><code>DEBUG_MODE</code> (default on) only controls whether the numbers are printed to the console.</li>
+</ul>
+<p>Keeping these separate means you can turn off noisy console logs in production without losing the cost records.</p>
+
+<div class="dialogue">
+  <p>Console output after a question (with both switches on):</p>
+  <p><code>[F6] Tokens - prompt: …, completion: …, total: … | Cost: $…</code></p>
+  <p class="note">(Exact numbers vary per question and model; the point is that every call reports its own cost the moment it finishes.)</p>
+</div>
+
+<p><strong>F6's limitation:</strong> the running totals live in a Python dictionary in RAM. Restart the server — a deploy, a crash — and every total resets to zero. The code also notes it isn't thread-safe under concurrent requests, which is fine for this single-worker demo but not for a multi-worker production deployment.</p>
+
+<hr>
+
+<h2>Step 2: A Durable Cost Ledger in SQLite (F11)</h2>
+
+<p>A number that disappears on restart isn't an accounting system; it's a scoreboard. F11 (<code>core/database.py</code>) gives every AI call a permanent row in a SQLite database file, <code>usage.db</code>, using Python's built-in <code>sqlite3</code> — no new dependency and no database server to run.</p>
+
+<ul>
+  <li><strong>The ledger — the <code>usage_log</code> table:</strong> one row per call, with a UTC timestamp, cuisine, session ID, the question, and the full token and cost breakdown. Rows are only ever added, never overwritten.</li>
+  <li><strong>The recorder — <code>log_call()</code>:</strong> takes the same <code>UsageInfo</code> object F6 already built and inserts it. Cost is calculated once and used twice: in the API response and in the database.</li>
+  <li><strong>The auditor — <code>get_session_totals()</code>:</strong> computes a session's totals on demand with a single SQL <code>SUM()</code> over its rows. There's no second "totals" table to drift out of sync with the raw log, so there's exactly one source of truth.</li>
+  <li><strong>Safe startup:</strong> <code>init_db()</code> uses <code>CREATE TABLE IF NOT EXISTS</code>, so it runs on every start without harm.</li>
+</ul>
+
+<p>Since F11, the <code>session_totals</code> field in every <code>/ask</code> response comes from the database, not from F6's in-memory dictionary — so totals survive restarts.</p>
+
+<div class="dialogue">
+  <p>User types: <code>tt</code></p>
+  <p>Answer: the session's durable totals from <code>usage.db</code> — prompt tokens, completion tokens, total tokens, and total cost.</p>
+  <p class="note">(<code>tt</code> is a built-in shortcut in both the API and the terminal loop. It skips the LLM entirely and just reads the ledger, so checking your spend costs nothing.)</p>
+</div>
+
+<h3>What about "Text-to-SQL"?</h3>
+<p>F11's roadmap name includes "Text-to-SQL Tool," but what's implemented today is the usage ledger only. There's no component yet that turns a natural-language question into a SQL query. The code describes the table as giving "future text-to-SQL tooling a real table to query" — the data is ready; the tool isn't built.</p>
+
+<hr>
+
+<h2>Why This Counts as Governance</h2>
+
+<ul>
+  <li><strong>Accountability:</strong> every call is tied to a session, a cuisine, and the exact question asked.</li>
+  <li><strong>Reconciliation:</strong> the ledger can be summed by session, by cuisine, or by date and compared against the provider's bill.</li>
+  <li><strong>Audit trail:</strong> rows are timestamped in UTC and append-only, so the history of spend can't silently change.</li>
+</ul>
+
+<p><strong>What's next (not yet built):</strong> a Text-to-SQL tool that answers questions like "What did the sushi menu cost us last week?" directly from <code>usage_log</code>, and per-session budget limits. Neither is implemented in this project yet.</p>
+
+</body>
+</html>

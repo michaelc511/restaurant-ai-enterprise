@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools and Data Grounding</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>Beyond the PDF: Live Restaurant Data Through a FastMCP Server and Google Sheets</h1>
+
+<p class="note">Category 8: Tools &amp; Data Grounding (#mcp, #tools). Feature covered: F8 (FastMCP Server Integration).</p>
+
+<p>A PDF menu is a snapshot. Today's specials, a holiday closure, or a private event next Saturday change daily and will never be in it. F8 connects the assistant to a live source — a Google Sheet the staff can edit — and exposes that data two ways: as plain functions the API calls directly, and as standard <strong>Model Context Protocol (MCP)</strong> tools any AI agent can use.</p>
+
+<hr>
+
+<h2>The Data Source: One Google Sheet (core/sheets.py)</h2>
+
+<ul>
+  <li><strong>Access:</strong> <code>gspread</code> authenticates with a Google service account (the key file lives in <code>secrets/</code>, which isn't committed). The spreadsheet must be shared with that account.</li>
+  <li><strong>Two tabs:</strong> <code>specials</code> (Day, Dish Name, Category, Description, Price, Allergens, Is Active) and <code>dates</code> (Date, Day, Event / Holiday, Status, Open Time, Close Time, Staff Notes).</li>
+  <li><strong><code>get_daily_specials(day)</code></strong> returns active specials, optionally filtered to a weekday such as "Fri." Rows marked "All Week" are included for every day.</li>
+  <li><strong><code>get_hours_and_events(target_date)</code></strong> returns hours, holiday, or closure rows for a specific date, or all rows.</li>
+  <li><strong>Always fresh:</strong> only the authenticated client is cached; sheet data is re-read on every call, so a staff edit shows up on the next question.</li>
+  <li><strong>Clear errors:</strong> a missing sheet, a renamed tab, a network problem, or a rate limit is turned into a <code>RuntimeError</code> with a readable message.</li>
+</ul>
+
+<hr>
+
+<h2>Consumer 1: The MCP Server (api/mcp_server.py)</h2>
+
+<p>MCP is an open standard that lets AI applications discover and call external tools in a uniform way. With FastMCP, exposing the sheet takes a few lines:</p>
+
+<pre><code>mcp = FastMCP("restaurant-ops-mcp")
+
+@mcp.tool
+def daily_specials(day: Optional[str] = None) -> list[dict]:
+    """Look up today's (or a given weekday's) active daily specials for the sushi menu."""
+    return get_daily_specials(day)
+
+@mcp.tool
+def hours_and_events(target_date: Optional[str] = None) -> list[dict]:
+    """Look up restaurant hours, holiday schedules, or closure notices."""
+    return get_hours_and_events(target_date)
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre>
+
+<ul>
+  <li><strong>Docstrings become tool descriptions.</strong> An agent reads them to decide when to call each tool and what arguments to pass.</li>
+  <li><strong>stdio transport:</strong> an MCP client such as Claude Desktop launches the server as a subprocess and talks to it over standard input and output.</li>
+  <li><strong>Stateless:</strong> no data or per-session state is kept between tool calls.</li>
+  <li><strong>Verified separately:</strong> <code>test_mcp_connection.py</code> starts the server over stdio and calls both tools.</li>
+</ul>
+
+<hr>
+
+<h2>Consumer 2: The Restaurant API</h2>
+
+<p>The same functions are called directly by the API — one implementation, two consumers.</p>
+<ul>
+  <li><strong><code>GET /specials</code> and <code>GET /hours</code></strong> return the sheet's rows as JSON.</li>
+  <li><strong>Routing inside <code>/ask</code>:</strong> <code>detect_ops_intent()</code> is a simple keyword check. A question containing "special" goes straight to the sheet. A question containing "hour," "open," "close," or "holiday" is treated as an hours question.</li>
+  <li><strong>Understanding "tomorrow":</strong> <code>resolve_target_days()</code> turns phrases like "tomorrow," "in 3 days," "Friday," or "this weekend" (Saturday and Sunday) into real dates.</li>
+</ul>
+
+<h3>Specials vs. hours: two different paths</h3>
+<ul>
+  <li><strong>Specials</strong> only ever exist in the sheet, so the answer comes straight from it — no retrieval, no LLM call.</li>
+  <li><strong>Hours</strong> are different: the regular weekly schedule is in the PDF menu. So the RAG chain answers first, with the resolved date added to the question ("The date being asked about is Friday, …"). Then any matching holiday or event rows from the sheet are appended.</li>
+  <li><strong>Hours questions skip conversation memory.</strong> Earlier turns about dishes were pulling retrieval away from the hours section of the menu, and an hours lookup is a standalone factual question anyway.</li>
+</ul>
+
+<div class="dialogue">
+  <p>User: "What are today's specials?"</p>
+  <p>Answer: "Specials:<br>[Fri] &lt;dish name&gt; (&lt;price&gt;) - &lt;description&gt; …"</p>
+  <p class="note">(Read live from the <code>specials</code> tab; <code>top_match</code> says "(F8) Live data from Google Sheets, not a PDF chunk." The actual dishes depend on what the staff have entered in the sheet.)</p>
+</div>
+
+<div class="dialogue">
+  <p>User: "What are your hours on Friday?"</p>
+  <p>Answer: "Friday hours are 12:00 PM to 11:00 PM." — followed by any Friday event or holiday rows from the sheet.</p>
+</div>
+
+<hr>
+
+<h2>Limitations</h2>
+<ul>
+  <li><strong>One sheet for every cuisine.</strong> There's a single spreadsheet, named "sushi," so a specials question on the steak or italian menu currently returns the sushi sheet's specials.</li>
+  <li><strong>Keyword routing is blunt.</strong> Any question with "special" in it goes to the sheet. A newer intent classifier rejects off-topic questions first, but the specials/hours routing is still keyword-based.</li>
+</ul>
+
+<p><strong>What's next (not yet built):</strong> a sheet per restaurant, and letting an agent engine call the MCP tools itself instead of relying on keyword routing. Neither is implemented in this project yet.</p>
+
+</body>
+</html>

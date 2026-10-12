@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing and Evaluation</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>Turning "Did That Change Help?" Into a Number: Unit Tests, LLM-Judged Evals, and a CI Gate</h1>
+
+<p class="note">Category 10: Testing, Quality &amp; Evaluation (#eval, #testing, #cicd). Features covered: F23 (Unit Tests for Core Modules), F17 (Automated RAG Evaluation Suite), F20 (CI/CD Eval Regression Gate).</p>
+
+<p>An AI app can break in two very different ways. The code can be wrong — a function returns the wrong value. Or the code can be fine while the <em>answers</em> get worse — a prompt tweak makes the model start inventing prices. Each needs its own kind of test. This post covers both, and the pipeline that runs them automatically on every pull request.</p>
+
+<hr>
+
+<h2>Layer 1: Unit Tests for the Logic (F23)</h2>
+
+<p>The <code>tests/</code> folder holds <strong>58 pytest tests</strong> across six modules:</p>
+<ul>
+  <li><strong><code>test_database.py</code></strong> — the cost ledger: table creation, safe re-runs, row inserts, per-session sums, and that one session's totals never leak into another's. Each test uses a temporary database file.</li>
+  <li><strong><code>test_sheets.py</code></strong> — the Google Sheets logic: date phrases ("tomorrow," "in 3 days," "this weekend," weekday names), specials-vs-hours keyword routing, active-row filtering, and error wrapping — all against fake sheet objects.</li>
+  <li><strong><code>test_vectorstore.py</code></strong> — re-ranking order and <code>top_k</code>, and that the retriever fuses BM25 with FAISS and builds an index when one is missing.</li>
+  <li><strong><code>test_sanitize.py</code></strong> — that chunks are wrapped in delimiters and forged delimiter tags are stripped.</li>
+  <li><strong><code>test_guardrails.py</code></strong> — the intent classifier's structured-output call and its off-topic check.</li>
+  <li><strong><code>test_evaluation.py</code></strong> — the eval scoring and pass/fail thresholds themselves.</li>
+</ul>
+
+<p><strong>Fully mocked:</strong> no test needs an API key or a network connection. LLM calls, the cross-encoder, and Google Sheets are replaced with fakes. The suite runs in under a second and costs nothing.</p>
+
+<pre><code>pytest</code></pre>
+
+<hr>
+
+<h2>Layer 2: LLM-Judged Evaluation of Real Answers (F17)</h2>
+
+<p>Unit tests can't tell you whether an answer is <em>good</em>. F17 (<code>evaluation/</code>) runs real questions through the real system and has an LLM grade the results.</p>
+
+<h3>Fixed test questions</h3>
+<p>Each cuisine has a checked-in fixture file (<code>evaluation/fixtures/sushi.json</code>, <code>steak.json</code>, <code>italian.json</code>) with five questions and their known-good answers — 15 in total. Because the questions never change, a score change means the system changed, not the test.</p>
+
+<h3>Three scores per answer</h3>
+<ul>
+  <li><strong>Faithfulness (must be ≥ 0.8):</strong> is every claim in the answer supported by the retrieved context? Adding a price or ingredient that isn't there fails, even if it happens to be true.</li>
+  <li><strong>Answer relevancy (≥ 0.8):</strong> does the answer actually address the question?</li>
+  <li><strong>Context precision (≥ 0.6):</strong> how many of the retrieved chunks were actually useful? The lower bar tolerates some noise.</li>
+</ul>
+<p>A question passes only if all three meet their thresholds.</p>
+
+<h3>How it's built</h3>
+<ul>
+  <li><strong>Same factory as production:</strong> questions go through <code>get_engine(...)</code>, so the eval tests exactly what users hit. <code>--engine langgraph</code> and <code>--cuisine sushi</code> select what to test.</li>
+  <li><strong>Structured judging:</strong> each metric is one <code>llm.with_structured_output(MetricJudgment)</code> call returning a 0.0–1.0 score and a short reason.</li>
+  <li><strong>Memory off:</strong> every question is answered with <code>use_memory=False</code>, so leftover conversation from a previous fixture can't affect the score.</li>
+  <li><strong>Why not Ragas or DeepEval?</strong> Installing Ragas in this environment would downgrade the <code>openai</code> and <code>langchain-openai</code> packages that every engine depends on. Scoring the same three metrics with the already-installed LLM avoids the conflict.</li>
+  <li><strong>A pass/fail exit code:</strong> the script exits with 0 if every question passed and 1 otherwise — exactly what CI needs.</li>
+</ul>
+
+<pre><code>python -m evaluation.run_evals
+[PASS] What's in the Dragon Roll and how much does it cost?
+    faithfulness=…  answer_relevancy=…  context_precision=…
+…
+15/15 passed</code></pre>
+<p class="note">(Scores vary by run; for any FAIL line, the judge's reasoning for each metric is printed underneath.)</p>
+
+<p><strong>One nuance:</strong> the fixtures store an expected answer for each question, but the three judges don't compare against it — they grade the answer against the question and the retrieved context. The expected answers serve as a human reference for now.</p>
+
+<hr>
+
+<h2>Layer 3: Enforce It on Every Pull Request (F20)</h2>
+
+<p>An eval suite nobody runs doesn't protect anything. F20 (<code>.github/workflows/eval_gate.yml</code>) is a GitHub Actions workflow that runs on every pull request to <code>main</code> (and on demand):</p>
+
+<ol>
+  <li><strong><code>unit-tests</code></strong> installs dependencies on Python 3.11 and runs <code>pytest</code>. It needs no secrets, so it runs on every PR, including ones from forks.</li>
+  <li><strong><code>eval-gate</code></strong> runs only after unit tests pass — if the code is broken, the eval numbers can't be trusted either. It runs <code>python -m evaluation.run_evals</code> against the real OpenAI API using the repository's <code>OPENAI_API_KEY</code> secret, and fails the build if any question drops below its thresholds.</li>
+</ol>
+
+<ul>
+  <li><strong>Fork safety:</strong> GitHub never exposes a repository's secrets to workflows triggered by fork PRs, so the eval job is skipped for them instead of failing.</li>
+  <li><strong>Built from scratch every time:</strong> the <code>vectorstores/</code> cache isn't committed, so CI builds fresh FAISS indexes from the PDFs on each run — the eval tests the full pipeline, not a stale index.</li>
+</ul>
+
+<hr>
+
+<h2>The Result</h2>
+
+<p>A change now has to pass two bars before it merges: the code does what it says (F23), and the answers are still grounded, relevant, and well-retrieved (F17), checked automatically (F20). "Did that prompt tweak help or hurt?" has a number for an answer.</p>
+
+<p><strong>What's next (not yet built):</strong> comparing answers against the stored expected answers, running the eval gate against the LangGraph engine as well, and unit tests for the memory and telemetry modules. None of these is implemented in this project yet.</p>
+
+</body>
+</html>

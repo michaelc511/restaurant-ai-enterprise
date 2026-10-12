@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observability and Tracing</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>Where Did the Time Go? Step-Level Latency Tracing and Error Rates for a RAG Assistant</h1>
+
+<p class="note">Category 7: Observability &amp; Telemetry (#observability, #tracing). Feature covered: F9 (Distributed Tracing / Observability &amp; Tracing).</p>
+
+<p>"The assistant feels slow" isn't something you can fix. "Retrieval takes 120 ms and the LLM takes 2,400 ms" is. A RAG answer has two main steps — finding the right chunks and generating the reply — and when something is slow or broken, you need to know which one. F9 adds that visibility.</p>
+
+<hr>
+
+<h2>What F9 Measures</h2>
+
+<p>For every question, F9 (<code>core/telemetry.py</code>) records:</p>
+<ul>
+  <li><strong><code>retriever_ms</code></strong> — time spent in the retrieval step.</li>
+  <li><strong><code>llm_ms</code></strong> — time spent in the LLM step.</li>
+  <li><strong><code>total_ms</code></strong> — wall-clock time for the whole call.</li>
+  <li><strong>Calls and errors</strong> — running counts, from which an error rate is calculated.</li>
+</ul>
+
+<p>These come back in every <code>/ask</code> response as a <code>trace</code> object (when <code>METRICS</code> is on), and are printed to the console when <code>DEBUG_MODE</code> is on:</p>
+
+<pre><code>[F9] Latency - retriever: …ms, llm: …ms, total: …ms
+[F9] Error Rate - 0/12 calls (0.0%)</code></pre>
+
+<hr>
+
+<h2>How It Works</h2>
+
+<h3>1. A LangChain callback handler as a stopwatch</h3>
+<p><code>StepTimer</code> extends LangChain's <code>BaseCallbackHandler</code>. LangChain fires events as a chain runs, and the timer listens to them:</p>
+<ul>
+  <li><code>on_retriever_start</code> / <code>on_retriever_end</code> time the retrieval step.</li>
+  <li><code>on_llm_start</code> / <code>on_chat_model_start</code> / <code>on_llm_end</code> time the LLM step. Chat models like <code>ChatOpenAI</code> fire <code>on_chat_model_start</code> instead of <code>on_llm_start</code>, so both are handled.</li>
+</ul>
+<p>Measurements use <code>time.perf_counter()</code>, a high-resolution clock meant for timing.</p>
+
+<h3>2. Ambient registration, so nested calls are captured</h3>
+<p>Callbacks normally have to be passed into each <code>invoke()</code> call through its <code>config</code>. But the conversation-memory wrapper calls the inner chain without forwarding that config, so a timer passed the normal way would miss the real work.</p>
+<p>F9 avoids that by using the same trick LangChain's own cost counter uses: the timer is stored in a <code>ContextVar</code> and registered with <code>register_configure_hook()</code>. LangChain then attaches it automatically to every chain run in the current context, however deeply nested.</p>
+
+<h3>3. A context manager that counts calls and errors</h3>
+<pre><code>with trace_call(session_trace_totals) as timer:
+    result = chain.invoke(...)
+# timer.retriever_ms / timer.llm_ms / timer.total_ms are now filled in</code></pre>
+<p><code>trace_call()</code> increments the call count, measures total time, and — if the wrapped call raises an exception — increments the error count before re-raising it. A <code>finally</code> block always records the total time and clears the timer.</p>
+
+<hr>
+
+<h2>Example</h2>
+
+<div class="dialogue">
+  <p>User: "What vegan options do you have?"</p>
+  <p>Answer: "Vegan options include the Sea Salt Edamame ($6.50), Spicy Garlic Edamame ($8.00), and the Yuzu Citrus Sorbet ($7.00) for dessert."</p>
+  <p>Response also includes: <code>"trace": {"retriever_ms": …, "llm_ms": …, "total_ms": …, "errors": 0, "calls": …}</code></p>
+  <p class="note">(In a typical run the LLM step is far larger than retrieval, which tells you where optimization effort should go.)</p>
+</div>
+
+<hr>
+
+<h2>Honest Limitations</h2>
+
+<ul>
+  <li><strong>In-process, not distributed.</strong> The roadmap name says "distributed tracing," but F9 is step timing inside one Python process. It doesn't send spans to an external tracing tool such as Langfuse or LangSmith, and it doesn't follow a request across services.</li>
+  <li><strong>Last step wins.</strong> Each <code>*_end</code> event overwrites the stored duration rather than adding to it. On a pipeline with several LLM calls — like the LangGraph engine's route, generate, and verify steps — <code>llm_ms</code> reflects the last LLM call, not the sum.</li>
+  <li><strong>Counters reset on restart</strong> and, like F6's totals, aren't thread-safe under concurrent requests.</li>
+</ul>
+
+<p><strong>What's next (not yet built):</strong> exporting traces to a tracing platform such as LangSmith or Langfuse, summing durations across multiple LLM calls, and persisting latency alongside cost in the database. None of these is implemented in this project yet.</p>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI and Client Experience</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>From Idea to Interface: Scoping the App and Putting a Face on the API</h1>
+
+<p class="note">Category 2: UI &amp; Client Experience (#ui, #client). Features covered: F0 (App Idea &amp; Scope Design), F5 (Interactive Web Interfaces).</p>
+
+<p>An AI assistant is only useful if someone can actually talk to it. This post covers the two ends of that story: the written idea that defined what the app should do (F0), and the two web interfaces that let a real person use it without touching <code>curl</code> (F5).</p>
+
+<hr>
+
+<h2>Part 1: The App Idea and Scope (F0)</h2>
+
+<p>F0 isn't code. It's the written proposal in <code>project-notes.txt</code> (the INTRODUCTION section) that every other feature builds on.</p>
+
+<p><strong>The problem:</strong> a general-purpose LLM knows nothing about a specific restaurant. Ask it about "the Dragon Roll" and it can only guess at the price and ingredients — and a confident wrong guess about an ingredient is worse than no answer at all.</p>
+
+<p><strong>The proposed fix:</strong> a Retrieval-Augmented Generation (RAG) pipeline. Chunk the restaurant's PDF menus, embed the chunks, retrieve the most relevant ones for each question, and have the LLM answer only from what was retrieved. The menu, not the model's general knowledge, becomes the source of truth.</p>
+
+<p><strong>The scope:</strong> three restaurants, each with its own PDF menu — sushi, steak, and italian — and questions about dishes, prices, ingredients, and restaurant policies. That scope is visible all the way through the code: every API and UI offers exactly those three cuisines.</p>
+
+<hr>
+
+<h2>Part 2: Two Web Interfaces on One API (F5)</h2>
+
+<p>JSON responses are fine for developers, but a guest needs a text box and a button. F5 adds two browser front ends in the <code>web-demo/</code> folder:</p>
+
+<ul>
+  <li><strong><code>web-demo/gradio_app.py</code></strong> — a Gradio <code>Blocks</code> app.</li>
+  <li><strong><code>web-demo/streamlit_app.py</code></strong> — a Streamlit app.</li>
+</ul>
+
+<p>Both do the same thing, on purpose. Neither one talks to the RAG chain directly; both send HTTP requests to the FastAPI backend at <code>http://127.0.0.1:8000</code>. Building two different UI frameworks against the same API proves that the API is a real, reusable contract and isn't accidentally tied to one frontend.</p>
+
+<h3>What each UI offers</h3>
+<ul>
+  <li><strong>Ask a question:</strong> pick a cuisine from a dropdown, type a question (pre-filled with "What rolls are on the menu?"), and click <strong>Ask</strong>. The UI shows the answer and the <strong>Top Matching Chunk</strong>, the piece of the menu the answer was based on.</li>
+  <li><strong>Debug metrics:</strong> when the server includes usage data in its response, a panel shows that call's tokens and cost, plus the session's running totals from the database.</li>
+  <li><strong>Get Daily Specials:</strong> calls <code>GET /specials</code> directly. Specials come from a live Google Sheet, not the PDF menu, so this button never touches the RAG chain.</li>
+  <li><strong>Get Today's Hours:</strong> sends "What are your hours today?" through <code>POST /ask</code>. Regular hours live in the PDF menu, so this needs the RAG chain; any holiday or event exceptions from the Google Sheet are appended to the answer.</li>
+</ul>
+
+<div class="dialogue">
+  <p>Guest picks <strong>sushi</strong> and types: "How much is valet parking?"</p>
+  <p>Answer: "Valet parking is a $12 flat fee…"</p>
+  <p class="note">(The Top Matching Chunk box underneath shows the parking-policy text from the sushi menu PDF, so the guest — or a developer — can see where the answer came from.)</p>
+</div>
+
+<h3>Running it</h3>
+<pre><code>uvicorn menu_api:app --reload        # terminal 1: the API
+python web-demo/gradio_app.py        # terminal 2: Gradio (opens a browser tab)
+streamlit run web-demo/streamlit_app.py   # or Streamlit instead</code></pre>
+
+<hr>
+
+<h2>Current Limitations</h2>
+
+<ul>
+  <li><strong>Every UI user shares one conversation.</strong> Neither UI sends a <code>session_id</code>, so every request uses the API's default session. Two people using the Gradio page at the same time share the same chat memory and the same cost totals.</li>
+  <li><strong>No engine picker.</strong> The project has a second API entry point that can switch between a plain RAG engine and a LangGraph engine per request, but neither UI exposes that choice yet.</li>
+  <li><strong>Local-only setup.</strong> The API address is hard-coded to <code>127.0.0.1:8000</code>, which is right for a demo but would need to be configurable for a real deployment.</li>
+</ul>
+
+<p><strong>What's next (not yet built):</strong> generating a unique session ID per browser tab, adding an engine dropdown, and reading the API address from configuration. None of these is implemented in this project yet.</p>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptive Conversational Memory</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2.1em; line-height: 1.25; }
+  h2 { margin-top: 40px; }
+  h3 { margin-top: 28px; text-decoration: underline; font-size: 1.3em; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  pre {
+    background: #f2f2f2;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; }
+  .dialogue {
+    border-left: 4px solid #dcf5dc;
+    background: #f8fcf8;
+    padding: 8px 14px;
+    margin: 12px 0;
+  }
+  .dialogue p { margin: 6px 0; }
+  .note { color: #555; font-style: italic; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<h1>Architecting Adaptive Conversational Memory: From Ephemeral Buffers to Durable SQL Checkpoints</h1>
+
+<h2>Memory — How Agents Remember</h2>
+
+<h3>Sensory Memory</h3>
+<p>The immediate, transient input processed by an agent during a single step of execution.</p>
+<p>Example: An agent briefly holds the raw error message returned by a failed shell command while formulating its next attempt.</p>
+
+<h3>Working Memory</h3>
+<p>The active context window holding current conversation history, active workspace data, and immediate scratchpad notes.</p>
+<p>Example: An agent references recent user instructions stored in the current prompt history to maintain conversational continuity.</p>
+
+<h2>Vector DBs / SQL DBs</h2>
+
+<h3>Episodic Memory</h3>
+<p>An external storage system that records historical events, past interactions, and previous task outcomes for long-term recall.</p>
+<p>Example: A coding agent checks its past execution logs to see what unit tests failed during yesterday's build attempt.</p>
+
+<h3>Semantic Memory</h3>
+<p>Persistent storage containing enduring domain knowledge, learned operational rules, and user preference profiles.</p>
+<p>Example: An assistant retrieves a stored preference rule stating that a specific user always requires responses formatted in markdown tables.</p>
+
+<p>Listen to this article on Spotify.</p>
+
+<h2>What Our Blog Will Focus On</h2>
+
+<p>These four memory types cover how AI agents hold on to information. Our architecture and this post focus on the two that handle live dialogue and session state:</p>
+
+<p><strong>Working Memory &amp; Episodic Memory (our main focus):</strong> We implement these through two features. The first is ephemeral in-RAM chat history (F7), which keeps the working context of the current conversation. The second is persistent SQLite-backed chat history (F16), which keeps a session's episode of the conversation even if the server restarts. Both are built on LangChain's chat-history classes, wrapped in <code>RunnableWithMessageHistory</code>.</p>
+
+<p><strong>Semantic Memory (via RAG):</strong> Our retrieval pipeline provides this. Vector search (F3), hybrid BM25 + FAISS fusion (F18), and cross-encoder re-ranking (F10) ground the assistant in lasting domain knowledge: the restaurant menus.</p>
+
+<p>When you deploy a generative AI app to production, treating every user query as a separate event makes for a bad experience. Without conversational memory, the assistant has "amnesia" and users must repeat themselves on every turn.</p>
+
+<p>Our roadmap fixes this in two steps. We start with ephemeral in-memory history (F7), then add an opt-in persistent SQL backend (F16) behind the same interface.</p>
+
+<hr>
+
+<h2>Phase 1: Short-Term Context with Ephemeral Chat Memory (F7)</h2>
+
+<p>Large Language Models are stateless: each request starts from scratch. F7 fills that gap without any outside infrastructure. All of it lives in one module, <code>core/memory.py</code>.</p>
+
+<ul>
+  <li><strong>Storage:</strong> a module-level dictionary (<code>_session_histories</code>) maps each session ID to a LangChain <code>ChatMessageHistory</code> object that lives entirely in RAM.</li>
+  <li><strong>Session isolation:</strong> session keys include the cuisine (<code>f"{cuisine}:{session_id}"</code>), so one customer's sushi conversation never mixes with another customer's, or with their own conversation about a different cuisine.</li>
+  <li><strong>Wiring:</strong> <code>wrap_with_memory()</code> wraps each RAG chain in LangChain's <code>RunnableWithMessageHistory</code>. It loads the session's history before each call and records the new question and answer afterward.</li>
+  <li><strong>Context injection:</strong> <code>_render_history()</code> formats the recent turns as a plain-text "Previous conversation:" block and puts it in front of the user's question. Because the question carries the history with it, the history affects both retrieval and the generated answer.</li>
+  <li><strong>Sliding window:</strong> only the last <code>MAX_HISTORY_TURNS = 5</code> exchanges are included in the prompt, which keeps token cost under control.</li>
+  <li><strong>Both engines share it:</strong> the plain RAG engine and the LangGraph engine (F13) both use <code>wrap_with_memory</code>, so they behave the same way with memory.</li>
+</ul>
+
+<p><strong>How it works, with an example:</strong></p>
+<div class="dialogue">
+  <p>User: "Which appetizers are gluten-free?"</p>
+  <p>Answer: "The Sea Salt Edamame ($6.50) and the Hamachi Jalapeño Crudo ($16.50)."</p>
+  <p>User: "How much is the second one?"</p>
+  <p>Answer: "The Hamachi Jalapeño Crudo is $16.50."</p>
+  <p class="note">(F7 put the previous exchange in front of the question, so the model knew what "the second one" meant.)</p>
+</div>
+
+<p><strong>A deliberate exception: hours questions skip memory (F8).</strong> Questions about opening hours are answered with no history at all. If earlier turns about rolls or prices were added to the query, they could pull retrieval toward the wrong documents.</p>
+
+<p><strong>Limitations of Phase 1:</strong></p>
+
+<p><em>Example of the sliding window cutoff:</em></p>
+<div class="dialogue">
+  <p>User (Turn 1): "Just so you know, I have a severe peanut allergy."</p>
+  <p>Answer (Turn 1): "Understood. I'll keep that in mind."</p>
+  <p>[... Turns 2–6 cover rolls, sides, and drinks ...]</p>
+  <p>User (Turn 7): "Is the dessert we talked about safe for me?"</p>
+  <p>Answer: "Could you tell me which allergies or ingredients you're concerned about?"</p>
+  <p class="note">(At Turn 7, the 5-exchange window holds only Turns 2–6, so the allergy from Turn 1 is no longer in the prompt.)</p>
+</div>
+
+<p><em>Example of process volatility:</em></p>
+<div class="dialogue">
+  <p>User: "Which of your rolls are spicy?"</p>
+  <p>Answer: "The Spicy Tuna Volcano Roll and the Spicy Scallop Hand Roll."</p>
+  <p>[... The uvicorn server restarts during a routine deployment ...]</p>
+  <p>User: "Is the first one gluten-free?"</p>
+  <p>Answer: "Could you clarify which item you mean?"</p>
+  <p class="note">(The history lived only in a RAM dictionary inside the process, so the restart erased every active session.)</p>
+</div>
+
+<hr>
+
+<h2>Phase 2: Durable SQLite Chat History (F16)</h2>
+
+<p>F7 has one major weakness: volatility. If the process restarts because of a deployment or a container crash, every customer's conversation disappears.</p>
+
+<p>F16 (Persistent Thread Checkpointing) fixes this with an opt-in backend switch in the same file:</p>
+
+<pre><code>MEMORY_BACKEND = os.environ.get("MEMORY_BACKEND", "ephemeral").lower()
+CHAT_HISTORY_DB_PATH = "chat_history.db"
+
+def get_session_history(session_id: str) -&gt; BaseChatMessageHistory:
+    if MEMORY_BACKEND == "persistent":  # F16: durable, survives a restart/crash
+        return SQLChatMessageHistory(session_id=session_id, connection=f"sqlite:///{CHAT_HISTORY_DB_PATH}")
+    if session_id not in _session_histories:  # F7: ephemeral (default)
+        _session_histories[session_id] = ChatMessageHistory()
+    return _session_histories[session_id]</code></pre>
+
+<p><strong>What changed and what didn't:</strong></p>
+<ul>
+  <li><strong>Same interface:</strong> <code>get_session_history()</code> still returns a LangChain <code>BaseChatMessageHistory</code>. With <code>MEMORY_BACKEND=persistent</code> it returns LangChain's <code>SQLChatMessageHistory</code>, which writes to <code>chat_history.db</code> on disk. <code>RunnableWithMessageHistory</code>, <code>wrap_with_memory()</code>, both engines, the API routes, and the frontend needed no changes.</li>
+  <li><strong>Opt-in:</strong> the default is still <code>ephemeral</code> (F7). Persistence is enabled with an environment variable.</li>
+  <li><strong>Trim when building the prompt, not when storing:</strong> F16 also made the stored history complete in both modes. The 5-exchange sliding window is applied only when the history is rendered into the prompt, so the full conversation stays stored while each LLM call stays the same size.</li>
+  <li><strong>Not a LangGraph checkpointer:</strong> despite the feature's name, F16 uses LangChain's SQL chat-message history, not LangGraph's <code>SqliteSaver</code>. The F13 LangGraph engine's <code>GraphState</code> holds per-request state only, and its conversation memory still comes from this module.</li>
+</ul>
+
+<p><strong>How this improved the product:</strong></p>
+
+<p><em>Example of crash recovery:</em></p>
+<div class="dialogue">
+  <p>User: "Which of your rolls are spicy?"</p>
+  <p>Answer: "The Spicy Tuna Volcano Roll and the Spicy Scallop Hand Roll."</p>
+  <p>[... The uvicorn server restarts during a rolling deployment ...]</p>
+  <p>User: "Is the first one gluten-free?"</p>
+  <p>Answer: "The Spicy Tuna Volcano Roll isn't listed as gluten-free. It's topped with crispy tempura flakes."</p>
+  <p class="note">(Each exchange was written to SQLite as it happened. After the restart, <code>SQLChatMessageHistory</code> reloaded the session's history from disk, so "the first one" still meant the Spicy Tuna Volcano Roll.)</p>
+</div>
+
+<p><em>Example of no downstream changes:</em></p>
+<p>The same <code>session_id</code> the frontend already sends now maps to a durable conversation. This needed no change to API route logic or UI components, only <code>MEMORY_BACKEND=persistent</code>.</p>
+
+<p class="note">(Note: per-session token and cost totals come from F11's separate <code>usage.db</code> log. They aren't part of conversational memory.)</p>
+
+<hr>
+
+<p><strong>What's next (not yet built):</strong> One fixed window isn't ideal for every situation. Possible future upgrades include a token-based limit instead of a turn count, or summarizing older turns so key facts like an allergy aren't dropped. Neither is implemented in this project yet.</p>
+
+</body>
+</html>
