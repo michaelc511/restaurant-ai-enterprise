@@ -47,6 +47,39 @@
   }
   ul { margin: 8px 0; }
   li { margin: 4px 0; }
+  .section-index {
+    background: #f7f7f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 16px 10px 34px;
+    margin: 16px 0 8px;
+  }
+  .section-index-phase {
+    list-style: none;
+    margin: 10px 0 2px -18px;
+    font-weight: 700;
+    color: #555;
+  }
+  .sd-intro {
+    font-size: 1.02em;
+    color: #333;
+    border-left: 3px solid #4caf50;
+    padding-left: 12px;
+  }
+  .h3-up {
+    font-size: 0.6em;
+    font-weight: 400;
+    vertical-align: middle;
+    margin-left: 8px;
+    color: #2e7d32;
+  }
+  .h2-top {
+    font-size: 0.4em;
+    font-weight: 400;
+    vertical-align: middle;
+    margin-left: 10px;
+    color: #2e7d32;
+  }
   .note {
     background: #fff8e1;
     border-left: 4px solid #f5c518;
@@ -438,7 +471,48 @@
 <p>Master doc for feature work added on top of the base RAG pipeline (<code>menu_api.py</code>).
 Each feature is numbered to match <code>checklist.csv</code>. Online documentation: <a href="https://michaelc511.github.io/restaurant-ai-enterprise/features.html" target="_blank" rel="noopener">https://michaelc511.github.io/restaurant-ai-enterprise/features.html</a></p>
 
-<h2 id="roadmap">Project Roadmap: The Build in Six Phases</h2>
+<h2 id="contents">Table of Contents</h2>
+<ul class="section-index">
+  <li><a href="#roadmap">Project Roadmap: The Build in Six Phases</a></li>
+  <li><a href="#ai-dev-areas">Main Areas of AI Dev</a></li>
+  <li><a href="#suites">Suites</a></li>
+  <li><a href="#system-design">System Design</a></li>
+  <li class="section-index-phase">Phase 1 — Shuttlecraft (Baseline Proof-of-Concept & Serving)</li>
+  <li><a href="#getting-started">Getting Started</a></li>
+  <li><a href="#debug-mode">DEBUG_MODE &amp; METRICS — debug/testing toggles</a></li>
+  <li><a href="#f0">F0 — App Idea</a></li>
+  <li><a href="#f1">F1 — Prototype</a></li>
+  <li><a href="#f2">F2 — Test the LLM (provider + connectivity)</a></li>
+  <li><a href="#f3">F3 — Test the chunking (RAG &amp; Vectorstore)</a></li>
+  <li><a href="#f3-1">F3.1 — RAG System Prompt &amp; Persona</a></li>
+  <li><a href="#f4">F4 — Test the API (FastAPI)</a></li>
+  <li><a href="#f5">F5 — Test the web UIs (Streamlit &amp; Gradio)</a></li>
+  <li class="section-index-phase">Phase 2 — Archer (Observability, Context & Data Foundation)</li>
+  <li><a href="#f6">F6 — In-Code Token &amp; Cost Accounting</a></li>
+  <li><a href="#f7">F7 — Ephemeral Chat Memory</a></li>
+  <li><a href="#f9">F9 — Observability &amp; Tracing</a></li>
+  <li><a href="#f10">F10 — Cross-Encoder Re-ranking</a></li>
+  <li><a href="#f11">F11 — Relational DB &amp; Text-to-SQL Tool</a></li>
+  <li><a href="#f8">F8 — FastMCP Server Endpoint</a></li>
+  <li class="section-index-phase">Phase 3 — D7 (Multi-Engine & Agent Frameworks)</li>
+  <li><a href="#f12">F12 — Modular Engine Strategy Factory</a></li>
+  <li><a href="#f13">F13 — LangGraph State Machine Engine</a></li>
+  <li><a href="#f14">F14 — CrewAI Multi-Role Engine (NI)</a></li>
+  <li><a href="#f15">F15 — AutoGen Multi-Agent Engine (NI)</a></li>
+  <li class="section-index-phase">Phase 4 — NCC-1701 (Resilience, Evals & Hybrid Retrieval)</li>
+  <li><a href="#f16">F16 &mdash; Persistent Thread Checkpointing</a></li>
+  <li><a href="#f17">F17 — Automated RAG Evals Harness</a></li>
+  <li><a href="#f18">F18 — Hybrid Search (BM25 + FAISS)</a></li>
+  <li class="section-index-phase">Phase 5 — Enterprise Refit (Enterprise Production Hardening)</li>
+  <li><a href="#f19">F19 — Query Guardrails &amp; Intent Gating</a></li>
+  <li><a href="#f20">F20 — CI/CD Eval Regression Gate</a></li>
+  <li class="section-index-phase">Phase 6 — Enterprise Next Generation (Security &amp; Quality Hardening)</li>
+  <li><a href="#f21">F21 — API Authentication &amp; Rate Limiting (NI)</a></li>
+  <li><a href="#f22">F22 — Prompt-Injection Defense</a></li>
+  <li><a href="#f23">F23 — Unit Tests for Core Modules</a></li>
+</ul>
+
+<h2 id="roadmap">Project Roadmap: The Build in Six Phases <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p style="font-size:1.6em; font-weight:700; color:#555; margin:4px 0 20px;">Architecting Enterprise AI: An Enterprise Roadmap for Scalable, Observable, and Durable Systems</p>
 
@@ -500,9 +574,9 @@ strategies behind clean interfaces.</p>
   <span class="f-tags"><strong>Tags:</strong> Strangler Fig Pattern, API Versioning, Backward Compatibility, System Migration, Zero Downtime</span></li>
   <li><strong><a href="#f13">F13 — LangGraph StateGraph Engine</a>:</strong> Graph-based cyclical reasoning, conditional branching, and retry logic. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f13-langgraph.html" target="_blank" rel="noopener">Blog article: LangGraph - F13</a>)
   <span class="f-tags"><strong>Tags:</strong> LangGraph, Agentic AI, Cyclic State Machines, Self-Correction, Loop Engineering, Graph Architecture</span></li>
-  <li><a href="#f14">F14 — CrewAI Multi-Agent Coordination</a>: Collaborative task delegation between specialized role-based personas.
+  <li><a href="#f14">F14 — CrewAI Multi-Agent Coordination (NI)</a>: Collaborative task delegation between specialized role-based personas.
   <span class="f-tags"><strong>Tags:</strong> Multi-Agent Systems, CrewAI, Role Delegation, Autonomous Agents, Persona Orchestration</span></li>
-  <li><a href="#f15">F15 — AutoGen Collaborative Swarm</a>: Conversational consensus loops between user proxy and assistant agents.
+  <li><a href="#f15">F15 — AutoGen Collaborative Swarm (NI)</a>: Conversational consensus loops between user proxy and assistant agents.
   <span class="f-tags"><strong>Tags:</strong> AutoGen, Agent Swarms, Multi-Agent Consensus, Conversational Loops, Collaborative AI</span></li>
 </ul>
 
@@ -532,7 +606,7 @@ trusted" — gating what questions get answered and what changes get shipped.</p
 <p>The final milestone locks down the perimeter and the core logic itself — authenticating requests, screening
 adversarial input, and proving the supporting code holds up under test, independent of any LLM call.</p>
 <ul>
-  <li><a href="#f21">F21 — API Authentication &amp; Rate Limiting</a>: Request-layer authentication and throttling to block unauthorized access and abuse before it reaches the pipeline.
+  <li><a href="#f21">F21 — API Authentication &amp; Rate Limiting (NI)</a>: Request-layer authentication and throttling to block unauthorized access and abuse before it reaches the pipeline.
   <span class="f-tags"><strong>Tags:</strong> API Security, Rate Limiting, Request Throttling, Authentication, Abuse Prevention, Perimeter Defense</span></li>
   <li><strong><a href="#f22">F22 — Prompt-Injection Defense</a>:</strong> Delimiter-based isolation that treats retrieved content as data, not instructions, blocking commands hidden inside a menu PDF. <em>Done</em> — see F22's full write-up below. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/prompt-injection-defense-boundary.html" target="_blank" rel="noopener">Blog article: Prompt-Injection Defense: A Boundary Around What the Model Is Told Is Data - F22</a>)
   <span class="f-tags"><strong>Tags:</strong> Prompt Injection Defense, AI Security, Input Sanitization, Delimiter Isolation, Data-Instruction Separation, Adversarial Defense</span></li>
@@ -542,12 +616,12 @@ adversarial input, and proving the supporting code holds up under test, independ
 
 <div class="note">
 <strong>Status note:</strong> bold items above are actually built and verified — Phases 1 and 2 (F0&ndash;F11) in
-full, plus F12/F12.1, F13, F16, F17, F18, F19, F20, F22, and F23. The unbolded items (F14, F15, F21) are detailed,
+full, plus F12/F12.1, F13, F16, F17, F18, F19, F20, F22, and F23. The unbolded items (F14, F15, F21), marked <strong>(NI)</strong> for "not implemented", are detailed,
 planned write-ups — architecture and intent decided, not yet implemented — same distinction the individual
 F-sections below make in their own Status lines.
 </div>
 
-<h2 id="ai-dev-areas">Main Areas of AI Dev</h2>
+<h2 id="ai-dev-areas">Main Areas of AI Dev <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 <div class="ai-dev-areas">
 
 <div class="ai-dev-area">
@@ -608,7 +682,7 @@ F-sections below make in their own Status lines.
 
 </div>
 
-<h2 id="suites">Suites</h2>
+<h2 id="suites">Suites <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 <div class="suites">
 
 <div class="suite">
@@ -668,7 +742,529 @@ Systems, CrewAI, AutoGen, Checkpointing, RAG Evals (Ragas / DeepEval), Agent Har
 Hybrid Search (BM25 + Dense), Query Guardrails &amp; Intent Gating, CI/CD, GitHub Actions, API Security,
 Authentication, Rate Limiting, Prompt Injection, Adversarial Robustness, Unit Testing, pytest</p>
 
-<nav class="toc">
+<h2 id="system-design">System Design <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
+
+<div class="note">
+<strong>What this section is:</strong> the platform walked through as a live system-design discussion — product
+framing, request flow, agents, retrieval, production trade-offs, evals/observability, infrastructure, and failure
+modes — with each point tied to the feature that implements it. Anything marked <em>not built</em> is a design
+proposal, not shipped code (F14, F15, F21 are still planned).
+</div>
+
+<h3 id="sd-product">1. Product thinking: who is this for, and why?</h3>
+<p class="sd-intro">Every design starts with the user and the problem, not the model. Before choosing chunk sizes or agent frameworks, you need to know who is asking, what a good answer looks like, and what failure costs. Here the cost of failure is concrete: an invented price or a missed allergen can hurt a guest and the restaurant. That one fact shapes most of the technical decisions below.</p>
+<ul>
+  <li><strong>User:</strong> a restaurant guest asking about dishes, prices, allergens, policies, specials, and
+  hours for one of three restaurants (sushi, steak, italian) — <a href="#f0">F0</a>.</li>
+  <li><strong>Why AI at all:</strong> the answers live in unstructured menu PDFs plus a live Google Sheet; a guest
+  wants one conversational answer, not a PDF to scroll — <a href="#f3">F3</a>, <a href="#f8">F8</a>.</li>
+  <li><strong>What "correct" means here:</strong> never invent a dish, price, or allergen. That one product rule
+  drives the persona prompt (<a href="#f3-1">F3.1</a>), the grounding check (<a href="#f13">F13</a>), and the
+  faithfulness metric (<a href="#f17">F17</a>).</li>
+  <li><strong>Scope boundary:</strong> off-topic questions get a fixed, polite rejection instead of an answer —
+  <a href="#f19">F19</a>.</li>
+  <li><strong>Surfaces:</strong> REST API (<a href="#f4">F4</a>), Streamlit/Gradio playgrounds (<a href="#f5">F5</a>),
+  and MCP tools for agent clients (<a href="#f8">F8</a>).</li>
+</ul>
+
+<h3 id="sd-architecture">2. Systems design for AI products: the request path</h3>
+<p class="sd-intro">This is the end-to-end path one question takes through the system. Laying it out step by step shows where each feature sits, where time and money are spent, and where things can fail. The design principle throughout: shared logic lives in one place, and every engine plugs into the same interface, so pieces can be swapped or improved without rewriting the rest.</p>
+<p>One <code>POST /ask</code> in <code>engine_api.py</code>, in order:</p>
+<pre><code>POST /ask {cuisine, question, session_id, engine?}
+  ├─ F19  classify_intent()        one structured LLM call → off_topic? return OFF_TOPIC_MESSAGE
+  ├─ F8   detect_ops_intent()      keyword check → "specials": answer straight from Google Sheet
+  │                                               "hours": add resolved date(s), skip memory
+  ├─ F12  get_engine(name)         plain_rag (default) or langgraph, cached singleton
+  │    └─ F7/F16 memory wrapper    last 5 turns prepended (RAM or SQLite)
+  │         └─ retriever           F18 BM25 + FAISS (RRF) → F10 cross-encoder top 3 → F22 delimiters
+  │         └─ LLM                 F2 provider (OpenAI gpt-4o-mini or Azure), temperature 0
+  ├─ F6/F9 track_usage + trace_call   tokens, $ cost, retriever_ms / llm_ms / total_ms
+  ├─ F11  log_call()               one usage_log row in SQLite
+  └─ F8   hours → append live sheet events for that date</code></pre>
+<ul>
+  <li><strong>Design choice — interface first:</strong> every engine implements <code>BaseMenuEngine.answer()</code>
+  and returns the same <code>{"result", "source_documents"}</code> shape, so the API, evals, and telemetry never
+  care which engine ran — <a href="#f12">F12</a>.</li>
+  <li><strong>Design choice — shared core:</strong> provider selection (<code>core/llm.py</code>) and the retrieval
+  pipeline (<code>core/vectorstore.py</code>) are written once and inherited by every engine, which is how
+  <a href="#f18">F18</a> and <a href="#f22">F22</a> reached both engines without touching either.</li>
+  <li><strong>Design choice — safe migration:</strong> <code>menu_api.py</code> stays the untouched baseline; new
+  work goes through <code>engine_api.py</code> (Strangler Fig, <a href="#f12-1">F12.1</a>).</li>
+</ul>
+
+<h3 id="sd-agents">3. Agent design and orchestration</h3>
+<p class="sd-intro">Agents are powerful but expensive, slower, and harder to predict, so the first question is always whether you need one. This section covers when this project uses a fixed chain versus an agent loop, how tools and guardrails fit in, and which agent framework suits this codebase — and why.</p>
+<ul>
+  <li><strong>When an agent <em>isn't</em> the right design:</strong> most menu questions are one lookup and one
+  answer. <code>plain_rag</code> (one retrieval, one LLM call) is the default for that reason — cheapest, fastest,
+  easiest to debug.</li>
+  <li><strong>When it is:</strong> when you need a check-and-retry loop. The <a href="#f13">F13</a> LangGraph
+  engine runs <code>route → retrieve → generate → verify</code>, and loops back to <code>retrieve</code> with the
+  verifier's feedback if the answer isn't grounded.</li>
+  <li><strong>Planning loops, bounded:</strong> <code>MAX_RETRIES = 2</code> — the loop always ends. Worst case is
+  1 route + 2 generate + 2 verify = 5 LLM calls, vs. 1 for plain RAG.</li>
+  <li><strong>Tool use:</strong> specials and hours are live data, not retrieval — exposed as MCP tools
+  (<code>daily_specials</code>, <code>hours_and_events</code>) in <code>api/mcp_server.py</code> and called
+  directly by <code>engine_api.py</code> — <a href="#f8">F8</a>.</li>
+  <li><strong>Guardrails, in layers:</strong> input intent gate (<a href="#f19">F19</a>), persona/grounding rules
+  in the system prompt (<a href="#f3-1">F3.1</a>), retrieved-content-as-data delimiters (<a href="#f22">F22</a>),
+  output grounding check (<a href="#f13">F13</a>), auth/rate limiting (<a href="#f21">F21</a>, <em>not built</em>).</li>
+  <li><strong>Multi-agent options:</strong> CrewAI roles (<a href="#f14">F14</a>) and AutoGen propose/critique
+  (<a href="#f15">F15</a>) — <em>not built</em>; they'd plug into the same <code>get_engine()</code> factory.</li>
+  <li><strong>Trade-off worth naming:</strong> with <code>GUARDRAILS_ENABLED</code> on and the LangGraph engine
+  selected, the question is classified twice (F19's gate and F13's <code>route</code> node). One of the two could
+  be dropped for that path.</li>
+</ul>
+
+
+<h4 id="sd-frameworks">Which agent framework? LangChain vs. LangGraph vs. CrewAI vs. AutoGen</h4>
+<p>Judged for <em>this</em> project: short, factual menu questions, a strict "never invent" rule, a cost budget,
+and an existing LangChain/LangGraph codebase (<code>langchain</code> 1.4, <code>langgraph</code> 1.2 already
+installed).</p>
+<table class="cost-table">
+  <tr><th>Option</th><th>Pros for this project</th><th>Cons for this project</th><th>Verdict</th></tr>
+  <tr><td><strong>Plain LangChain chain</strong> (no agent) — <code>plain_rag</code></td>
+      <td>1 LLM call; cheapest, fastest, easiest to debug; already built</td>
+      <td>No self-check, no retry, no tool choice — it answers once and stops</td>
+      <td><strong>Default.</strong> Right for most menu questions.</td></tr>
+  <tr><td><strong>LangChain agent</strong> (<code>create_agent</code>: model picks tools in a loop)</td>
+      <td>Few lines of code; already installed (runs on LangGraph underneath); good fit if retrieval, specials, and
+      hours were all tools the model chooses between</td>
+      <td>The model decides the control flow — less predictable, harder to guarantee a grounding check runs every
+      time; loop length varies, so cost varies</td>
+      <td>Good for open-ended tool use (e.g. replacing F8's keyword routing). Weaker when you need a fixed,
+      auditable path.</td></tr>
+  <tr><td><strong>LangGraph</strong> — F13</td>
+      <td>You draw the exact path (route → retrieve → generate → verify), with explicit loops and a hard retry cap;
+      typed state; built-in checkpointing; same ecosystem — reuses <code>get_retriever()</code> and F2's LLM as-is;
+      no new dependency</td>
+      <td>More code than a prebuilt agent; you design every node and edge yourself</td>
+      <td><strong>Best fit for the agent path.</strong> Predictable cost, auditable steps, guaranteed verify step.</td></tr>
+  <tr><td><strong>CrewAI</strong> — F14</td>
+      <td>Roles, tasks, and delegation out of the box; reads naturally (a "menu expert", a "policy expert")</td>
+      <td>New framework and dependency (version conflicts must be checked — Ragas already failed that test in F17);
+      ≥ 3 LLM calls; less control over exact flow; most questions here only need one "expert"</td>
+      <td>Worth a benchmark, not the default. Only pays off if many questions span several domains.</td></tr>
+  <tr><td><strong>AutoGen</strong> — F15</td>
+      <td>Natural fit for propose-and-critique conversations between agents</td>
+      <td>Most calls and latency; open-ended conversations are hard to bound and test; separate ecosystem from
+      LangChain; AutoGen has been through a major rewrite (0.2 → 0.4) and a community fork (AG2), and Microsoft
+      now points new work to its Agent Framework — a maintenance risk</td>
+      <td>Weakest fit. F13's verify loop already gives a bounded version of the same idea.</td></tr>
+</table>
+<p><strong>Bottom line:</strong> plain chain for most questions, LangGraph when you need verify-and-retry, a LangChain
+agent if tool choice should become dynamic. CrewAI and AutoGen are worth building only as benchmarks against F17,
+F6 cost, and F9 latency — which is exactly what F12's factory makes cheap to do.</p>
+
+<h3 id="sd-rag">4. Production RAG depth: retrieval as a first-class design problem</h3>
+<p class="sd-intro">Retrieval decides what the model gets to see; if the right chunk isn't retrieved, no prompt or model can produce the right answer. So retrieval is treated as its own design problem, with its own decisions and measurements: how text is chunked, how it's embedded and searched, how keyword and semantic search are combined, and how results are re-ranked before reaching the LLM.</p>
+<table class="cost-table">
+  <tr><th>Stage</th><th>What's built</th><th>Trade-off / what I'd change at scale</th></tr>
+  <tr><td>Chunking (<a href="#f3">F3</a>)</td>
+      <td><code>RecursiveCharacterTextSplitter</code>, 500 chars, 50 overlap</td>
+      <td>Fixed-size chunks can split a dish from its price. Menus are naturally structured, so section/item-aware
+      chunking is the next step — and F17's context precision score is how you'd prove it helped.</td></tr>
+  <tr><td>Embeddings (<a href="#f2">F2</a>/<a href="#f3">F3</a>)</td>
+      <td><code>text-embedding-3-small</code> (OpenAI) or <code>text-embedding-ada-002</code> (Azure); one FAISS index
+      per cuisine, saved to <code>vectorstores/</code></td>
+      <td>Per-cuisine indexes stop a sushi question pulling steak chunks. The index is only built when missing, so
+      an updated PDF needs the index deleted — a production version would re-index on content hash.</td></tr>
+  <tr><td>Hybrid search (<a href="#f18">F18</a>)</td>
+      <td>BM25 + FAISS fused by <code>EnsembleRetriever</code> (reciprocal rank fusion, weights 0.5/0.5)</td>
+      <td>Embeddings blur exact terms (a dish name, a price, an allergen); BM25 catches them. BM25 is rebuilt in
+      memory from the PDF on each startup — cheap here, worth persisting at larger corpus sizes.</td></tr>
+  <tr><td>Re-ranking (<a href="#f10">F10</a>)</td>
+      <td>FlashRank cross-encoder <code>ms-marco-MiniLM-L-12-v2</code>, keeps top 3</td>
+      <td>Runs locally — no API cost, adds CPU latency (visible in F9's <code>retriever_ms</code>). Fewer, better
+      chunks also mean fewer prompt tokens.</td></tr>
+  <tr><td>Injection isolation (<a href="#f22">F22</a>)</td>
+      <td>Each final chunk wrapped in <code>&lt;retrieved_context&gt;</code> tags, forged tags stripped first</td>
+      <td>Treats documents as untrusted input — matters as soon as content comes from anyone but you.</td></tr>
+</table>
+
+<p><strong>Why 500 characters and 50 overlap?</strong> Measured on the real menus (~12,000 characters each), 500/50
+gives ~29 chunks per menu, averaging ~460 characters, ~55 words, ~165 tokens — roughly a few dishes with their
+descriptions and prices. That's small enough for precise matches and big enough to usually keep a dish next to its
+price, and the top 3 chunks come to only ~500 tokens of context. The 50-character overlap (10%) means a line cut
+at a boundary shows up in both chunks. Two catches: about 35% of each chunk is whitespace (the PDF extracts one word
+per line), so a "500-character" chunk holds only ~300 characters of real text; and 500/50 was a sensible default,
+not a tuned value. The right way to settle it is to collapse whitespace, try 300 / 500 / 800 / 1,000, and keep
+whichever scores best on F17's context precision. Full pros/cons: <a href="#f3-sysdesign">F3:9</a>.</p>
+
+<h4 id="sd-rag-embeddings">Embedding strategies</h4>
+<p><strong>What's built:</strong> <code>text-embedding-3-small</code> (OpenAI) or <code>text-embedding-ada-002</code>
+(Azure), both 1,536 dimensions. One FAISS index per cuisine, built once and saved to <code>vectorstores/</code>
+(~180 KB each — ~29 vectors × 1,536 floats). The index is <code>IndexFlatL2</code>: exact, brute-force search, no
+approximation. Every question costs one embedding call for the query.</p>
+<table class="cost-table">
+  <tr><th>Strategy</th><th>Pros</th><th>Cons</th><th>Fit for this project</th></tr>
+  <tr><td>Small general model (<code>3-small</code>) — <em>current</em></td>
+      <td>Cheap, fast, good on short English text</td>
+      <td>Less precise than <code>3-large</code> on subtle wording</td>
+      <td>Right default; upgrade only if F17 shows retrieval is the weak link</td></tr>
+  <tr><td>Larger model (<code>3-large</code>, 3,072 dims)</td>
+      <td>Better recall on paraphrased questions</td>
+      <td>More cost per call, 2× storage, full re-index</td>
+      <td>Not needed for ~29 chunks per menu</td></tr>
+  <tr><td>Shortened vectors (the <code>3-*</code> models support a <code>dimensions</code> setting)</td>
+      <td>Smaller, faster indexes</td>
+      <td>Some accuracy lost</td>
+      <td>Matters at millions of chunks, not here</td></tr>
+  <tr><td>Exact search (<code>IndexFlatL2</code>) — <em>current</em></td>
+      <td>Perfect recall, zero tuning</td>
+      <td>Search time grows linearly with chunk count</td>
+      <td>Ideal at ~90 vectors total; switch to HNSW/IVF (approximate) past ~100k</td></tr>
+  <tr><td>Add context to each chunk before embedding (e.g. prefix "Steak menu — Appetizers:")</td>
+      <td>A chunk carries its section and restaurant, so "starters" can match an "APPETIZERS" chunk that never repeats
+      the heading</td>
+      <td>Needs section detection at index time</td>
+      <td>High value here — menus are organized by section headings that only appear once</td></tr>
+  <tr><td>Hybrid: embeddings + keyword (BM25) — <em>current, F18</em></td>
+      <td>Embeddings catch meaning, BM25 catches exact names and prices</td>
+      <td>Two retrievers to tune</td>
+      <td>Right call for menus full of proper nouns and numbers</td></tr>
+</table>
+<p><strong>Production concerns:</strong></p>
+<ul>
+  <li><strong>Model version = index version.</strong> Vectors from different models can't be compared. Today the
+  OpenAI and Azure paths use <em>different</em> embedding models but save to the <em>same</em>
+  <code>vectorstores/&lt;cuisine&gt;</code> folder — switch providers without deleting it and retrieval silently
+  breaks (both are 1,536 dimensions, so nothing errors). Fix: put the model name in the index path.</li>
+  <li><strong>Re-index on change:</strong> the index is only built when missing. Store a hash of the PDF + model name
+  and rebuild when either changes.</li>
+  <li><strong>Query embedding is on the critical path:</strong> one network call per question before retrieval can
+  start — cache embeddings of repeated questions.</li>
+  <li><strong>Security:</strong> the index is loaded with <code>allow_dangerous_deserialization=True</code> (pickle) —
+  only ever load indexes you built yourself.</li>
+</ul>
+
+<h4 id="sd-rag-chunking">Chunking strategies</h4>
+<p><strong>What's built:</strong> <code>RecursiveCharacterTextSplitter</code>, 500 characters, 50 overlap. Measured on
+the steak menu, with and without collapsing the PDF's extra whitespace first (overlap kept at 10%):</p>
+<table class="cost-table">
+  <tr><th>Chunk size</th><th>Chunks (raw)</th><th>Avg tokens (raw)</th><th>Chunks (whitespace collapsed)</th><th>Avg tokens (collapsed)</th></tr>
+  <tr><td>300</td><td>49</td><td>97</td><td>38</td><td>73</td></tr>
+  <tr><td><strong>500 (current)</strong></td><td><strong>30</strong></td><td><strong>160</strong></td><td>24</td><td>117</td></tr>
+  <tr><td>800</td><td>19</td><td>252</td><td>16</td><td>174</td></tr>
+  <tr><td>1,000</td><td>16</td><td>300</td><td>13</td><td>215</td></tr>
+</table>
+<p><strong>Reading the table:</strong> collapsing whitespace packs more real menu text into each chunk <em>and</em>
+uses ~27% fewer tokens per chunk at 500 — the stray line breaks cost tokens too. It's the cheapest improvement
+available.</p>
+<table class="cost-table">
+  <tr><th>Strategy</th><th>Pros</th><th>Cons</th><th>Fit for this project</th></tr>
+  <tr><td>Fixed size, recursive breaks — <em>current</em></td>
+      <td>Simple, predictable, no extra cost</td>
+      <td>Ignores dish boundaries; can split a dish from its price</td>
+      <td>Fine baseline</td></tr>
+  <tr><td>Structure-aware (split on section headings / dish lines)</td>
+      <td>One chunk = one dish or one section; price never separated</td>
+      <td>Custom parsing per menu layout</td>
+      <td><strong>Best fit</strong> — menus are highly structured</td></tr>
+  <tr><td>Semantic chunking (split where meaning shifts, using embeddings)</td>
+      <td>Adapts to any document</td>
+      <td>Embedding calls at index time; boundaries less predictable</td>
+      <td>Overkill for menus; useful for long prose policies</td></tr>
+  <tr><td>Small chunks to search, bigger parent to answer (parent-document)</td>
+      <td>Precise matching <em>and</em> full context for the LLM</td>
+      <td>Two-level storage; more tokens per answer</td>
+      <td>Good for list questions ("all gluten-free dishes")</td></tr>
+  <tr><td>No chunking — whole menu in the prompt</td>
+      <td>No retrieval misses (~2,600 tokens per menu)</td>
+      <td>~5× more input tokens per call; doesn't scale</td>
+      <td>Valid at today's size; the baseline to beat</td></tr>
+</table>
+<p><strong>How to choose:</strong> chunking is an experiment, not a guess — change one setting, rerun F17, compare
+context precision and faithfulness, and check F6 cost per question.</p>
+
+<h4 id="sd-rag-reranking">Re-ranking strategies</h4>
+<p><strong>What's built:</strong> FlashRank cross-encoder <code>ms-marco-MiniLM-L-12-v2</code> on CPU, re-scoring the
+fused BM25 + FAISS candidates and keeping the top 3. Measured locally: ~2 s to load the model at startup; re-ranking
+takes ~31 ms for 6 chunks, ~113 ms for 20, ~175 ms for 30 — about 6 ms per chunk, growing linearly.</p>
+<table class="cost-table">
+  <tr><th>Strategy</th><th>Pros</th><th>Cons</th><th>Fit for this project</th></tr>
+  <tr><td>Small local cross-encoder — <em>current</em></td>
+      <td>No API cost, no network, private</td>
+      <td>CPU time per request; generic web-search training data</td>
+      <td>Good fit</td></tr>
+  <tr><td>Hosted re-rank API</td>
+      <td>Stronger models, no local CPU</td>
+      <td>Network call + per-request cost; another vendor</td>
+      <td>Only if F17 shows ranking errors the local model can't fix</td></tr>
+  <tr><td>LLM as re-ranker</td>
+      <td>Understands nuance best</td>
+      <td>Slowest and most expensive</td>
+      <td>No — the answering LLM already reads the chunks</td></tr>
+  <tr><td>No re-ranker, rely on fusion</td>
+      <td>Simplest, fastest</td>
+      <td>Embedding similarity is only a rough ranking</td>
+      <td>Worth an A/B in F17 to prove F10 earns its ~30 ms</td></tr>
+</table>
+<p><strong>The biggest gap — candidate pool size:</strong> BM25 and FAISS each return 3, so the re-ranker sees at
+most 6 chunks and can only reorder what's already close. Standard practice is to retrieve wide (20–30), re-rank,
+then keep 3. From the timings above, going to 20–30 candidates costs ~80–145 ms more — a reasonable price if
+context precision improves. Keep the re-ranker warm (load at startup, not first request).</p>
+
+<h3 id="sd-scale">5. Production-scale reasoning: latency, cost, reliability</h3>
+<p class="sd-intro">A demo answers one question at a time; production answers many at once, on a budget, and keeps working when parts fail. This section looks at where latency comes from, what drives cost per question, what keeps the system available, and which current shortcuts would break first under real traffic.</p>
+<ul>
+  <li><strong>Latency:</strong> <a href="#f9">F9</a> splits every call into <code>retriever_ms</code>,
+  <code>llm_ms</code>, and <code>total_ms</code>, so you know which half to optimize. F19 adds one LLM call to
+  every request; F13 can add up to four more.</li>
+  <li><strong>Cost:</strong> <a href="#f6">F6</a> records tokens and dollar cost per call; <a href="#f11">F11</a>
+  persists it to <code>usage_log</code> and sums it per session in SQL. Levers already pulled: a small model
+  (<code>gpt-4o-mini</code>), top-3 chunks, a 5-turn memory window (<a href="#f7">F7</a>), and rejecting off-topic
+  questions before retrieval (<a href="#f19">F19</a>).</li>
+  <li><strong>Reliability:</strong> sessions survive restarts with <code>MEMORY_BACKEND=persistent</code>
+  (<a href="#f16">F16</a>). If the Google Sheet fails on an hours question, the engine's PDF answer is still
+  returned (<a href="#f8">F8</a>).</li>
+  <li><strong>Known limits under real traffic:</strong> F6/F9 session counters are documented as not thread-safe
+  (single worker only); SQLite and in-memory FAISS are single-node; no request timeout or retry count is set on
+  the LLM client (listed as options in <code>core/llm.py</code>); no response caching.</li>
+  <li><strong>Rough numbers:</strong> ~$0.00025 per typical question (~$0.25 per 1,000); LangGraph worst case
+  ~3× that. At restaurant scale, cost isn't the constraint — accuracy and latency are. See
+  <a href="#sd-playbook-numbers">rough numbers</a>.</li>
+  <li><strong>Reliability patterns still missing:</strong> timeouts, backoff, circuit breaker, model fallback,
+  answer cache — see the <a href="#sd-playbook-reliability">reliability checklist</a>.</li>
+</ul>
+
+<h3 id="sd-evals">6. Evals and observability</h3>
+<p class="sd-intro">You can't improve what you don't measure. Evals answer "is the answer quality good, and did this change make it better or worse?"; observability answers "what is happening in production right now?". Together they turn quality and performance into numbers that can gate a merge or trigger an alert.</p>
+<ul>
+  <li><strong>Quality measurement:</strong> <a href="#f17">F17</a> runs 15 ground-truth questions (5 per cuisine)
+  through the real engine and scores faithfulness (≥ 0.8), answer relevancy (≥ 0.8), and context precision
+  (≥ 0.6) with an LLM judge.</li>
+  <li><strong>Regression testing:</strong> <a href="#f20">F20</a>'s GitHub Actions workflow runs the mocked
+  <code>pytest</code> suite (<a href="#f23">F23</a>), then the F17 evals, on every PR to <code>main</code> — a
+  drop below threshold fails the build.</li>
+  <li><strong>Runtime telemetry:</strong> per-request latency, error count, tokens, and cost are returned in the
+  <code>/ask</code> response (<code>trace</code>, <code>usage</code>) when <code>METRICS</code> is on —
+  <a href="#f6">F6</a>, <a href="#f9">F9</a>.</li>
+  <li><strong>Datadog-style monitoring (<em>not built</em>):</strong> F9's numbers are the right signals but stay
+  in-process. Next step: emit them as metrics (latency percentiles per stage, error rate, cost per request, F19
+  rejection rate, F13 retry rate) with alerts on p95 latency, error rate, and daily spend.</li>
+  <li><strong>Online quality (<em>not built</em>):</strong> sample live traffic into the F17 judge to catch drift
+  that the fixed fixture set can't.</li>
+</ul>
+
+<h3 id="sd-infra">7. Grounding in real infrastructure</h3>
+<p class="sd-intro">A design is only credible if you can say where it would run. This section maps each part of today's local setup to the managed cloud service that would replace it, so the path from laptop to production is concrete rather than hand-waved.</p>
+<p>Today: a local FastAPI/uvicorn process, FAISS indexes and SQLite files on disk, OpenAI or an Azure OpenAI
+gateway, Google Sheets via service account, and GitHub Actions for CI. A proposed AWS deployment
+(<em>not built</em>):</p>
+<table class="cost-table">
+  <tr><th>Concern</th><th>Today</th><th>AWS proposal</th></tr>
+  <tr><td>API serving</td><td>uvicorn, single worker</td><td>ECS Fargate behind an Application Load Balancer</td></tr>
+  <tr><td>Auth / rate limit (<a href="#f21">F21</a>)</td><td>none</td><td>API Gateway usage plans + API keys, WAF</td></tr>
+  <tr><td>Menus + vector index</td><td><code>menus/*.pdf</code>, <code>vectorstores/</code></td><td>S3; OpenSearch for managed BM25 + vector hybrid search</td></tr>
+  <tr><td>Chat history, usage log</td><td>SQLite (<a href="#f11">F11</a>, <a href="#f16">F16</a>)</td><td>DynamoDB (sessions), RDS Postgres (usage_log)</td></tr>
+  <tr><td>LLM provider</td><td>OpenAI / Azure (<a href="#f2">F2</a>)</td><td>add Amazon Bedrock as a provider branch and fallback</td></tr>
+  <tr><td>Secrets</td><td><code>.env</code>, <code>secrets/service_account.json</code></td><td>AWS Secrets Manager</td></tr>
+  <tr><td>Monitoring</td><td>console prints + response fields (<a href="#f9">F9</a>)</td><td>CloudWatch or Datadog metrics, dashboards, alarms</td></tr>
+  <tr><td>Scaling &amp; availability</td><td>one process, one machine</td><td>ECS service auto scaling across 2+ Availability Zones</td></tr>
+  <tr><td>Answer &amp; embedding cache</td><td>none</td><td>ElastiCache (Redis) — also holds rate-limit counters for F21</td></tr>
+  <tr><td>Background jobs (re-index on menu change)</td><td>index built on first request if missing</td><td>S3 upload event → SQS → worker rebuilds the index</td></tr>
+  <tr><td>Managed RAG alternative</td><td>hand-built retrieval (F3/F10/F18)</td><td>Bedrock Knowledge Bases — less code, less control over chunking and re-ranking</td></tr>
+  <tr><td>Tracing</td><td>F9 in-process timer</td><td>AWS X-Ray or OpenTelemetry → Datadog</td></tr>
+  <tr><td>Deploy pipeline</td><td>GitHub Actions runs tests/evals only (F20)</td><td>Same pipeline builds an image → ECR → ECS rolling deploy</td></tr>
+</table>
+
+<h3 id="sd-failure">8. Beyond the happy path: wrong, slow, or expensive</h3>
+<p class="sd-intro">The happy path is easy; the real design work is what happens when the model is wrong, slow, or expensive, or when a dependency goes down. For each failure, this table lists what's already built to handle it and what's still missing.</p>
+<table class="cost-table">
+  <tr><th>Failure</th><th>What's built</th><th>Gap</th></tr>
+  <tr><td>Model is <strong>wrong</strong></td>
+      <td>"say you don't know" rule (<a href="#f3-1">F3.1</a>); grounding verify + retry (<a href="#f13">F13</a>);
+      evals gate merges (<a href="#f17">F17</a>/<a href="#f20">F20</a>); injected content treated as data (<a href="#f22">F22</a>)</td>
+      <td>plain_rag has no runtime verify step; no online eval of live answers</td></tr>
+  <tr><td>Model is <strong>slow</strong></td>
+      <td>per-stage latency measured (<a href="#f9">F9</a>); bounded retries (<a href="#f13">F13</a>)</td>
+      <td>no LLM timeout set; no latency alerting; no fallback to a faster model</td></tr>
+  <tr><td>Model is <strong>expensive</strong></td>
+      <td>per-call and per-session cost (<a href="#f6">F6</a>/<a href="#f11">F11</a>); small model; off-topic rejected
+      early (<a href="#f19">F19</a>)</td>
+      <td>no budget cap per session; no caching of repeat questions</td></tr>
+  <tr><td>Dependency <strong>down</strong></td>
+      <td>Sheets failure on hours → PDF answer still returned (<a href="#f8">F8</a>)</td>
+      <td>provider is picked once at startup — no runtime failover between OpenAI and Azure</td></tr>
+</table>
+
+<h3 id="sd-tradeoffs">9. Key trade-offs at a glance</h3>
+<p class="sd-intro">Every design choice gives something up. This is the short list of decisions most worth defending in a review — what each one buys, what it costs, and where the full reasoning lives.</p>
+<p>The decisions most worth defending in a design review. Each feature's System Design section has the full
+pros/cons table.</p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Details</th></tr>
+  <tr><td>RAG vs. putting the whole menu in the prompt</td>
+      <td>Top 3 chunks ≈ 500 tokens vs ~2,600 for a whole menu — ~5× cheaper per call; scales to more documents</td>
+      <td>At three short menus, the whole menu fits — long-context would remove retrieval misses</td>
+      <td><a href="#f0-sysdesign">F0</a></td></tr>
+  <tr><td>Chunks of 500 chars, 50 overlap</td>
+      <td>~165 tokens per chunk; a few dishes with prices; cheap context</td>
+      <td>35% whitespace; fixed size ignores dish boundaries; not tuned</td>
+      <td><a href="#f3-sysdesign">F3:9</a></td></tr>
+  <tr><td>Hybrid BM25 + FAISS with rank fusion</td>
+      <td>Exact names/prices <em>and</em> meaning both match</td>
+      <td>Small candidate pool (≤ 6) limits what re-ranking can fix; BM25 is case-sensitive</td>
+      <td><a href="#f18-sysdesign">F18:9</a>, <a href="#f10-sysdesign">F10:9</a></td></tr>
+  <tr><td><code>gpt-4o-mini</code>, temperature 0</td>
+      <td>Cheap, fast, repeatable evals</td>
+      <td>Weaker multi-step reasoning; no provider failover</td>
+      <td><a href="#f2-sysdesign">F2:9</a></td></tr>
+  <tr><td>Plain RAG default, LangGraph opt-in</td>
+      <td>1 LLM call for most questions; verify-and-retry when it matters</td>
+      <td>LangGraph: up to 5 calls, self-verification bias, returns an unverified answer after 2 failed checks</td>
+      <td><a href="#f13-sysdesign">F13:9</a></td></tr>
+  <tr><td>LLM intent gate on every request</td>
+      <td>Consistent off-topic rejections; catches injection attempts in the question</td>
+      <td>Extra call on every request; fails closed</td>
+      <td><a href="#f19-sysdesign">F19:9</a></td></tr>
+  <tr><td>5-turn memory, pasted before the question</td>
+      <td>Follow-ups work with no extra LLM call</td>
+      <td>Old turns also go into retrieval and can pull the wrong chunks</td>
+      <td><a href="#f7-sysdesign">F7:9</a></td></tr>
+  <tr><td>Own LLM-judge evals, all thresholds must pass</td>
+      <td>No dependency conflicts; strict</td>
+      <td>Same model judges itself; 15 questions; noisy scores can fail CI</td>
+      <td><a href="#f17-sysdesign">F17:9</a>, <a href="#f20-sysdesign">F20:9</a></td></tr>
+  <tr><td>SQLite + local files for everything</td>
+      <td>Zero ops; easy to run and demo</td>
+      <td>One machine, one process — the first thing to replace for real traffic</td>
+      <td><a href="#sd-infra">Infrastructure</a></td></tr>
+</table>
+
+<h3 id="sd-playbook">10. Interview playbook: designing a new system live</h3>
+<p class="sd-intro">The interview gives you a <em>new</em> design prompt, not this project. This part turns
+everything above into a repeatable approach: a step-by-step path for any AI system design question, rough numbers
+to estimate with, a reliability checklist, how the system learns from users, and how the common eval tools compare.
+This project is the worked example for each step.</p>
+
+<h4 id="sd-playbook-steps">The steps (any prompt)</h4>
+<table class="cost-table">
+  <tr><th>Step</th><th>What to cover</th><th>Example from this project</th></tr>
+  <tr><td>1. Clarify</td>
+      <td>Who are the users? What do they ask? What does a wrong answer cost? How much traffic? Latency target?
+      What data exists, and how often does it change?</td>
+      <td>Restaurant guests; menu/policy/hours questions; a wrong allergen is the worst failure; menus change
+      rarely, specials daily</td></tr>
+  <tr><td>2. Rough numbers</td>
+      <td>Questions per day and at peak, tokens and dollars per question, latency budget per step</td>
+      <td>See <a href="#sd-playbook-numbers">rough numbers</a> below</td></tr>
+  <tr><td>3. Simplest design that works</td>
+      <td>Draw the request path end to end before adding anything clever</td>
+      <td>Plain RAG: retrieve 3 chunks → one LLM call (<a href="#sd-architecture">§2</a>)</td></tr>
+  <tr><td>4. Retrieval in depth</td>
+      <td>Chunking, embeddings, keyword + vector search, re-ranking — each with its trade-off</td>
+      <td><a href="#sd-rag">§4</a></td></tr>
+  <tr><td>5. Agent or not</td>
+      <td>Add an agent only where a fixed chain fails: tool choice, self-checking, multi-step work. Name the
+      framework and why</td>
+      <td>LangGraph verify-and-retry for high-stakes questions (<a href="#sd-agents">§3</a>)</td></tr>
+  <tr><td>6. Guardrails</td>
+      <td>Input checks, grounding rules, treating retrieved text as data, auth and rate limits</td>
+      <td>F19, F3.1, F22, F21</td></tr>
+  <tr><td>7. Evals and observability</td>
+      <td>Offline evals gating every change, online monitoring with alerts — bring this up unprompted</td>
+      <td>F17 + F20; F6/F9 → Datadog (<a href="#sd-evals">§6</a>)</td></tr>
+  <tr><td>8. Infrastructure</td>
+      <td>Name the actual services</td>
+      <td><a href="#sd-infra">§7</a></td></tr>
+  <tr><td>9. Failure modes</td>
+      <td>Wrong, slow, expensive, dependency down — and what the user sees in each case</td>
+      <td><a href="#sd-failure">§8</a> + <a href="#sd-playbook-reliability">reliability checklist</a></td></tr>
+  <tr><td>10. Trade-offs and next steps</td>
+      <td>What you'd measure first, and what you'd build next</td>
+      <td><a href="#sd-tradeoffs">§9</a></td></tr>
+</table>
+
+<h4 id="sd-playbook-numbers">Rough numbers</h4>
+<p>Token counts are measured from this code; prices are <code>gpt-4o-mini</code>'s from LangChain's built-in price
+table ($0.15 per 1M input tokens, $0.60 per 1M output tokens — check current pricing before quoting). Answer length is
+<em>assumed</em> at ~100 tokens.</p>
+<table class="cost-table">
+  <tr><th>Item</th><th>Tokens</th><th>Approx. cost</th></tr>
+  <tr><td>Plain RAG answer: system prompt (~313) + 3 wrapped chunks (~560) + question</td>
+      <td>~900 in, ~100 out</td><td>~$0.0002</td></tr>
+  <tr><td>F19 intent check: prompt (~144) + structured output</td>
+      <td>~150–250 in, ~30 out</td><td>~$0.00005</td></tr>
+  <tr><td>Memory: up to 5 previous turns</td>
+      <td>up to ~600 more in</td><td>~$0.0001</td></tr>
+  <tr><td><strong>Typical question (plain RAG + F19)</strong></td>
+      <td>~1,100 in, ~130 out</td><td><strong>~$0.00025 → ~$0.25 per 1,000 questions</strong></td></tr>
+  <tr><td>LangGraph worst case (route + 2 generate + 2 verify)</td>
+      <td>~3,500 in, ~350 out</td><td>~$0.0007 (~3× plain RAG)</td></tr>
+</table>
+<p><strong>What the numbers say:</strong> three restaurants at ~500 questions a day each is ~1,500 questions/day,
+well under $1/day even on the LangGraph engine. At this scale <strong>cost isn't the constraint — accuracy and
+latency are.</strong> Cost starts to matter at hundreds of locations, or with a model ~17× pricier (e.g.
+<code>gpt-4o</code> in the same table). Before then, the limit you hit first is the provider's rate limit (tokens per
+minute), not your budget.</p>
+<p><strong>Latency budget (targets to measure against with F9, not measurements):</strong> intent check + query
+embedding + retrieval + re-rank + one generation, aiming for p95 under ~3 s. Measured pieces so far: re-ranking ~31 ms
+for 6 chunks. The LLM calls dominate, so streaming the answer is the biggest perceived-latency win.</p>
+
+<h4 id="sd-playbook-reliability">Reliability checklist</h4>
+<table class="cost-table">
+  <tr><th>Pattern</th><th>What it does</th><th>Status here</th></tr>
+  <tr><td>Timeouts</td><td>Never wait forever on the LLM or Google Sheets</td>
+      <td>Not set — listed as an option in <code>core/llm.py</code></td></tr>
+  <tr><td>Retry with backoff + jitter</td><td>Retry brief errors, spaced out so retries don't pile up</td>
+      <td>Library default retries only</td></tr>
+  <tr><td>Circuit breaker</td><td>Stop calling a failing dependency for a while; fail fast instead</td>
+      <td>Not built</td></tr>
+  <tr><td>Model / provider fallback</td><td>Second provider or smaller model when the first fails or is slow</td>
+      <td>Not built — F2 picks one provider at startup</td></tr>
+  <tr><td>Cache repeated answers</td><td>Same question → stored answer, no LLM call (exact match, or by similar meaning)</td>
+      <td>Not built</td></tr>
+  <tr><td>Graceful degradation</td><td>A safe reply ("please ask staff") instead of an error or a guess</td>
+      <td>Partial — F8 keeps the PDF answer when the sheet fails; F13 doesn't yet</td></tr>
+  <tr><td>Load shedding / rate limits</td><td>Protect the system and the budget under spikes</td>
+      <td>Planned (F21)</td></tr>
+  <tr><td>Durable state</td><td>Survive restarts and multiple instances</td>
+      <td>Partial — F16 SQLite on one machine</td></tr>
+</table>
+
+<h4 id="sd-playbook-feedback">Learning from users</h4>
+<ul>
+  <li><strong>Thumbs up/down</strong> on every answer, stored with the question, chunks used, engine, and trace id.</li>
+  <li><strong>Turn bad answers into tests:</strong> every thumbs-down or bug report becomes a new F17 ground-truth
+  question, so the same mistake fails CI next time.</li>
+  <li><strong>Score live traffic:</strong> run the F17 judge on a small sample of real answers daily to catch drift
+  the fixed test set can't.</li>
+  <li><strong>A/B test engines:</strong> F12's factory already allows per-request engine choice — split traffic and
+  compare thumbs-up rate, cost, and latency.</li>
+  <li><strong>Watch what people ask:</strong> F19's off-topic rate and the most common questions show what to add
+  to the menu documents or the product.</li>
+</ul>
+
+<h4 id="sd-playbook-evaltools">Eval and observability tools compared</h4>
+<table class="cost-table">
+  <tr><th>Tool</th><th>What it is</th><th>Pros</th><th>Cons</th></tr>
+  <tr><td><strong>Ragas</strong></td><td>Library of RAG metrics (faithfulness, answer relevancy, context precision/recall)</td>
+      <td>Standard, well-known metric definitions</td>
+      <td>Its pinned dependencies conflicted with this repo (F17); still an LLM judge underneath</td></tr>
+  <tr><td><strong>DeepEval</strong></td><td>pytest-style LLM test framework</td>
+      <td>Fits CI naturally; many metrics</td>
+      <td>Another dependency; same judge-reliability questions</td></tr>
+  <tr><td><strong>LangSmith</strong></td><td>LangChain's hosted tracing, datasets, and evals</td>
+      <td>Near-zero setup with LangChain/LangGraph; traces and evals in one place</td>
+      <td>Hosted service; data leaves your environment; paid at scale</td></tr>
+  <tr><td><strong>Langfuse</strong></td><td>Open-source tracing and evals</td>
+      <td>Can self-host; vendor-neutral</td>
+      <td>You run and maintain it</td></tr>
+  <tr><td><strong>Datadog (LLM Observability) / CloudWatch</strong></td><td>General monitoring with LLM features</td>
+      <td>Same dashboards and alerts as the rest of the stack</td>
+      <td>Less focused on answer quality; cost</td></tr>
+  <tr><td><strong>Own LLM judge (this project, F17)</strong></td><td>Three structured judge prompts</td>
+      <td>No dependencies; fully visible and editable</td>
+      <td>Not validated against human ratings; you maintain it</td></tr>
+</table>
+<p><strong>A good answer in the interview:</strong> offline evals (Ragas-style metrics or your own judge) gate every
+change in CI; online tracing (LangSmith or Langfuse) shows each request step by step; Datadog or CloudWatch holds
+the latency, error-rate, and cost alerts.</p>
+
+<nav class="toc" id="toc">
+  <a href="#system-design">System Design</a>
   <span class="toc-phase-label">Phase 1 — Shuttlecraft (Baseline Proof-of-Concept & Serving)</span>
   <a href="#getting-started">Getting Started</a>
   <a href="#debug-mode">DEBUG_MODE</a>
@@ -707,7 +1303,7 @@ Authentication, Rate Limiting, Prompt Injection, Adversarial Robustness, Unit Te
 
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 1</span>Shuttlecraft (Baseline Proof-of-Concept & Serving)</span><img class="phase-header-img" src="images/shuttleG.png" alt="Starfleet shuttlecraft"></h1>
 
-<h2 id="getting-started">Getting Started</h2>
+<h2 id="getting-started">Getting Started <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <h3 class="hl-title">1) Install requirements &amp; set up .env</h3>
 <pre class="cmd"><code>python3 -m venv venv                  # skip if venv/ already exists
@@ -759,7 +1355,7 @@ take effect — it's only read once, at import time. See the DEBUG_MODE section 
 silences.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="debug-mode">DEBUG_MODE &amp; METRICS — debug/testing toggles</h2>
+<h2 id="debug-mode">DEBUG_MODE &amp; METRICS — debug/testing toggles <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 <p>Two related env vars, deliberately split apart so tracking/persistence never silently stops just because
 console noise gets turned off.</p>
 
@@ -789,7 +1385,7 @@ in-memory session. <code>METRICS</code> was split out to fix that: tracking/pers
 printed to the console.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f0">F0 — App Idea</h2>
+<h2 id="f0">F0 — App Idea <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p>Maps to <code>checklist.csv</code> day 0, "App Idea" — the written proposal this whole project builds on.
 No code to run for this one; it's a doc, not a runtime feature.</p>
@@ -807,8 +1403,25 @@ No code to run for this one; it's a doc, not a runtime feature.</p>
 <p>Read the <code>INTRODUCTION</code> section — everything else in this file (and every other feature below) is
 built on top of that one idea.</p>
 
+<h3 id="f0-sysdesign">System Design <a class="h3-up" href="#f0" title="Back to F0">↑ F0</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-product">Product</a>:</strong> Who: a guest of one of three restaurants. Problem: a plain LLM doesn't know this restaurant's dishes or prices. Why RAG instead of fine-tuning: menus change, and retrieval lets you swap a PDF without retraining.</li>
+  <li><strong><a href="#sd-product">Product</a>:</strong> Success metric to name up front: answers are grounded in the menu — the rule that later becomes F17's faithfulness score.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Scope decision: three separate cuisines from day one, which is why every later layer (indexes, memory, sessions) is keyed by cuisine.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>RAG instead of fine-tuning</td><td>Menus change — swap a PDF, no retraining. Answers can show their source chunks. Cheap to build.</td><td>A retrieval miss means a wrong or "I don't know" answer. More moving parts (splitter, embeddings, index).</td><td>Fine-tuning only makes sense for tone/style, never for facts that change weekly.</td></tr>
+  <tr><td>RAG instead of putting the whole menu in the prompt</td><td>Measured: a whole menu is ~2,550–2,620 tokens; the top 3 chunks are ~500. RAG sends ~5× fewer input tokens per call, and keeps working as documents grow.</td><td>At this size the whole menu <em>fits</em> in context — stuffing it would remove retrieval misses entirely and drop F3/F10/F18 complexity.</td><td>Honest answer in an interview: for three short menus, long-context is a valid design. RAG wins once you add more locations, wine lists, catering docs, etc.</td></tr>
+  <tr><td>Three separate cuisines, one index each</td><td>Hard isolation — a sushi question can never retrieve a steak chunk. Simple mental model.</td><td>Three indexes to build and keep fresh. A cross-restaurant question ("which one has vegetarian options?") can't be answered.</td><td>One shared index with a <code>cuisine</code> metadata filter supports both.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f1">F1 — Prototype</h2>
+<h2 id="f1">F1 — Prototype <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -819,7 +1432,8 @@ Jump to:
 <a href="#f1-5">F1:5 Source Code Reference (menu_rag.py)</a> ·
 <a href="#f1-6">F1:6 Source Code Reference: TBA</a> ·
 <a href="#f1-7">F1:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f1-8">F1:8 Technical Deep Dive: TBA</a>
+<a href="#f1-8">F1:8 Technical Deep Dive: TBA</a> ·
+<a href="#f1-sysdesign">F1:9 System Design</a>
 </p>
 
 <h3 id="f1-1">F1:1 Prototype: TBA</h3>
@@ -1139,8 +1753,23 @@ sound, so it's deliberately deferred until after that question is answered.
 </div>
 </div>
 
+<h3 id="f1-sysdesign">F1:9 System Design <a class="h3-up" href="#f1" title="Back to F1">↑ F1</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-product">Product</a>:</strong> A notebook prototype (<code>prototype/</code>) proves the idea is worth building before any API or infra exists — cheapest way to learn if retrieval actually answers menu questions.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Trade-off: notebooks are fast to iterate but not testable or deployable; everything after F1 moves logic into importable modules.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Gap to discuss: the prototype is judged by eye. That's the gap F17 later closes with scored ground-truth questions.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Prototype in a notebook first</td><td>Fastest way to see intermediate results (chunks, retrieved text, answer) and kill a bad idea cheaply.</td><td>Hidden state from out-of-order cells; not testable, not deployable.</td><td>Move to modules as soon as the idea works — which is what F2–F4 did.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f2">F2 — Test the LLM (provider + connectivity)</h2>
+<h2 id="f2">F2 — Test the LLM (provider + connectivity) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -1151,7 +1780,8 @@ Jump to:
 <a href="#f2-5">F2:5 Source Code Reference (menu_api.py)</a> ·
 <a href="#f2-6">F2:6 Source Code Reference: TBA</a> ·
 <a href="#f2-7">F2:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f2-8">F2:8 Technical Deep Dive: TBA</a>
+<a href="#f2-8">F2:8 Technical Deep Dive: TBA</a> ·
+<a href="#f2-sysdesign">F2:9 System Design</a>
 </p>
 
 <h3 id="f2-1">F2:1 Test the LLM (provider + connectivity): TBA</h3>
@@ -2022,8 +2652,41 @@ check endpoint or a Kubernetes readiness probe applies at the infrastructure lay
 </div>
 </div>
 
+<h3 id="f2-sysdesign">F2:9 System Design <a class="h3-up" href="#f2" title="Back to F2">↑ F2</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> <code>build_llm_and_embeddings()</code> in <code>core/llm.py</code> picks the provider once: OpenAI (<code>gpt-4o-mini</code>, <code>text-embedding-3-small</code>) if <code>OPENAI_API_KEY</code> is set, else Azure OpenAI. One function, every engine uses it.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> <code>temperature=0</code> for consistent answers. <code>timeout</code> and <code>max_retries</code> are listed in a comment but not set — worth setting before real traffic.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> No runtime failover: the provider is chosen at startup, and if neither key is set it raises immediately. A production version would fall back to the second provider (or Bedrock) on errors or timeouts.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> The code has OpenAI and Azure branches only — Ollama/Gemini/Claude would be new branches in the same function. On AWS, Bedrock is the natural extra branch.</li>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Embedding model is tied to the provider: switching providers means re-embedding, because vectors from different models can't share one FAISS index.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td><code>gpt-4o-mini</code> as the default model</td><td>Cheap and fast; grounded, short answers from 3 chunks don't need a large model.</td><td>Weaker on multi-step reasoning (e.g. combining an allergen rule with a dish list).</td><td>Route by difficulty, or use a bigger model only for F13's verify step.</td></tr>
+  <tr><td><code>temperature=0</code></td><td>Consistent answers, so F17 eval runs are comparable between changes.</td><td>Less varied phrasing (fine for factual Q&amp;A). Still not perfectly deterministic.</td><td>Keep at 0 for factual answers; raise only for creative copy.</td></tr>
+  <tr><td>Provider chosen once at startup from env vars</td><td>Simple — no runtime branching, one place to change.</td><td>No failover: a provider outage takes the whole app down.</td><td>LangChain's <code>with_fallbacks()</code> to try Azure (or Bedrock) when OpenAI errors or times out.</td></tr>
+  <tr><td><code>text-embedding-3-small</code></td><td>Cheap, and plenty for short menu text.</td><td><code>-large</code> is more accurate. Changing the model means rebuilding every index.</td><td>Upgrade only if F17's context precision shows retrieval is the weak point.</td></tr>
+</table>
+
+
+<p><strong>Production RAG depth — embeddings:</strong></p>
+<ul>
+  <li><strong>Two providers, two embedding models, one index folder.</strong> OpenAI uses
+  <code>text-embedding-3-small</code>, Azure uses <code>text-embedding-ada-002</code> — both 1,536 dimensions, so an
+  index built by one loads fine under the other and retrieval quietly returns poor matches. Fix: include the
+  embedding model name in the index path.</li>
+  <li><strong>The LLM and embeddings are chosen together.</strong> Swapping the chat model is free; swapping the
+  embedding model means re-embedding every chunk. Keep them independently configurable.</li>
+  <li><strong>Query embedding latency:</strong> one network call per question before retrieval starts — cache it for
+  repeated questions.</li>
+</ul>
+<p>Full comparison: <a href="#sd-rag-embeddings">System Design → embedding strategies</a>.</p>
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f3">F3 — Test the chunking (RAG &amp; Vectorstore)</h2>
+<h2 id="f3">F3 — Test the chunking (RAG &amp; Vectorstore) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -2034,7 +2697,8 @@ Jump to:
 <a href="#f3-sec5">F3:5 Source Code Reference (menu_api.py)</a> ·
 <a href="#f3-sec6">F3:6 Source Code Reference: TBA</a> ·
 <a href="#f3-sec7">F3:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f3-sec8">F3:8 Technical Deep Dive: TBA</a>
+<a href="#f3-sec8">F3:8 Technical Deep Dive: TBA</a> ·
+<a href="#f3-sysdesign">F3:9 System Design</a>
 </p>
 
 <h3 id="f3-sec1">F3:1 Test the chunking (RAG &amp; Vectorstore): TBA</h3>
@@ -2906,9 +3570,49 @@ Precision — see Automated RAG Evals Harness (F17) — rather than assume is co
 </div>
 </div>
 
+<h3 id="f3-sysdesign">F3:9 System Design <a class="h3-up" href="#f3" title="Back to F3">↑ F3</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Chunking: <code>RecursiveCharacterTextSplitter</code>, 500 characters with 50 overlap. Simple and predictable, but fixed-size chunks can separate a dish from its price — menu-item-aware chunking is the next step.</li>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> One FAISS index per cuisine, saved under <code>vectorstores/</code>, so a sushi question can't retrieve steak chunks.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Embedding is the expensive step, so the index is built once and loaded after. Downside: an updated PDF isn't picked up until the index is deleted — re-index on a content hash in production.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> How to know chunking is good: F17's context precision score. Change chunk size, rerun the evals, compare.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: PDFs and indexes in S3; at larger scale, OpenSearch instead of local FAISS.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td><code>chunk_size=500</code> characters — <strong>why 500?</strong></td><td>Measured on the real menus: ~29 chunks per menu, averaging ~460 characters, ~55 words, ~165 tokens. That's roughly a few dishes with their descriptions and prices — small enough that a match is precise, big enough to keep a dish with its price. Top 3 chunks ≈ 500 tokens of context: cheap.</td><td>Measured: ~35% of each chunk's characters are whitespace, because the PDF text extracts one word per line. So a "500-character" chunk only holds ~300 characters of real text. Fixed size also ignores where one dish ends and the next begins.</td><td>Collapse whitespace before splitting (more real text per chunk), or split on menu items/sections. Then test 300 / 500 / 800 / 1000 with F17's context precision and pick by data.</td></tr>
+  <tr><td>Smaller chunks (e.g. 200)</td><td>Very precise matches; less noise per chunk.</td><td>A dish name can land in one chunk and its price in the next. Needs more chunks retrieved to answer anything.</td><td>Only with item-aware splitting, so each chunk is exactly one dish.</td></tr>
+  <tr><td>Larger chunks (e.g. 1,000–1,500)</td><td>Whole sections stay together; fewer "half a dish" misses.</td><td>More unrelated text per chunk → lower context precision, more tokens per call, and the answer can get lost in the middle.</td><td>Worth testing for list questions ("all vegetarian dishes").</td></tr>
+  <tr><td><code>chunk_overlap=50</code> (10%) — <strong>why 50?</strong></td><td>A sentence cut at a boundary appears in both chunks. Only ~10% duplicated text, so cost stays low. 10–20% is the usual starting range.</td><td>After the whitespace effect, 50 characters is only ~30 characters of real text — less than one menu line, so it doesn't fully protect a dish split across chunks. Overlapping chunks can both land in the top 3, wasting a slot.</td><td>Raise to ~100 after whitespace cleanup, or make it unnecessary with item-aware splitting.</td></tr>
+  <tr><td><code>RecursiveCharacterTextSplitter</code></td><td>Tries paragraph, then line, then word breaks before cutting mid-word.</td><td>Doesn't understand menu structure (sections, dish/price lines).</td><td>Section-aware splitting, or semantic chunking (split where meaning changes) — costs embedding calls at index time.</td></tr>
+  <tr><td>FAISS saved to local disk</td><td>Free, fast, no server. Embedding cost paid once.</td><td>Single machine. Loaded with <code>allow_dangerous_deserialization=True</code> (pickle), so only safe for indexes you built yourself. Stale if the PDF changes.</td><td>S3-stored index rebuilt on PDF change, or OpenSearch / pgvector at scale.</td></tr>
+</table>
+
+
+<p><strong>Production RAG depth — chunking and embeddings:</strong></p>
+<ul>
+  <li><strong>Measured chunk options (steak menu):</strong> 300 → 49 chunks / ~97 tokens; <strong>500 → 30 /
+  ~160</strong>; 800 → 19 / ~252; 1,000 → 16 / ~300.</li>
+  <li><strong>Collapse whitespace first:</strong> at 500, chunks drop from 30 to 24 and from ~160 to ~117 tokens each
+  while holding <em>more</em> real menu text — the stray line breaks cost tokens.</li>
+  <li><strong>Structure-aware chunking is the best fit:</strong> menus are organized by section and dish; one chunk
+  per dish means a price is never separated from its dish.</li>
+  <li><strong>Add the section to each chunk</strong> ("Steak menu — Appetizers: …") before embedding, so a chunk still
+  matches "starters" when the heading appeared only once, chunks earlier.</li>
+  <li><strong>Index:</strong> <code>IndexFlatL2</code> — exact search over ~29 vectors (~180 KB). Perfect recall and
+  no tuning; approximate indexes (HNSW/IVF) only matter past ~100k vectors.</li>
+  <li><strong>Staleness:</strong> rebuild when the PDF or embedding model changes (hash both), not only when the folder
+  is missing.</li>
+</ul>
+<p>Full comparison: <a href="#sd-rag-chunking">chunking strategies</a> ·
+<a href="#sd-rag-embeddings">embedding strategies</a>.</p>
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f3-1">F3.1 — RAG System Prompt &amp; Persona</h2>
+<h2 id="f3-1">F3.1 — RAG System Prompt &amp; Persona <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p>Not one of the original 21 checklist days — added while testing F8, and worth tracking anyway: it isn't
 scoped to F8 at all. It changes the core RAG chain itself, so it affects <em>every</em> question, on
@@ -3009,8 +3713,25 @@ independently verifiable claims.
 </div>
 </div>
 
+<h3 id="f3-1-sysdesign">System Design <a class="h3-up" href="#f3-1" title="Back to F3.1">↑ F3.1</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-product">Product</a>:</strong> The persona prompt turns the product rule — never invent dishes, prices, ingredients, allergens, or policies — into instructions the model sees on every call.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Designed for the model being wrong: it's told to say "I don't have that information" instead of guessing. A prompt is a soft guarantee, which is why F13 (verify) and F17 (evals) back it up.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> First guardrail layer: off-topic redirect in the prompt. F19 later moves that decision to a dedicated classifier so it's consistent and measurable.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Prompt edits are regressions waiting to happen — every change should go through F17/F20 before merging.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>"Answer ONLY from the context"</td><td>Directly targets the worst failure — an invented price or allergen.</td><td>More "I don't have that information" replies, even for harmless general questions.</td><td>Allow general knowledge but label it, if the product wants friendlier answers.</td></tr>
+  <tr><td>Prompt copied per file (<code>menu_api.py</code>, <code>plain_rag_engine.py</code>, <code>langgraph_engine.py</code>)</td><td>Each file is independent; the baseline stays untouched.</td><td>The copies have already drifted: plain_rag adds a policy-details rule, and the LangGraph copy has no "redirect off-topic questions" line.</td><td>One shared prompt in <code>core/</code>, imported by every engine.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f4">F4 — Test the API (FastAPI)</h2>
+<h2 id="f4">F4 — Test the API (FastAPI) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -3021,7 +3742,8 @@ Jump to:
 <a href="#f4-5">F4:5 Source Code Reference (menu_api.py)</a> ·
 <a href="#f4-6">F4:6 Source Code Reference: TBA</a> ·
 <a href="#f4-7">F4:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f4-8">F4:8 Technical Deep Dive: TBA</a>
+<a href="#f4-8">F4:8 Technical Deep Dive: TBA</a> ·
+<a href="#f4-sysdesign">F4:9 System Design</a>
 </p>
 
 <h3 id="f4-1">F4:1 Test the API (FastAPI): TBA</h3>
@@ -3910,8 +4632,27 @@ production.
 </div>
 </div>
 
+<h3 id="f4-sysdesign">F4:9 System Design <a class="h3-up" href="#f4" title="Back to F4">↑ F4</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> FastAPI exposes <code>POST /ask</code>, <code>GET /specials</code>, <code>GET /hours</code>. Every client — UIs, CLI, evals — goes through the same request path.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> <code>/ask</code> is a sync handler, so FastAPI runs it in a thread pool; the F6/F9 session counters are documented as not thread-safe, so this is a single-worker design today.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> No streaming yet: the user waits for the full answer. Streaming tokens back would cut perceived latency more than any backend change.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Errors from the Google Sheet come back as <code>{"error": ...}</code> with a 200 status — production should use proper HTTP status codes so monitoring can count them.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: containerize and run on ECS Fargate behind an Application Load Balancer; API Gateway in front once F21 adds auth.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Sync <code>def</code> handler</td><td>Simple; FastAPI runs it in a thread pool so blocking LangChain calls don't freeze the server.</td><td>Concurrency is capped by the thread pool, and the F6/F9 counters aren't thread-safe.</td><td><code>async def</code> + <code>ainvoke()</code> for I/O-bound LLM calls; more workers behind a load balancer.</td></tr>
+  <tr><td>Full JSON response, no streaming</td><td>Simple clients; the response carries answer + usage + trace together.</td><td>The user stares at a spinner for the whole LLM call.</td><td>Server-Sent Events for the answer, usage sent at the end.</td></tr>
+  <tr><td>Errors returned as <code>{"error": ...}</code> with HTTP 200</td><td>Easy for the UIs to display.</td><td>Load balancers and monitors see a success; error rates are invisible.</td><td>Real status codes (400 bad cuisine, 502/503 upstream failure).</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f5">F5 — Test the web UIs (Streamlit &amp; Gradio)</h2>
+<h2 id="f5">F5 — Test the web UIs (Streamlit &amp; Gradio) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -3922,7 +4663,8 @@ Jump to:
 <a href="#f5-5">F5:5 Source Code Reference (web-demo/gradio_app.py)</a> ·
 <a href="#f5-6">F5:6 Source Code Reference (web-demo/streamlit_app.py)</a> ·
 <a href="#f5-7">F5:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f5-8">F5:8 Technical Deep Dive: TBA</a>
+<a href="#f5-8">F5:8 Technical Deep Dive: TBA</a> ·
+<a href="#f5-sysdesign">F5:9 System Design</a>
 </p>
 
 <h3 id="f5-1">F5:1 Test the web UIs (Streamlit &amp; Gradio): TBA</h3>
@@ -4321,10 +5063,28 @@ accidentally leaking frontend assumptions into the backend.
 </div>
 </div>
 
+<h3 id="f5-sysdesign">F5:9 System Design <a class="h3-up" href="#f5" title="Back to F5">↑ F5</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-product">Product</a>:</strong> Streamlit and Gradio playgrounds let non-engineers try the assistant — the fastest way to get real questions from real people.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Both UIs are thin clients: they call the API at <code>http://127.0.0.1:8000</code> and hold no logic of their own.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> They don't send a <code>session_id</code>, so every UI user shares the API's <code>"default"</code> session — one user's chat history can leak into another's answers. Fix: generate a session id per browser session.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> Hardcoded local URL — would become a config value pointing at the deployed API.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Thin clients calling the API</td><td>One source of truth — UIs test the same path production uses.</td><td>API must be running; an extra network hop.</td><td>Keep it — that's the right design.</td></tr>
+  <tr><td>Two UI frameworks (Streamlit and Gradio)</td><td>Compare them side by side.</td><td>Two codebases doing the same thing.</td><td>Pick one for the product; keep the other only as a demo.</td></tr>
+  <tr><td>No <code>session_id</code> sent</td><td>Simplest possible request.</td><td>All UI users share the <code>"default"</code> session — memory leaks between users.</td><td>Generate a per-browser-session id and send it.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 2</span>Archer (Observability, Context & Data Foundation)</span><img class="phase-header-img" src="images/thumbs/archer.jpg" alt="Archer, NX-01 era vessel"></h1>
 
-<h2 id="f6">F6 — In-Code Token &amp; Cost Accounting</h2>
+<h2 id="f6">F6 — In-Code Token &amp; Cost Accounting <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -4336,7 +5096,8 @@ Jump to:
 <a href="#f6-6">F6:6 Source Code Reference (menu_api.py)</a> ·
 <a href="#f6-7">F6:7 Line-by-Line Deep Dive: TBA</a> ·
 <a href="#f6-8">F6:8 Technical Deep Dive: TBA</a> ·
-<a href="#f6-9">F6:9 Usage Guide</a>
+<a href="#f6-9">F6:9 Usage Guide</a> ·
+<a href="#f6-sysdesign">F6:10 System Design</a>
 </p>
 
 <h3 id="f6-2">F6:2 Architecture Summary: TBA</h3>
@@ -5622,8 +6383,26 @@ same <code>invoke_chain()</code> call simultaneously without interfering with ea
 </div>
 </div>
 
+<h3 id="f6-sysdesign">F6:10 System Design <a class="h3-up" href="#f6" title="Back to F6">↑ F6</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every call records prompt tokens, completion tokens, and dollar cost via LangChain's <code>get_openai_callback()</code>, returned as <code>usage</code> in the <code>/ask</code> response.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> This is the number you need before any cost decision: which engine, how many chunks, how much memory, whether F19's extra call pays for itself.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Expensive-model defense starts here, but nothing acts on it yet — no per-session budget cap or alert when spend spikes.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Datadog-style next step: emit cost per request as a metric and alert on daily spend.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Session totals live in a module-level dict — not thread-safe and lost on restart, which is why F11 persists them.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Cost counted in code via LangChain's callback</td><td>Per-request and per-session cost, attributed immediately, no external service.</td><td>Relies on LangChain's built-in price table (must stay current). Only LLM calls go through it — the per-question query embedding isn't counted. Not thread-safe.</td><td>Reconcile monthly against the provider's billing/usage API; or LangSmith/Langfuse cost tracking.</td></tr>
+  <tr><td>Usage returned in every <code>/ask</code> response</td><td>Visible to developers instantly.</td><td>Leaks internal cost data to any client.</td><td>Return it only in debug mode; send it to metrics instead.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f7">F7 — Ephemeral Chat Memory</h2>
+<h2 id="f7">F7 — Ephemeral Chat Memory <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -5634,7 +6413,8 @@ Jump to:
 <a href="#f7-5">F7:5 Source Code Reference (core/memory.py)</a> ·
 <a href="#f7-6">F7:6 Source Code Reference (menu_api.py)</a> ·
 <a href="#f7-7">F7:7 Line-by-Line Deep Dive</a> ·
-<a href="#f7-8">F7:8 Technical Deep Dive</a>
+<a href="#f7-8">F7:8 Technical Deep Dive</a> ·
+<a href="#f7-sysdesign">F7:9 System Design</a>
 </p>
 
 <table class="blog-box blog-box-green">
@@ -7444,8 +8224,27 @@ doesn't actually have yet.
 </div>
 </div>
 
+<h3 id="f7-sysdesign">F7:9 System Design <a class="h3-up" href="#f7" title="Back to F7">↑ F7</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Memory is context engineering: the last 5 exchanges (<code>MAX_HISTORY_TURNS</code>) are prepended to the question so "how much is it?" makes sense after "tell me about the ribeye".</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> The window bounds token cost — full history is kept, only the last 5 turns are sent to the LLM.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Sessions are keyed <code>cuisine:session_id</code>, so a sushi conversation can't leak into steak.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> In-memory only: a restart wipes every conversation (F16 fixes this). Hours questions skip memory on purpose so an old date doesn't confuse a new one.</li>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Trade-off: the history is prepended to the question itself, so it also goes into retrieval — old turns can pull in less relevant chunks.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td><code>MAX_HISTORY_TURNS = 5</code> — <strong>why 5?</strong></td><td>Follow-ups ("how much is it?", "and the other one?") almost always point at the last 1–3 turns; 5 covers that with margin while capping how many tokens history adds to each call.</td><td>Anything older than 5 turns is forgotten. Long answers make even 5 turns expensive.</td><td>Summarize older turns, or cap history by tokens instead of turns.</td></tr>
+  <tr><td>History pasted in front of the question</td><td>One call, no extra LLM step.</td><td>That whole block also goes into retrieval, so the search runs on old turns + new question — it can pull the wrong chunks.</td><td>Standard fix: one LLM call to rewrite the follow-up into a standalone question, then retrieve on that.</td></tr>
+  <tr><td>In-memory dict per session</td><td>Instant, zero setup, nothing on disk (privacy-friendly).</td><td>Lost on restart; never evicted, so it grows forever; one process only.</td><td>F16 SQLite for durability; Redis/DynamoDB with a TTL at scale.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f9">F9 — Observability &amp; Tracing</h2>
+<h2 id="f9">F9 — Observability &amp; Tracing <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -7456,7 +8255,8 @@ Jump to:
 <a href="#f9-5">F9:5 Source Code Reference (core/telemetry.py)</a> ·
 <a href="#f9-6">F9:6 Source Code Reference (menu_api.py)</a> ·
 <a href="#f9-7">F9:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f9-8">F9:8 Technical Deep Dive: TBA</a>
+<a href="#f9-8">F9:8 Technical Deep Dive: TBA</a> ·
+<a href="#f9-sysdesign">F9:9 System Design</a>
 </p>
 
 <h3 id="f9-2">F9:2 Architecture Summary: TBA</h3>
@@ -8802,8 +9602,25 @@ dict.
 </div>
 </div>
 
+<h3 id="f9-sysdesign">F9:9 System Design <a class="h3-up" href="#f9" title="Back to F9">↑ F9</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> <code>StepTimer</code> splits each call into <code>retriever_ms</code>, <code>llm_ms</code>, and <code>total_ms</code>, plus a running error count — you know which half of the pipeline is slow.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> This is the observability layer. Today it's console output and a <code>trace</code> field in the response; the Datadog-style version exports these as metrics with p95 latency and error-rate alerts.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Designing for "the model is slow" starts with measuring it per stage — you can't set a timeout or pick a faster model without these numbers.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: CloudWatch metrics or a Datadog agent on the ECS task; traces with OpenTelemetry.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Home-made <code>StepTimer</code> on LangChain callbacks</td><td>No dependency, works offline, cheap.</td><td>In-process only. <code>llm_ms</code> keeps only the <em>last</em> LLM call — with LangGraph's up-to-5 calls it undercounts. Nested retrievers share one start timestamp, so <code>retriever_ms</code> is approximate.</td><td>OpenTelemetry spans (one per step, summed correctly) exported to Datadog/CloudWatch, or LangSmith/Langfuse.</td></tr>
+  <tr><td>Error count kept in memory</td><td>Simple running error rate.</td><td>Resets on restart; per process; no time window.</td><td>A metrics backend with error rate per minute and alerts.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f10">F10 — Cross-Encoder Re-ranking</h2>
+<h2 id="f10">F10 — Cross-Encoder Re-ranking <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -8814,7 +9631,8 @@ Jump to:
 <a href="#f10-5">F10:5 Source Code Reference (core/vectorstore.py)</a> ·
 <a href="#f10-6">F10:6 Source Code Reference (menu_api.py)</a> ·
 <a href="#f10-7">F10:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f10-8">F10:8 Technical Deep Dive: TBA</a>
+<a href="#f10-8">F10:8 Technical Deep Dive: TBA</a> ·
+<a href="#f10-sysdesign">F10:9 System Design</a>
 </p>
 
 <h3 id="f10-2">F10:2 Architecture Summary: TBA</h3>
@@ -9925,8 +10743,43 @@ metric the checklist tracks for this feature.
 </div>
 </div>
 
+<h3 id="f10-sysdesign">F10:9 System Design <a class="h3-up" href="#f10" title="Back to F10">↑ F10</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Two-stage retrieval: fetch candidates, then re-score each against the question with a cross-encoder (FlashRank <code>ms-marco-MiniLM-L-12-v2</code>) and keep the top 3.</li>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Why: embedding similarity is a rough guess; a cross-encoder reads question and chunk together and ranks much more precisely.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Runs locally — no API cost, but adds CPU time that shows up in F9's <code>retriever_ms</code>. Fewer, better chunks also mean fewer prompt tokens.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Measured by F17's context precision (threshold 0.6).</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> At scale, run the re-ranker on its own CPU service or use a managed re-rank API so it doesn't compete with the API workers.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Re-rank with a cross-encoder</td><td>Much better ordering than raw embedding similarity, so the best chunk is in the top 3.</td><td>CPU time on every request; model download at startup.</td><td>Managed re-rank API, or a GPU re-rank service at high traffic.</td></tr>
+  <tr><td>Candidate pool: BM25 <code>k=3</code> + FAISS <code>k=3</code> → at most 6 unique chunks, re-ranked to 3</td><td>Cheap — the re-ranker only scores a few chunks.</td><td>Re-ranking pays off with a <em>wide</em> pool (often 20–50). With 6 candidates it can only reorder what's already close; a relevant chunk ranked 4th by both retrievers is never seen.</td><td>Retrieve 10–20 from each, re-rank to 3; check F17 context precision against F9 latency.</td></tr>
+  <tr><td><code>ms-marco-MiniLM-L-12-v2</code></td><td>Good accuracy for its size; runs on CPU via FlashRank.</td><td>Slower than the 6-layer version; not trained on menus.</td><td>Try the smaller model if latency matters more than precision.</td></tr>
+  <tr><td><code>top_k=3</code></td><td>~500 tokens of context — cheap, focused.</td><td>List questions ("all gluten-free dishes") need more than 3 chunks.</td><td>Make <code>top_k</code> depend on question type (F19 could tag list questions).</td></tr>
+</table>
+
+
+<p><strong>Production RAG depth — re-ranking:</strong></p>
+<ul>
+  <li><strong>Measured cost:</strong> ~2 s to load the model; ~31 ms to re-rank 6 chunks, ~113 ms for 20, ~175 ms for
+  30 (≈ 6 ms per chunk on CPU).</li>
+  <li><strong>Pool too small:</strong> today it sees at most 6 candidates (3 BM25 + 3 FAISS). Retrieving 20–30 and
+  re-ranking to 3 is the standard pattern — ~80–145 ms more, worth it if F17 context precision rises.</li>
+  <li><strong>Warm-up:</strong> the model loads when <code>core/vectorstore.py</code> is imported, so the ~2 s is paid
+  at startup, not on a user's request — keep it that way.</li>
+  <li><strong>Prove it earns its place:</strong> A/B with and without the re-ranker in F17; if precision doesn't move,
+  ~30 ms per request is being spent for nothing.</li>
+  <li><strong>Options:</strong> hosted re-rank API (stronger, costs per call), LLM re-ranker (strongest, slowest),
+  or none.</li>
+</ul>
+<p>Full comparison: <a href="#sd-rag-reranking">System Design → re-ranking strategies</a>.</p>
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
-<h2 id="f11">F11 — Relational DB &amp; Text-to-SQL Tool</h2>
+<h2 id="f11">F11 — Relational DB &amp; Text-to-SQL Tool <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -9938,7 +10791,8 @@ Jump to:
 <a href="#f11-6">F11:6 Source Code Reference (menu_api.py)</a> ·
 <a href="#f11-7">F11:7 Line-by-Line Deep Dive: TBA</a> ·
 <a href="#f11-8">F11:8 Technical Deep Dive: TBA</a> ·
-<a href="#f11-9">F11:9 Integration Guide (the Gradio &amp; Streamlit UIs)</a>
+<a href="#f11-9">F11:9 Integration Guide (the Gradio &amp; Streamlit UIs)</a> ·
+<a href="#f11-sysdesign">F11:10 System Design</a>
 </p>
 
 <h3 id="f11-2">F11:2 Architecture Summary: TBA</h3>
@@ -11057,9 +11911,27 @@ real ceiling here, not the SQL itself.
 </div>
 </div>
 
+<h3 id="f11-sysdesign">F11:10 System Design <a class="h3-up" href="#f11" title="Back to F11">↑ F11</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every call writes a row to SQLite <code>usage_log</code> (tokens, cost, session, question); session totals come from a SQL <code>SUM()</code>, so they survive restarts.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> This is the audit trail: cost per session, per cuisine, over time — the data behind any cost report.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Opens a new SQLite connection per call and is single-file — fine for one process, not for many workers.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: RDS Postgres for <code>usage_log</code>; or stream rows to a metrics pipeline instead of a database.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>SQLite for <code>usage_log</code></td><td>Zero setup, real SQL, survives restarts.</td><td>One writer at a time; new connection per call; one machine.</td><td>Postgres (RDS) or a metrics pipeline at scale.</td></tr>
+  <tr><td>Totals via <code>SUM()</code> instead of a running-totals table</td><td>Can't drift out of sync.</td><td>Scans more rows as the log grows; there's no index on <code>session_id</code>.</td><td>Add an index on <code>session_id</code>.</td></tr>
+  <tr><td>Raw question text stored</td><td>Great for debugging and audits.</td><td>Personal data may end up in the log, kept forever.</td><td>Retention policy, or store a hash/redacted version.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f8">F8 — FastMCP Server Endpoint</h2>
+<h2 id="f8">F8 — FastMCP Server Endpoint <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -11073,7 +11945,8 @@ Jump to:
 <a href="#f8-8">F8:8 Technical Deep Dive: TBA</a> ·
 <a href="#f8-9">F8:9 Setup Guide</a> ·
 <a href="#f8-10">F8:10 Integration Guide (menu_api.py)</a> ·
-<a href="#f8-11">F8:11 Integration Guide (the CLI, Gradio &amp; Streamlit UIs)</a>
+<a href="#f8-11">F8:11 Integration Guide (the CLI, Gradio &amp; Streamlit UIs)</a> ·
+<a href="#f8-sysdesign">F8:12 System Design</a>
 </p>
 
 <h3 id="f8-2">F8:2 Architecture Summary: TBA</h3>
@@ -12689,10 +13562,36 @@ agent runtimes — rather than forcing every consumer through the same protocol 
 </div>
 </div>
 
+<h3 id="f8-sysdesign">F8:12 System Design <a class="h3-up" href="#f8" title="Back to F8">↑ F8</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Tool use: specials and hours are live data, so they're exposed as MCP tools (<code>daily_specials</code>, <code>hours_and_events</code>) in <code>api/mcp_server.py</code> instead of being put in the vector store.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Routing today is a keyword check (<code>detect_ops_intent()</code>): "special" goes straight to the Google Sheet; hours questions go to the engine first, then live events are appended.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> If the sheet is down on an hours question, the PDF answer is still returned. For specials there's no fallback — an error comes back.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every call re-reads the sheet (only the auth client is cached) — always fresh, but each request pays a network round trip and can hit Google's rate limits. A short cache (e.g. 60 seconds) is the trade-off to discuss.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent isn't needed: the API calls the tools directly from a simple rule; MCP is what lets an external agent (e.g. Claude Desktop) call the same tools.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Google Sheet as the source for specials/hours</td><td>Staff update specials without a deploy or an engineer.</td><td>Rate limits, network latency, and silent breakage if someone renames a tab or column.</td><td>A small admin UI backed by a database at scale; keep the Sheet for a single restaurant.</td></tr>
+  <tr><td>Read live on every call, no cache</td><td>Always fresh.</td><td>Each request pays a network round trip and counts against Google's quota.</td><td>Cache rows for ~60 seconds — specials don't change by the second.</td></tr>
+  <tr><td>Keyword routing (<code>detect_ops_intent()</code>)</td><td>Free, instant, predictable.</td><td>Brittle: only the word "special" routes to specials; "what's good today?" doesn't.</td><td>Use F19's intent label (it already returns <code>specials</code>/<code>hours</code>) instead of keywords.</td></tr>
+  <tr><td>Hours: engine answers from the PDF, then sheet events are appended</td><td>Regular hours from the menu plus live exceptions (holidays).</td><td>Two sources can disagree, and the answer is two pieces glued together.</td><td>Merge both into the prompt and let the model give one answer, with the sheet marked as the override.</td></tr>
+</table>
+
+<p><strong>Framework fit:</strong> today the API calls the sheet tools directly from a keyword rule — no agent.
+A LangChain agent (<code>create_agent</code>) with three tools (menu retrieval, <code>daily_specials</code>,
+<code>hours_and_events</code>) is the natural upgrade: the model picks the tool, so phrasing like "what's good
+today?" still reaches specials. Cost: an extra LLM decision per question, and less predictable paths. See
+<a href="#sd-frameworks">the framework comparison</a>.</p>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 3</span>D7 (Multi-Engine & Agent Frameworks)</span><img class="phase-header-img" src="images/thumbs/Klingon_D-7_class.jpg" alt="Klingon vessel"></h1>
 
-<h2 id="f12">F12 — Modular Engine Strategy Factory</h2>
+<h2 id="f12">F12 — Modular Engine Strategy Factory <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -12705,7 +13604,8 @@ Jump to:
 <a href="#f12-sec7">F12:7 Line-by-Line Deep Dive: TBA</a> ·
 <a href="#f12-sec8">F12:8 Technical Deep Dive: TBA</a> ·
 <a href="#f12-sec9">F12:9 Source Code Reference (engines/plain_rag_engine.py)</a> ·
-<a href="#f12-sec10">F12:10 Source Code Reference (engine_api.py)</a>
+<a href="#f12-sec10">F12:10 Source Code Reference (engine_api.py)</a> ·
+<a href="#f12-sysdesign">F12:11 System Design</a>
 </p>
 
 <h3 id="f12-sec2">F12:2 Architecture Summary: TBA</h3>
@@ -13884,9 +14784,33 @@ running both indefinitely.
 </div>
 </div>
 
+<h3 id="f12-sysdesign">F12:11 System Design <a class="h3-up" href="#f12" title="Back to F12">↑ F12</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Strategy + factory: every engine implements <code>BaseMenuEngine.answer()</code>, and <code>get_engine(name)</code> builds and caches it. The API, evals, and telemetry never depend on a specific engine.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> This is what makes "agent or not" a per-request choice (<code>engine</code> field or <code>DEFAULT_ENGINE</code>) instead of a rewrite.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Same factory is used by production and by F17, so evals test exactly what users hit.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Safe migration: <code>menu_api.py</code> stays the untouched baseline while <code>engine_api.py</code> runs the new path side by side (Strangler Fig).</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Possible next step: fall back from <code>langgraph</code> to <code>plain_rag</code> if the graph errors or runs too long.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>One <code>answer()</code> interface for every engine</td><td>Swap engines per request; evals and telemetry work for all of them.</td><td>Lowest common denominator — richer engine output (agent steps, retries) has to be squeezed into <code>result</code> + <code>source_documents</code>.</td><td>Add an optional <code>metadata</code> field for engine-specific details.</td></tr>
+  <tr><td>Lazy build, cached singleton per engine</td><td>Fast startup; unused engines never load.</td><td>The first request to each engine pays the cold-start cost (loading 3 indexes + re-ranker). Singletons are shared across threads.</td><td>Warm up engines at startup in production.</td></tr>
+</table>
+
+<p><strong>Framework fit:</strong> the factory is what keeps the framework choice reversible. Every option —
+plain chain, LangChain agent, LangGraph, CrewAI, AutoGen — becomes one more <code>get_engine()</code> branch behind
+the same <code>answer()</code> interface, and F17 can score them side by side. That's the real answer to "which
+framework is best": don't bet on one, make them swappable and measure. See
+<a href="#sd-frameworks">the framework comparison</a>.</p>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f13">F13 — LangGraph State Machine Engine</h2>
+<h2 id="f13">F13 — LangGraph State Machine Engine <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -13897,7 +14821,8 @@ Jump to:
 <a href="#f13-5">F13:5 Source Code Reference (engines/langgraph_engine.py)</a> ·
 <a href="#f13-6">F13:6 Source Code Reference: TBA</a> ·
 <a href="#f13-7">F13:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f13-8">F13:8 Technical Deep Dive: TBA</a>
+<a href="#f13-8">F13:8 Technical Deep Dive: TBA</a> ·
+<a href="#f13-sysdesign">F13:9 System Design</a>
 </p>
 
 <h3 id="f13-2">F13:2 Architecture Summary: TBA</h3>
@@ -14430,9 +15355,44 @@ bounded-termination behavior without depending on the model happening to produce
 </pre></div></td></tr></table></div>
 </div>
 
+<h3 id="f13-sysdesign">F13:9 System Design <a class="h3-up" href="#f13" title="Back to F13">↑ F13</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent is the right design: when you need to check your own answer and retry. Graph: <code>route → retrieve → generate → verify</code>, looping back with the verifier's feedback if the answer isn't grounded.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Bounded planning loop: <code>MAX_RETRIES = 2</code>, so it always ends. Worst case is 5 LLM calls (route, 2× generate, 2× verify) vs. 1 for plain RAG.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Designed for "the model is wrong": the verify node catches answers not supported by the context before the user sees them.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Cost and latency are several times plain RAG — worth it for accuracy-critical questions, not for every request.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Overlap to discuss: with <code>GUARDRAILS_ENABLED</code> on, F19 and this engine's <code>route</code> node both classify the same question.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Same LLM routes, generates, <em>and</em> verifies</td><td>Simple — one model, one config.</td><td>A model checking its own answer tends to approve its own mistakes.</td><td>A different (or larger) model for the verify step.</td></tr>
+  <tr><td><code>MAX_RETRIES = 2</code> — <strong>why 2?</strong></td><td>Most fixable mistakes are fixed on the first retry; 2 caps the worst case at 5 LLM calls.</td><td>If both tries fail, the last answer is returned <em>even though the verifier said it isn't grounded</em>.</td><td>After the last failed check, return a safe "I'm not sure — please ask staff" message instead.</td></tr>
+  <tr><td>Retry goes back to <code>retrieve</code></td><td>Keeps the graph simple.</td><td>Retrieval uses the same unchanged question, so it returns the same chunks — the retry only changes the generation step.</td><td>Retry straight to <code>generate</code>, or rewrite the query before re-retrieving.</td></tr>
+  <tr><td>Agent engine vs plain RAG</td><td>Catches ungrounded answers before the user sees them.</td><td>Up to 5× the LLM calls, cost, and latency.</td><td>Use it only for high-stakes questions (allergens), plain RAG for the rest.</td></tr>
+</table>
+
+<p><strong>Why LangGraph is the best fit here (and when it isn't):</strong></p>
+<ul>
+  <li><strong>vs. a LangChain agent:</strong> an agent lets the model choose what to do next; LangGraph lets
+  <em>you</em> fix the path. For a "never invent a price" rule you want the verify step to run every time, not
+  only when the model decides to — so the fixed graph wins.</li>
+  <li><strong>vs. CrewAI / AutoGen:</strong> one agent with a check-and-retry loop covers this project's need;
+  multiple agents add calls without a clear accuracy gain for short menu questions.</li>
+  <li><strong>Practical:</strong> already a dependency, same LangChain objects (retriever, LLM, prompts), and has
+  built-in checkpointers if F16-style persistence is ever moved into the graph.</li>
+  <li><strong>When it isn't:</strong> for simple lookups it's overkill — plain RAG answers in 1 call instead of up
+  to 5. And if tool choice became open-ended (many tools, unpredictable order), a prebuilt LangChain agent would be
+  less code.</li>
+</ul>
+<p>Full comparison: <a href="#sd-frameworks">System Design → agent frameworks</a>.</p>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f14">F14 — CrewAI Multi-Role Engine</h2>
+<h2 id="f14">F14 — CrewAI Multi-Role Engine (NI) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -14443,7 +15403,8 @@ Jump to:
 <a href="#f14-5">F14:5 Source Code Reference: TBA</a> ·
 <a href="#f14-6">F14:6 Source Code Reference: TBA</a> ·
 <a href="#f14-7">F14:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f14-8">F14:8 Technical Deep Dive: TBA</a>
+<a href="#f14-8">F14:8 Technical Deep Dive: TBA</a> ·
+<a href="#f14-sysdesign">F14:9 System Design</a>
 </p>
 
 <h3 id="f14-1">F14:1 CrewAI Multi-Role Engine: TBA</h3>
@@ -14480,9 +15441,64 @@ extra cost.</div>
   <li>also implemented behind F12's shared interface, selectable the same way as any other engine</li>
 </ul>
 
+<h3 id="f14-plan">Plan to discuss</h3>
+<ul>
+  <li><strong>Where it plugs in:</strong> a <code>CrewAiEngine</code> class implementing
+  <code>BaseMenuEngine.answer()</code>, plus one new <code>elif name == "crewai"</code> branch in
+  <code>get_engine()</code> (<code>engines/base.py</code>). <code>engine_api.py</code> needs no change — callers
+  pick it with <code>"engine": "crewai"</code> or <code>DEFAULT_ENGINE=crewai</code>.</li>
+  <li><strong>Proposed roles:</strong> a <em>menu expert</em> (dishes, prices, allergens), a <em>policy expert</em>
+  (parking, payment, reservations, corkage), and a <em>coordinator</em> that merges their parts into one guest-facing
+  answer.</li>
+  <li><strong>Reuse, not rebuild:</strong> each role retrieves through the same <code>get_retriever()</code>, so it
+  inherits hybrid search (F18), re-ranking (F10), and injection isolation (F22) for free. Provider comes from
+  <code>core/llm.py</code> (F2).</li>
+  <li><strong>Return shape:</strong> must still return <code>{"result", "source_documents"}</code> so F6/F9 telemetry,
+  F11 logging, and the F17 evals work unchanged.</li>
+  <li><strong>How we'd judge it:</strong> run <code>python -m evaluation.run_evals --engine crewai</code> (adding
+  <code>crewai</code> to the <code>--engine</code> choices) and compare against <code>plain_rag</code> and
+  <code>langgraph</code> on F17 scores, F6 cost, and F9 latency.</li>
+  <li><strong>Trade-offs to discuss:</strong> at least 3 LLM calls per question vs. 1 for plain RAG; most menu
+  questions only touch one domain, so a router that only calls the crew for mixed questions may be the better
+  design.</li>
+  <li><strong>Open questions:</strong> does <code>crewai</code> install cleanly alongside the current
+  <code>langchain-openai</code> pins (the same conflict that ruled out Ragas in F17)? Should each role get its own
+  retriever filter, or share one?</li>
+</ul>
+
+<h3 id="f14-sysdesign">F14:9 System Design <a class="h3-up" href="#f14" title="Back to F14">↑ F14</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Multi-agent design question: does splitting work into specialist roles (menu, policy, coordinator) beat one agent? Only if questions often span both domains.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> At least 3 LLM calls per question — a router that sends only mixed questions to the crew keeps cost down.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Decision rule: build it, run F17 with <code>--engine crewai</code>, and keep it only if scores go up enough to justify F6 cost and F9 latency.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> More agents means more places to go wrong — the coordinator merging two partial answers is a new place for hallucination.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Specialist roles (menu, policy, coordinator)</td><td>Each role has a narrow job and a focused prompt.</td><td>At least 3 LLM calls; the coordinator merging two answers is a new place to invent things.</td><td>Route only mixed questions to the crew; single-domain ones stay on plain RAG.</td></tr>
+  <tr><td>Adopt the CrewAI framework</td><td>Roles, tasks, and delegation out of the box.</td><td>New dependency that may conflict with current package versions (as Ragas did in F17); less control than a hand-built LangGraph.</td><td>Build the same roles as LangGraph nodes if the dependency doesn't fit.</td></tr>
+</table>
+
+<p><strong>Is CrewAI the right framework here?</strong> Probably not as the default:</p>
+<ul>
+  <li><strong>For:</strong> the role/task model maps cleanly onto "menu expert + policy expert + coordinator",
+  and it's quick to set up.</li>
+  <li><strong>Against:</strong> a new dependency outside the current LangChain/LangGraph stack; less control over
+  the exact flow than LangGraph; at least 3 LLM calls when most questions need one domain.</li>
+  <li><strong>Alternative:</strong> the same roles can be built as LangGraph nodes (a router node picking the
+  "expert" node), keeping one framework and a fixed, testable path.</li>
+  <li><strong>Why build it anyway:</strong> as a benchmark — if F17 shows a real accuracy gain on mixed questions,
+  it earns its cost.</li>
+</ul>
+<p>Full comparison: <a href="#sd-frameworks">System Design → agent frameworks</a>.</p>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f15">F15 — AutoGen Multi-Agent Engine</h2>
+<h2 id="f15">F15 — AutoGen Multi-Agent Engine (NI) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -14493,7 +15509,8 @@ Jump to:
 <a href="#f15-5">F15:5 Source Code Reference: TBA</a> ·
 <a href="#f15-6">F15:6 Source Code Reference: TBA</a> ·
 <a href="#f15-7">F15:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f15-8">F15:8 Technical Deep Dive: TBA</a>
+<a href="#f15-8">F15:8 Technical Deep Dive: TBA</a> ·
+<a href="#f15-sysdesign">F15:9 System Design</a>
 </p>
 
 <h3 id="f15-1">F15:1 AutoGen Multi-Agent Engine: TBA</h3>
@@ -14529,10 +15546,63 @@ back-and-forth catches mistakes a single pass would miss.</div>
   <li>the third and final engine behind F12's shared interface for this phase</li>
 </ul>
 
+<h3 id="f15-plan">Plan to discuss</h3>
+<ul>
+  <li><strong>Where it plugs in:</strong> an <code>AutoGenEngine</code> implementing
+  <code>BaseMenuEngine.answer()</code> and an <code>elif name == "autogen"</code> branch in <code>get_engine()</code>
+  — same pattern as F13 and F14.</li>
+  <li><strong>Proposed loop:</strong> retrieval runs first through <code>get_retriever()</code> (F18/F10/F22); the
+  assistant drafts an answer from those chunks; a critic checks it against the same chunks; repeat until the critic
+  approves or a max-round limit is hit.</li>
+  <li><strong>Stopping rule:</strong> a hard round cap, like F13's <code>MAX_RETRIES = 2</code>, so cost and latency
+  have a known worst case.</li>
+  <li><strong>How it differs from F13:</strong> F13's verify step is a fixed yes/no check with feedback; here the
+  critic and drafter actually talk back and forth. The question to answer is whether that conversation catches
+  errors F13's single check misses.</li>
+  <li><strong>How we'd judge it:</strong> F17 scores (especially faithfulness), F6 cost, F9 latency, plus
+  rounds-to-agreement per question — compared against <code>plain_rag</code>, <code>langgraph</code>, and
+  <code>crewai</code>.</li>
+  <li><strong>Trade-offs to discuss:</strong> the most expensive and slowest engine by design; best reserved for
+  accuracy-critical questions (allergens) rather than every request.</li>
+  <li><strong>Open questions:</strong> which AutoGen package/version to standardize on, and whether it conflicts
+  with the current <code>langchain-openai</code>/<code>openai</code> pins.</li>
+</ul>
+
+<h3 id="f15-sysdesign">F15:9 System Design <a class="h3-up" href="#f15" title="Back to F15">↑ F15</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Propose-and-critique loop: one agent drafts, one checks, until they agree or a round cap is hit.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> How it differs from F13: a real back-and-forth instead of one yes/no check — the question is whether that catches more errors.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Most expensive engine by design; best kept for accuracy-critical questions such as allergens.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Track rounds-to-agreement and F17 faithfulness against the other engines.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Drafter + critic conversation</td><td>Can catch errors that a single check misses.</td><td>Slowest and most expensive engine; agents can agree on a wrong answer.</td><td>Keep for accuracy-critical questions only.</td></tr>
+  <tr><td>Hard round cap</td><td>Known worst-case cost and latency.</td><td>May stop before agreement.</td><td>Same safe fallback as F13: a cautious message when no agreement is reached.</td></tr>
+</table>
+
+<p><strong>Is AutoGen the right framework here?</strong> The weakest fit of the four:</p>
+<ul>
+  <li><strong>For:</strong> built for agents that talk to each other — propose-and-critique is its natural
+  pattern.</li>
+  <li><strong>Against:</strong> the most LLM calls and latency; conversations are harder to bound and test than a
+  graph; a separate ecosystem from LangChain; AutoGen has been rewritten (0.2 → 0.4), forked (AG2), and Microsoft
+  now steers new work to its Agent Framework — a long-term maintenance risk.</li>
+  <li><strong>Alternative:</strong> F13 already has a bounded critique loop (verify → retry). A second "critic"
+  node in LangGraph gets most of the benefit without a new framework.</li>
+  <li><strong>Why build it anyway:</strong> to measure whether real back-and-forth beats F13's single check on
+  F17 faithfulness.</li>
+</ul>
+<p>Full comparison: <a href="#sd-frameworks">System Design → agent frameworks</a>.</p>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 4</span>NCC-1701 (Resilience, Evals & Hybrid Retrieval)</span><img class="phase-header-img" src="images/thumbs/enterprisetos.jpg" alt="USS Enterprise, original series era"></h1>
 
-<h2 id="f16">F16 &mdash; Persistent Thread Checkpointing</h2>
+<h2 id="f16">F16 &mdash; Persistent Thread Checkpointing <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -14543,7 +15613,8 @@ Jump to:
 <a href="#f16-5">F16:5 Source Code Reference (core/memory.py)</a> &middot;
 <a href="#f16-6">F16:6 Source Code Reference: TBA</a> &middot;
 <a href="#f16-7">F16:7 Line-by-Line Deep Dive</a> &middot;
-<a href="#f16-8">F16:8 Technical Deep Dive</a>
+<a href="#f16-8">F16:8 Technical Deep Dive</a> ·
+<a href="#f16-sysdesign">F16:9 System Design</a>
 </p>
 
 <div class="note">
@@ -14802,9 +15873,27 @@ layered on top of, not instead of, what F16 built here.</p>
   <li>zero changes to any caller &mdash; <code>menu_api.py</code>, <code>engine_api.py</code>, both engines &mdash; since <code>wrap_with_memory()</code>'s contract is unchanged</li>
 </ul>
 
+<h3 id="f16-sysdesign">F16:9 System Design <a class="h3-up" href="#f16" title="Back to F16">↑ F16</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Reliability: <code>MEMORY_BACKEND=persistent</code> stores chat history in SQLite (<code>chat_history.db</code>) so conversations survive a restart or crash; default stays in-memory (F7).</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Same 5-turn trimming either way — trimmed when sent to the LLM, not when stored.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> SQLite is one file on one machine — multiple API instances wouldn't share it.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: DynamoDB keyed by session id, with a TTL so old sessions expire automatically.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>SQLite chat history (<code>MEMORY_BACKEND=persistent</code>)</td><td>Conversations survive restarts; zero setup.</td><td>One machine; history is never deleted.</td><td>DynamoDB or Redis with a TTL so old sessions expire.</td></tr>
+  <tr><td>Ephemeral stays the default</td><td>Nothing written to disk by default — simpler and more private.</td><td>A restart wipes every conversation unless you opt in.</td><td>Persistent by default once deployed.</td></tr>
+  <tr><td>Trim when sending, not when storing</td><td>Full history kept for audits; one trimming rule for both backends.</td><td>Storage keeps growing.</td><td>Add retention / TTL.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">&uarr; Back to top</a></p>
 
-<h2 id="f17">F17 — Automated RAG Evals Harness</h2>
+<h2 id="f17">F17 — Automated RAG Evals Harness <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -14815,7 +15904,8 @@ Jump to:
 <a href="#f17-5">F17:5 Source Code Reference (evaluation/run_evals.py)</a> ·
 <a href="#f17-6">F17:6 Source Code Reference (evaluation/scoring.py)</a> ·
 <a href="#f17-7">F17:7 Line-by-Line Deep Dive</a> ·
-<a href="#f17-8">F17:8 Technical Deep Dive</a>
+<a href="#f17-8">F17:8 Technical Deep Dive</a> ·
+<a href="#f17-sysdesign">F17:9 System Design</a>
 </p>
 
 <div class="note">
@@ -15527,9 +16617,30 @@ fresh download &mdash; confirmed by hand by re-running the harness immediately a
 load correctly. Worth flagging for anyone hitting the same <code>NoSuchFile</code> error locally: it means "empty
 cache directory," not "corrupt install."</p>
 
+<h3 id="f17-sysdesign">F17:9 System Design <a class="h3-up" href="#f17" title="Back to F17">↑ F17</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> The evals framework: 15 ground-truth questions (5 per cuisine) run through the real engine, scored by an LLM judge for faithfulness (≥ 0.8), answer relevancy (≥ 0.8), and context precision (≥ 0.6).</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Each question is judged on all three thresholds — one weak score fails it; no averaging that hides a bad retrieval.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Ragas and DeepEval were considered and rejected because installing them would downgrade the <code>openai</code>/<code>langchain-openai</code> versions every engine relies on.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Limits to discuss: 15 questions is a small set; an LLM judge can be wrong too; nothing scores live traffic yet. Next steps: grow the fixture set and sample production answers into the judge.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every run costs real API calls — 1 answer + 3 judge calls per question.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Own LLM-judge instead of Ragas/DeepEval</td><td>No dependency conflict; prompts are visible and easy to change.</td><td>Metrics aren't standardized or validated against human ratings.</td><td>Spot-check judge scores against human labels on a sample.</td></tr>
+  <tr><td>Judge uses the same model as the answering engine</td><td>One provider setup.</td><td>A model grading its own kind of output is biased toward approving it.</td><td>Use a different or stronger model as the judge.</td></tr>
+  <tr><td>Thresholds 0.8 / 0.8 / 0.6 — <strong>why these?</strong></td><td>Faithfulness is strictest because an invented price or allergen is the worst failure. Context precision is looser because the top 3 chunks nearly always include some unrelated text.</td><td>Judgment calls, not calibrated from data.</td><td>Calibrate on a labeled set: where do humans say "good enough"?</td></tr>
+  <tr><td>Every question must pass all three thresholds</td><td>No average hides one bad answer.</td><td>A single noisy judge score fails the whole run — flaky CI.</td><td>Rerun failures once, or gate on the pass rate with a small tolerance.</td></tr>
+  <tr><td>15 questions (5 per cuisine)</td><td>Fast and cheap enough to run on every PR.</td><td>Low coverage — no off-topic, prompt-injection, or multi-turn cases.</td><td>Grow the set, adding a case for every production bug.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f18">F18 — Hybrid Search (BM25 + FAISS)</h2>
+<h2 id="f18">F18 — Hybrid Search (BM25 + FAISS) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -15540,7 +16651,8 @@ Jump to:
 <a href="#f18-5">F18:5 Source Code Reference (core/vectorstore.py)</a> ·
 <a href="#f18-6">F18:6 Source Code Reference (tests/test_vectorstore.py)</a> ·
 <a href="#f18-7">F18:7 Line-by-Line Deep Dive</a> ·
-<a href="#f18-8">F18:8 Technical Deep Dive</a>
+<a href="#f18-8">F18:8 Technical Deep Dive</a> ·
+<a href="#f18-sysdesign">F18:9 System Design</a>
 </p>
 
 <div class="note">
@@ -16181,10 +17293,45 @@ split rather than tuned speculatively, the same "don't optimize against a hypoth
 href="#f20">CI/CD Eval Regression Gate (F20)</a>'s own Technical Deep Dive applied to caching the FAISS index
 inside CI.</p>
 
+<h3 id="f18-sysdesign">F18:9 System Design <a class="h3-up" href="#f18" title="Back to F18">↑ F18</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Hybrid search: BM25 (keyword) and FAISS (meaning) results fused with reciprocal rank fusion (<code>EnsembleRetriever</code>, weights 0.5/0.5), then re-ranked by F10.</li>
+  <li><strong><a href="#sd-rag">RAG depth</a>:</strong> Why: embeddings blur exact terms — a dish name, a price, an allergen. BM25 matches them exactly.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> BM25 is rebuilt in memory from the PDF on each startup — cheap for three menus, worth persisting for a big corpus.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Weights are 50/50 by default — F17's context precision is how you'd tune them.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: OpenSearch does keyword and vector search in one managed service.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Reciprocal rank fusion instead of blending scores</td><td>BM25 and embedding scores are on different scales — RRF only uses rank positions, so no normalization is needed.</td><td>Ignores how confident each retriever was.</td><td>Weighted score blending after normalization, if evals show RRF leaves quality on the table.</td></tr>
+  <tr><td>Weights 0.5 / 0.5</td><td>Neutral starting point; no tuning data yet.</td><td>Not tuned for menus, where exact names and prices matter a lot.</td><td>Sweep weights against F17's context precision.</td></tr>
+  <tr><td>BM25 with the default tokenizer (<code>text.split()</code>)</td><td>Zero setup.</td><td>Case-sensitive and keeps punctuation: "Ribeye" vs "ribeye", or "$45" vs "$45," don't match.</td><td>Lowercase and strip punctuation in a custom <code>preprocess_func</code>.</td></tr>
+  <tr><td>BM25 rebuilt in memory at startup</td><td>Nothing extra to store; the PDF is always the source of truth.</td><td>Rebuild time grows with the corpus.</td><td>Persist it, or use OpenSearch for both keyword and vector search.</td></tr>
+</table>
+
+
+<p><strong>Production RAG depth — hybrid retrieval:</strong></p>
+<ul>
+  <li><strong>Measured case problem:</strong> on the steak menu, BM25 for <code>Corkage fee</code> returns the corkage
+  chunk first, but lowercase <code>corkage fee</code> returns a reservations chunk instead — the default tokenizer
+  doesn't lowercase. Guests type in lowercase, so this matters.</li>
+  <li><strong>Fusion:</strong> reciprocal rank fusion (constant <code>c=60</code>, the library default) with
+  0.5 / 0.5 weights — rank-based, so BM25 and vector scores never need to be on the same scale.</li>
+  <li><strong>Feed the re-ranker more:</strong> raise each retriever's <code>k</code> from 3 to 10–15 so F10 gets a
+  real candidate pool.</li>
+  <li><strong>At scale:</strong> OpenSearch (or Postgres with pgvector + full-text search) runs keyword and vector
+  search in one service.</li>
+</ul>
+<p>Full comparison: <a href="#sd-rag-embeddings">embedding strategies</a> ·
+<a href="#sd-rag-reranking">re-ranking strategies</a>.</p>
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 5</span>Enterprise Refit (Enterprise Production Hardening)</span><img class="phase-header-img" src="images/thumbs/enterprise-movie.jpg" alt="USS Enterprise, movie-era refit"></h1>
 
-<h2 id="f19">F19 — Query Guardrails &amp; Intent Gating</h2>
+<h2 id="f19">F19 — Query Guardrails &amp; Intent Gating <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -16195,7 +17342,8 @@ Jump to:
 <a href="#f19-5">F19:5 Source Code Reference (core/guardrails.py)</a> ·
 <a href="#f19-6">F19:6 Source Code Reference (tests/test_guardrails.py)</a> ·
 <a href="#f19-7">F19:7 Line-by-Line Deep Dive</a> ·
-<a href="#f19-8">F19:8 Technical Deep Dive</a>
+<a href="#f19-8">F19:8 Technical Deep Dive</a> ·
+<a href="#f19-sysdesign">F19:9 System Design</a>
 </p>
 
 <div class="note">
@@ -16567,9 +17715,28 @@ one gap left.</p>
   suite (54 passed)</li>
 </ul>
 
+<h3 id="f19-sysdesign">F19:9 System Design <a class="h3-up" href="#f19" title="Back to F19">↑ F19</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Guardrail before any work: one structured LLM call labels intent as <code>menu</code>, <code>specials</code>, <code>hours</code>, or <code>off_topic</code>; off-topic gets a fixed polite reply and never reaches retrieval.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Trade-off: one extra LLM call on <em>every</em> request, on-topic ones included. Pays off if enough traffic is off-topic; a cheaper keyword or small-model pre-filter is an option.</li>
+  <li><strong><a href="#sd-product">Product</a>:</strong> Consistent rejections are a product decision — users get the same message every time, and the rate is measurable.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Metrics to watch: off-topic rejection rate, and false rejections of real menu questions.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> If the classifier call fails, the request fails — a production version should fail open (treat as on-topic) and log it. Toggle: <code>GUARDRAILS_ENABLED</code>.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>LLM classifier on every request</td><td>Handles phrasing keywords can't; consistent, measurable rejections; also flags "ignore your instructions" attempts.</td><td>One extra LLM call of latency and cost on <em>every</em> question, on-topic ones too.</td><td>A cheap keyword/small-model pre-filter first, LLM only when unsure.</td></tr>
+  <tr><td>Four labels, only one used</td><td>The label set is ready for routing.</td><td><code>engine_api.py</code> only acts on <code>off_topic</code>; <code>specials</code>/<code>hours</code> are ignored, and F8's keyword check still routes.</td><td>Use the label for routing and drop <code>detect_ops_intent()</code>.</td></tr>
+  <tr><td>Fails closed</td><td>Nothing unchecked reaches the engine.</td><td>If the classifier call errors, the whole request fails.</td><td>Fail open (treat as on-topic) and log it — retrieval grounding still protects the answer.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f20">F20 — CI/CD Eval Regression Gate</h2>
+<h2 id="f20">F20 — CI/CD Eval Regression Gate <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -16580,7 +17747,8 @@ Jump to:
 <a href="#f20-5">F20:5 Source Code Reference (.github/workflows/eval_gate.yml)</a> ·
 <a href="#f20-6">F20:6 What a Real Gate Run Looks Like</a> ·
 <a href="#f20-7">F20:7 Line-by-Line Deep Dive</a> ·
-<a href="#f20-8">F20:8 Technical Deep Dive</a>
+<a href="#f20-8">F20:8 Technical Deep Dive</a> ·
+<a href="#f20-sysdesign">F20:9 System Design</a>
 </p>
 
 <div class="note">
@@ -16939,10 +18107,29 @@ changed nothing relevant to answer quality could, rarely, flip a borderline <cod
 across its <code>0.6</code> threshold between two runs of the identical code &mdash; a flaky-test failure mode this
 gate shares with any LLM-judged CI check, not something F20's own YAML introduces or could fix by itself.</p>
 
+<h3 id="f20-sysdesign">F20:9 System Design <a class="h3-up" href="#f20" title="Back to F20">↑ F20</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Regression testing: a GitHub Actions workflow runs the mocked <code>pytest</code> suite, then the F17 evals, on every PR to <code>main</code>. Any question below threshold fails the build.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Catches "the model got worse" before it ships — a prompt tweak, chunking change, or model swap has to pass the same bar.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Fork PRs skip the eval job, since GitHub doesn't give them the repo's API key secret; the unit tests still run.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every PR spends real API calls — a cost to keep an eye on as the fixture set grows.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Run the full eval suite on every PR</td><td>Regressions are caught before merge, not by a customer.</td><td>Real API cost per PR; LLM-judge noise can fail a good PR.</td><td>Only run evals when prompt/retrieval/engine files change, plus a nightly full run.</td></tr>
+  <tr><td>Unit tests run first, evals only if they pass</td><td>Doesn't spend API money on code that's already broken.</td><td>Slower total feedback.</td><td>Keep — right order.</td></tr>
+  <tr><td>Skip evals on fork PRs</td><td>Never exposes the API key secret to outside code.</td><td>Outside contributions aren't quality-gated.</td><td>A maintainer runs the gate by hand after review.</td></tr>
+  <tr><td>Workflow exists but nothing enforces it</td><td>No friction while working solo.</td><td>It has never run on GitHub (work is pushed straight to <code>main</code>, no PRs), and no branch protection requires it.</td><td>Work through PRs and require <code>unit-tests</code> + <code>eval-gate</code> in branch protection.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 6</span>Enterprise Next Generation (Security &amp; Quality Hardening)</span><img class="phase-header-img" src="images/thumbs/tng.jpg" alt="Enterprise Next Generation"></h1>
 
-<h2 id="f21">F21 — API Authentication &amp; Rate Limiting</h2>
+<h2 id="f21">F21 — API Authentication &amp; Rate Limiting (NI) <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -16953,7 +18140,8 @@ Jump to:
 <a href="#f21-5">F21:5 Source Code Reference: TBA</a> ·
 <a href="#f21-6">F21:6 Source Code Reference: TBA</a> ·
 <a href="#f21-7">F21:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f21-8">F21:8 Technical Deep Dive: TBA</a>
+<a href="#f21-8">F21:8 Technical Deep Dive: TBA</a> ·
+<a href="#f21-sysdesign">F21:9 System Design</a>
 </p>
 
 <h3 id="f21-1">F21:1 API Authentication &amp; Rate Limiting: TBA</h3>
@@ -16991,9 +18179,49 @@ hammer the endpoints with no limit.</div>
   <li>tracked via Unauthorized Request Rejection Rate and Requests Throttled/Min</li>
 </ul>
 
+<h3 id="f21-plan">Plan to discuss</h3>
+<ul>
+  <li><strong>Where it lives:</strong> new <code>core/auth.py</code>, wired into <code>engine_api.py</code> as a
+  FastAPI dependency on <code>/ask</code>, <code>/specials</code>, and <code>/hours</code>.
+  <code>menu_api.py</code> stays untouched.</li>
+  <li><strong>Authentication:</strong> an <code>X-API-Key</code> header via <code>APIKeyHeader</code>, checked
+  against keys loaded from an env var. Missing or wrong key → <code>401</code>, before any LLM call is made.</li>
+  <li><strong>Rate limiting:</strong> <code>slowapi</code>, keyed by API key (falling back to client IP), returning
+  <code>429</code> when exceeded. <code>/ask</code> gets a tighter limit than <code>/specials</code> and
+  <code>/hours</code>, since only <code>/ask</code> spends LLM tokens.</li>
+  <li><strong>Toggle:</strong> an on/off env var defaulting to on, matching <code>GUARDRAILS_ENABLED</code>, so local
+  demos can switch it off.</li>
+  <li><strong>Order in the request:</strong> auth → rate limit → F19 intent gate → engine. Rejecting early is the
+  cheapest possible failure.</li>
+  <li><strong>Tests:</strong> mocked <code>pytest</code> cases in <code>tests/</code> with FastAPI's
+  <code>TestClient</code> — valid key, missing key, wrong key, and the request that crosses the limit.</li>
+  <li><strong>Trade-offs to discuss:</strong> slowapi's in-memory counters are per process, so they don't hold across
+  multiple workers — production would move counters to Redis or push limits to an API gateway (see System Design
+  &rarr; infrastructure). Streamlit/Gradio clients (F5) would need to send the key too.</li>
+  <li><strong>Open questions:</strong> one shared key vs. per-client keys; whether F11's <code>usage_log</code>
+  should record which key made each call, for per-client cost tracking.</li>
+</ul>
+
+<h3 id="f21-sysdesign">F21:9 System Design <a class="h3-up" href="#f21" title="Back to F21">↑ F21</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Without auth, anyone with the URL can run up the LLM bill — this is the "expensive" failure mode, from the outside.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Rate limiting protects cost and reliability: one caller can't use up the shared provider quota.</li>
+  <li><strong><a href="#sd-infra">Infrastructure</a>:</strong> AWS: API Gateway usage plans and API keys plus WAF do this at the edge, so app-level limits become a backup.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Order: auth → rate limit → F19 → engine — reject as early and cheaply as possible.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>API keys (planned)</td><td>Simple for server-to-server and demo clients.</td><td>No user identity; keys get shared or leaked.</td><td>OAuth/JWT once there are real user accounts.</td></tr>
+  <tr><td>Rate limiting in the app with <code>slowapi</code> (planned)</td><td>Easy to add and test.</td><td>In-memory counters are per process — they don't hold across multiple workers.</td><td>Redis-backed counters, or API Gateway usage plans at the edge.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f22">F22 — Prompt-Injection Defense</h2>
+<h2 id="f22">F22 — Prompt-Injection Defense <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -17004,7 +18232,8 @@ Jump to:
 <a href="#f22-5">F22:5 Source Code Reference (core/sanitize.py)</a> ·
 <a href="#f22-6">F22:6 Source Code Reference (tests/test_sanitize.py)</a> ·
 <a href="#f22-7">F22:7 Line-by-Line Deep Dive</a> ·
-<a href="#f22-8">F22:8 Technical Deep Dive</a>
+<a href="#f22-8">F22:8 Technical Deep Dive</a> ·
+<a href="#f22-sysdesign">F22:9 System Design</a>
 </p>
 
 <div class="note">
@@ -17404,9 +18633,26 @@ reads retrieved content without being told what the wrapper around it means.</p>
   <code>pytest</code> suite (58 passed)</li>
 </ul>
 
+<h3 id="f22-sysdesign">F22:9 System Design <a class="h3-up" href="#f22" title="Back to F22">↑ F22</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Guardrail on the retrieval side: every retrieved chunk is wrapped in <code>&lt;retrieved_context&gt;</code> tags and the prompt says that content is data, never instructions.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Any fake tags inside a chunk are stripped first, so a planted menu PDF can't "close" the wrapper and inject commands.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Lives in the shared <code>get_retriever()</code>, so every engine gets it automatically.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Next step: add injection test cases to the eval fixtures so a regression is caught in CI (F20).</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Delimiters + "this is data" instruction</td><td>Cheap — no extra LLM call; applies to every engine via <code>get_retriever()</code>.</td><td>A strong hint, not a guarantee — models can still follow injected text. Only covers retrieved content; the user's own question is F19's job.</td><td>Scan documents for injection when they're indexed; add injection cases to F17.</td></tr>
+  <tr><td>Strip fake tags before wrapping</td><td>A planted chunk can't close the wrapper early.</td><td>Exact-match only: a variant like <code>&lt;RETRIEVED_CONTEXT&gt;</code> isn't stripped.</td><td>Case-insensitive regex, or escape all angle brackets in retrieved text.</td></tr>
+</table>
+
+
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f23">F23 — Unit Tests for Core Modules</h2>
+<h2 id="f23">F23 — Unit Tests for Core Modules <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
 
 <p class="f-toc">
 Jump to:
@@ -17417,7 +18663,8 @@ Jump to:
 <a href="#f23-5">F23:5 Source Code Reference (tests/test_vectorstore.py)</a> ·
 <a href="#f23-6">F23:6 Source Code Reference: TBA</a> ·
 <a href="#f23-7">F23:7 Line-by-Line Deep Dive</a> ·
-<a href="#f23-8">F23:8 Technical Deep Dive</a>
+<a href="#f23-8">F23:8 Technical Deep Dive</a> ·
+<a href="#f23-sysdesign">F23:9 System Design</a>
 </p>
 
 <div class="note">
@@ -17795,6 +19042,22 @@ instead of the first object that happens to be nearby.</p>
   <li>zero changes to any production file — every module under test was already structured to accept its
   dependencies as arguments</li>
 </ul>
+
+<h3 id="f23-sysdesign">F23:9 System Design <a class="h3-up" href="#f23" title="Back to F23">↑ F23</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> 45 mocked unit tests across 6 files in <code>tests/</code> — database, sheets, vectorstore/re-ranking, sanitize, guardrails, evaluation — no API key, no network.</li>
+  <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Two kinds of testing: unit tests prove the code logic is right (fast, free, deterministic); F17 evals prove answer quality (slow, costs money, scored by an LLM). CI runs both, unit tests first.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Mocking at the boundary means a Google Sheets or model outage can't make tests flaky.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>Mock every external dependency</td><td>Fast, free, deterministic — no flaky tests from outages.</td><td>Can't catch a real API change in gspread, FlashRank, or the LLM — that's left to F17.</td><td>A small, separate integration suite that runs nightly.</td></tr>
+  <tr><td>What's covered</td><td>Database, sheets, vectorstore/re-ranking, sanitize, guardrails, evaluation scoring (45 tests).</td><td>Not covered: <code>core/memory.py</code>, <code>core/telemetry.py</code>, the engines, and <code>engine_api.py</code>.</td><td>Next: FastAPI <code>TestClient</code> tests for <code>/ask</code> with a mocked engine.</td></tr>
+</table>
+
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
