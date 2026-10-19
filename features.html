@@ -11974,15 +11974,19 @@ it's actually a Google Sheet underneath.</p>
 <p>At a high level, this splits into three responsibilities:</p>
 
 <ul>
-  <li><strong>The Live Ledger</strong> (the <code>sushi</code> Google Sheet, tabs <code>specials</code> and
-  <code>dates</code>): the actual no-code data store — restaurant staff edit rows directly, no deploy required for
-  a menu change to take effect.</li>
+  <li><strong>The Live Ledger</strong> (the <code>sushi</code> Google Sheet, tabs <code>specials</code>,
+  <code>dates</code>, <code>org</code>, and <code>items</code>): the actual no-code data store — restaurant staff edit
+  rows directly, no deploy required for a menu change to take effect. <code>org</code> is the parent company's
+  directory (one row per office, department, vendor, etc., with a contact) and <code>items</code> holds non-date
+  company facts (announcements, system status, outages, promotions, prices), each tagged with an
+  <code>App</code> and <code>Tenant</code> so the same tabs can serve other apps built from this one.</li>
   <li><strong>The Shared Reader</strong> (<code>core/sheets.py</code>): one implementation of
-  <code>get_daily_specials()</code>/<code>get_hours_and_events()</code>, with a cached service-account client,
+  <code>get_daily_specials()</code>/<code>get_hours_and_events()</code>/<code>get_org()</code>/<code>get_items()</code>, with a cached service-account client,
   and real error handling for a renamed tab, a network blip, or a Google Sheets API rate limit — instead of
   reimplementing the read logic wherever it's needed.</li>
   <li><strong>The Two Frontends</strong> (<code>api/mcp_server.py</code>'s MCP tools for agents,
-  <code>menu_api.py</code>'s <code>/specials</code> and <code>/hours</code> endpoints for everything else): thin
+  <code>menu_api.py</code>'s <code>/specials</code> and <code>/hours</code> endpoints for everything else, plus
+  <code>engine_api.py</code>'s <code>/org</code> and <code>/items</code>): thin
   wrappers around the same shared functions — one implementation, two consumers, the same pattern In-Code Token
   &amp; Cost Accounting (F6) and Cross-Encoder Re-ranking (F10) already use.</li>
 </ul>
@@ -12012,8 +12016,8 @@ the GitHub Repository &amp; Code Details link.</p>
 <div class="toolbox">
 <strong>Tools &amp; Libraries</strong> (per <code>checklist.csv</code>'s "Primary Tools &amp; Libraries" for #8):
 <ul>
-  <li><code>FastMCP</code> — <span class="used">used.</span> Both tools (<code>daily_specials</code>,
-  <code>hours_and_events</code>) are registered with the bare <code>@mcp.tool</code> decorator and served over
+  <li><code>FastMCP</code> — <span class="used">used.</span> All four tools (<code>daily_specials</code>,
+  <code>hours_and_events</code>, <code>org_directory</code>, <code>company_items</code>) are registered with the bare <code>@mcp.tool</code> decorator and served over
   the stdio transport, matching the checklist's "Stateless MCP" buzzword — no server-side session state is kept
   between calls; only the authenticated <code>gspread</code> client is cached, never the sheet data itself, so
   every call re-reads live.</li>
@@ -12140,9 +12144,10 @@ reality after <code>test_mcp_connection.py</code> caught the mismatch as a live 
 
 <p class="back-to-top"><a href="#f8">↑ Back to F8</a></p>
 <h3 id="f8-3">F8:3 Integration Guide: Integration into api/mcp_server.py</h3>
-<p><strong>Import:</strong> <code>from core.sheets import get_daily_specials, get_hours_and_events</code></p>
+<p><strong>Import:</strong> <code>from core.sheets import get_daily_specials, get_hours_and_events, get_org, get_items</code></p>
 <ul>
-  <li><code>daily_specials(day=None)</code> and <code>hours_and_events(target_date=None)</code> are thin
+  <li><code>daily_specials(day=None)</code>, <code>hours_and_events(target_date=None)</code>,
+  <code>org_directory(type=None, name=None)</code>, and <code>company_items(category=None, tenant=None)</code> are thin
   <code>@mcp.tool</code>-decorated wrappers — each just calls straight into <code>core/sheets.py</code> and
   returns the result; all the actual logic (and error handling) lives in one place.</li>
   <li>runs over the <strong>stdio</strong> transport (<code>mcp.run(transport="stdio")</code>), the standard way
@@ -12986,7 +12991,7 @@ same as they already do for <code>/ask</code>:</p>
 <p class="back-to-top"><a href="#f8">↑ Back to F8</a></p>
 <h3 class="hl-title" id="f8-4">F8:4 Testing Guide: How to test F8</h3>
 
-<p><strong>1) Standalone MCP verification</strong> — spawns the real server over stdio and calls both tools
+<p><strong>1) Standalone MCP verification</strong> — spawns the real server over stdio and calls all four tools
 against the live sheet, exactly like a real MCP client would:</p>
 <pre class="cmd"><code>source venv/bin/activate
 python3 test_mcp_connection.py</code></pre>
@@ -13017,7 +13022,22 @@ streamlit run web-demo/streamlit_app.py</code></pre>
 Specials", or click "Get Hours &amp; Events" with no input needed — both render the same live rows the curl and
 CLI paths return, straight from the sheet.</p>
 
-<p><strong>5) A real invocation-failure case</strong> — proves the error handling actually works, not just the
+<p><strong>5) Org directory &amp; items</strong> (<code>engine_api.py</code> only — <code>menu_api.py</code> is the
+untouched baseline):</p>
+<pre class="cmd"><code>uvicorn engine_api:app --reload --port 8000</code></pre>
+<pre class="cmd"><code>curl "http://127.0.0.1:8000/org?name=Legal"
+curl "http://127.0.0.1:8000/items?category=System%20Status&amp;tenant=London"
+curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
+  -d '{"cuisine": "sushi", "question": "Who heads Legal?"}'
+curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
+  -d '{"cuisine": "sushi", "question": "What are the office hours?"}'</code></pre>
+<p>"Who heads Legal?" returns the <code>org</code> row for Legal (Rachel Vance, Head of Legal); "What are the office
+hours?" returns the New York, London, and Austin office rows with their hours. Both come back with
+<code>top_match</code> "(F8) Live data from Google Sheets", on either engine. A question that trips the keyword
+check but matches no row — "Who makes the Dragon Roll?" — falls through to the engine and is answered from the
+menu as before.</p>
+
+<p><strong>6) A real invocation-failure case</strong> — proves the error handling actually works, not just the
 happy path: rename the <code>specials</code> tab in the live sheet (or point
 <code>DAILY_SPECIALS_TAB</code> in <code>core/sheets.py</code> at a tab that doesn't exist) and re-run any test
 above. Expect a clear <code>RuntimeError</code>/<code>{"error": ...}</code> naming the missing tab, not a raw
@@ -13027,7 +13047,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 <p class="back-to-top"><a href="#f8">↑ Back to F8</a></p>
 <h3 id="f8-5">F8:5 Source Code Reference: core/sheets.py — full file</h3>
 <div class="code-block">
-<div class="code-block-title"><span>core/sheets.py</span><span class="role">Defines get_daily_specials, get_hours_and_events, detect_ops_intent, resolve_target_days (F8) — 167 lines</span></div>
+<div class="code-block-title"><span>core/sheets.py</span><span class="role">Defines get_daily_specials, get_hours_and_events, get_org, get_items, find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days (F8) — 274 lines</span></div>
 <div class="pyhl"><table class="pyhltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">  1</span>
 <span class="normal">  2</span>
 <span class="normal">  3</span>
@@ -13194,8 +13214,116 @@ stack trace — this is exactly the failure this project hit for real while buil
 <span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span>
-<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F8: Reads live restaurant-ops data (daily specials, hours &amp; events) from the</span>
-<span class="sd">'sushi' Google Sheet via a service account. Shared by api/mcp_server.py (exposed</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F8: Reads live restaurant-ops data (daily specials, hours &amp; events) plus the</span>
+<span class="sd">company org directory and items list (org, items tabs) from the 'sushi' Google</span>
+<span class="sd">Sheet via a service account. Shared by api/mcp_server.py (exposed</span>
 <span class="sd">as MCP tools for agents) and menu_api.py (called directly as plain functions) -</span>
 <span class="sd">one implementation, two consumers, same pattern F6/F10 already use.</span>
 <span class="sd">"""</span>
@@ -13212,9 +13340,19 @@ stack trace — this is exactly the failure this project hit for real while buil
 
 <span class="n">DAILY_SPECIALS_TAB</span> <span class="o">=</span> <span class="s2">"specials"</span>  <span class="c1"># the actual tab name in the live sheet (not "Daily Specials")</span>
 <span class="n">HOURS_AND_EVENTS_TAB</span> <span class="o">=</span> <span class="s2">"dates"</span>  <span class="c1"># the actual tab name in the live sheet (not "Hours &amp; Events")</span>
+<span class="n">ORG_TAB</span> <span class="o">=</span> <span class="s2">"org"</span>  <span class="c1"># F8: company directory - offices, departments, vendors, etc. with a contact each</span>
+<span class="n">ITEMS_TAB</span> <span class="o">=</span> <span class="s2">"items"</span>  <span class="c1"># F8: non-date facts per App/Tenant - announcements, statuses, prices, promotions</span>
 
 <span class="n">SPECIALS_KEYWORDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"special"</span><span class="p">,)</span>
 <span class="n">HOURS_KEYWORDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"hour"</span><span class="p">,</span> <span class="s2">"open"</span><span class="p">,</span> <span class="s2">"close"</span><span class="p">,</span> <span class="s2">"holiday"</span><span class="p">)</span>
+<span class="c1"># F8: substring-matched against both the question and each items row's Category, so "any outages?"</span>
+<span class="c1"># finds "Known Outage" rows without needing the exact category name</span>
+<span class="n">ITEMS_KEYWORDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"announcement"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">,</span> <span class="s2">"outage"</span><span class="p">,</span> <span class="s2">"release note"</span><span class="p">,</span> <span class="s2">"promotion"</span><span class="p">,</span> <span class="s2">"deductible"</span><span class="p">,</span> <span class="s2">"out-of-pocket"</span><span class="p">,</span>
+    <span class="s2">"contract"</span><span class="p">,</span> <span class="s2">"amenit"</span><span class="p">,</span> <span class="s2">"room type"</span><span class="p">,</span> <span class="s2">"list price"</span><span class="p">,</span> <span class="s2">"policy update"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># F8: whole-word match - "who"/"head" as substrings would hit "whole"/"ahead"</span>
+<span class="n">ORG_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\b(who|whom|whose|heads?|contact|email|phone|office|offices|department|manager|director)\b"</span><span class="p">)</span>
 
 <span class="n">WEEKDAY_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"monday"</span><span class="p">,</span> <span class="s2">"tuesday"</span><span class="p">,</span> <span class="s2">"wednesday"</span><span class="p">,</span> <span class="s2">"thursday"</span><span class="p">,</span> <span class="s2">"friday"</span><span class="p">,</span> <span class="s2">"saturday"</span><span class="p">,</span> <span class="s2">"sunday"</span><span class="p">)</span>
 
@@ -13267,16 +13405,24 @@ stack trace — this is exactly the failure this project hit for real while buil
 
 <span class="sd">    Not real intent understanding - a simple substring match, good enough to</span>
 <span class="sd">    catch obvious phrasing like "what are today's specials?" or "are you open on</span>
-<span class="sd">    Sunday?". Real intent classification is checklist item Query Guardrails &amp;</span>
-<span class="sd">    Intent Gating (F19) / LangGraph State Machine Engine (F13)'s routing node -</span>
-<span class="sd">    this is a stopgap for F8, not a replacement for either.</span>
+<span class="sd">    Sunday?". Query Guardrails &amp; Intent Gating (F19)'s classify_intent() (core/guardrails.py)</span>
+<span class="sd">    now runs before this, in menu_api.py/engine_api.py's ask(), and rejects off-topic</span>
+<span class="sd">    questions outright - but it doesn't replace this heuristic's specials-vs-hours-vs-menu</span>
+<span class="sd">    routing, so both still run.</span>
+
+<span class="sd">    Order matters: items keywords are more specific than org's "who"/"contact", and org runs before</span>
+<span class="sd">    hours so "office hours" reads the org tab's per-office hours, not the restaurant's dates tab.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        "specials", "hours", or None (fall through to the RAG chain as normal).</span>
+<span class="sd">        "specials", "items", "org", "hours", or None (fall through to the RAG chain as normal).</span>
 <span class="sd">    """</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">question</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">SPECIALS_KEYWORDS</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">"specials"</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">ITEMS_KEYWORDS</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"items"</span>
+    <span class="k">if</span> <span class="n">ORG_PATTERN</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"org"</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">HOURS_KEYWORDS</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">"hours"</span>
     <span class="k">return</span> <span class="kc">None</span>
@@ -13361,6 +13507,94 @@ stack trace — this is exactly the failure this project hit for real while buil
         <span class="n">wanted</span> <span class="o">=</span> <span class="n">target_date</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Date"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">wanted</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">rows</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_same</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># F8: case/whitespace-insensitive cell match</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_mentions</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">phrase</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># F8: whole-word, so "Product A" doesn't match "a"</span>
+    <span class="n">phrase</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">"\b</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span><span class="si">}</span><span class="s2">\b"</span><span class="p">,</span> <span class="n">question</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_org</span><span class="p">(</span><span class="n">org_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Look up active rows in the company org directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        org_type: A Type like "Department", "Office", or "Vendor". Omit for every type.</span>
+<span class="sd">        name: A Name like "Legal" or "London". Omit for every name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of dicts with keys matching the sheet's columns: Type, Name, Parent,</span>
+<span class="sd">        Location, Contact, Email, Notes, Is Active.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: if the sheet/tab can't be reached.</span>
+<span class="sd">    """</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">_open_tab</span><span class="p">(</span><span class="n">ORG_TAB</span><span class="p">)</span><span class="o">.</span><span class="n">get_all_records</span><span class="p">()</span> <span class="k">if</span> <span class="n">_is_active</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Is Active"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="n">org_type</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_same</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">org_type</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_same</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">name</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">rows</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_items</span><span class="p">(</span><span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tenant</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Look up active rows in the items list (announcements, statuses, prices, promotions).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        category: A Category like "System Status" or "Announcement". Omit for every category.</span>
+<span class="sd">        tenant: A Tenant like "London" or "Gold". Omit for every tenant.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of dicts with keys matching the sheet's columns: App, Tenant, Category,</span>
+<span class="sd">        Name, Description, Value, Applies To, Is Active.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: if the sheet/tab can't be reached.</span>
+<span class="sd">    """</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">_open_tab</span><span class="p">(</span><span class="n">ITEMS_TAB</span><span class="p">)</span><span class="o">.</span><span class="n">get_all_records</span><span class="p">()</span> <span class="k">if</span> <span class="n">_is_active</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Is Active"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="n">category</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_same</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Category"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">category</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">tenant</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_same</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Tenant"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">tenant</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">rows</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_org_rows</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Org rows a free-text question is about: rows whose Name it mentions ("Who heads Legal?"),</span>
+<span class="sd">    else every row of a Type it mentions ("What are the office hours?" -&gt; all Offices).</span>
+<span class="sd">    [] means nothing matched, so the caller falls through to the RAG engine.</span>
+<span class="sd">    """</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">get_org</span><span class="p">()</span>
+    <span class="n">by_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_mentions</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="n">by_name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">by_name</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span>
+        <span class="k">if</span> <span class="n">_mentions</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Type"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span> <span class="ow">or</span> <span class="n">_mentions</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Type'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+    <span class="p">]</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_item_rows</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Items rows a free-text question is about: rows whose Category the question names (exactly, or</span>
+<span class="sd">    via a shared ITEMS_KEYWORDS stem), narrowed to any Tenant it also names.</span>
+<span class="sd">    [] means nothing matched, so the caller falls through to the RAG engine.</span>
+<span class="sd">    """</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">question</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">kw</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">ITEMS_KEYWORDS</span> <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">q</span><span class="p">]</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">get_items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Category"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">q</span>
+        <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">kw</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Category"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">for_tenant</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">_mentions</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Tenant"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">for_tenant</span> <span class="ow">or</span> <span class="n">rows</span>
 </pre></div></td></tr></table></div>
 </div>
 
@@ -13369,7 +13603,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 <p class="back-to-top"><a href="#f8">↑ Back to F8</a></p>
 <h3 id="f8-6">F8:6 Source Code Reference: api/mcp_server.py — full file</h3>
 <div class="code-block">
-<div class="code-block-title"><span>api/mcp_server.py</span><span class="role">FastMCP server exposing core/sheets.py as MCP tools (F8) — 61 lines</span></div>
+<div class="code-block-title"><span>api/mcp_server.py</span><span class="role">FastMCP server exposing core/sheets.py as MCP tools (F8) — 96 lines</span></div>
 <div class="pyhl"><table class="pyhltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -13430,8 +13664,44 @@ stack trace — this is exactly the failure this project hit for real while buil
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &amp;</span>
-<span class="sd">events) from the 'sushi' Google Sheet as MCP tools for agent runtimes. Read logic</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &amp;</span>
+<span class="sd">events) and the company org directory and items list from the 'sushi' Google Sheet</span>
+<span class="sd">as MCP tools for agent runtimes. Read logic</span>
 <span class="sd">lives in core/sheets.py; menu_api.py calls those same functions directly for the</span>
 <span class="sd">FastAPI-facing /specials and /hours endpoints - one implementation, two consumers,</span>
 <span class="sd">same pattern F6/F10 already use. Stateless: every tool call re-authenticates</span>
@@ -13452,7 +13722,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">core.sheets</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_daily_specials</span><span class="p">,</span> <span class="n">get_hours_and_events</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.sheets</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_daily_specials</span><span class="p">,</span> <span class="n">get_hours_and_events</span><span class="p">,</span> <span class="n">get_org</span><span class="p">,</span> <span class="n">get_items</span>
 
 <span class="n">mcp</span> <span class="o">=</span> <span class="n">FastMCP</span><span class="p">(</span><span class="s2">"restaurant-ops-mcp"</span><span class="p">)</span>
 
@@ -13487,6 +13757,40 @@ stack trace — this is exactly the failure this project hit for real while buil
 <span class="sd">        Close Time, and Staff Notes.</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="n">get_hours_and_events</span><span class="p">(</span><span class="n">target_date</span><span class="p">)</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">org_directory</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Look up the company org directory: who heads a department, office hours and</span>
+<span class="sd">    contacts, vendors, and so on.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        type: A Type like "Department", "Office", "Vendor", or "Clinic". Omit for every type.</span>
+<span class="sd">        name: A Name like "Legal" or "London". Omit for every name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of rows, each with Type, Name, Parent, Location, Contact, Email,</span>
+<span class="sd">        and Notes.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">get_org</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<span class="c1"># F8 FastMCP Server Endpoint</span>
+<span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">company_items</span><span class="p">(</span><span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tenant</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Look up company items: announcements, system status, known outages, promotions,</span>
+<span class="sd">    prices, and other non-date facts.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        category: A Category like "System Status" or "Announcement". Omit for every category.</span>
+<span class="sd">        tenant: A Tenant like "London" or "Gold". Omit for every tenant.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of rows, each with App, Tenant, Category, Name, Description, Value,</span>
+<span class="sd">        and Applies To.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">get_items</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">tenant</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
@@ -13567,6 +13871,7 @@ agent runtimes — rather than forcing every consumer through the same protocol 
 <ul>
   <li><strong><a href="#sd-agents">Agents</a>:</strong> Tool use: specials and hours are live data, so they're exposed as MCP tools (<code>daily_specials</code>, <code>hours_and_events</code>) in <code>api/mcp_server.py</code> instead of being put in the vector store.</li>
   <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Routing today is a keyword check (<code>detect_ops_intent()</code>): "special" goes straight to the Google Sheet; hours questions go to the engine first, then live events are appended.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> <code>org</code>/<code>items</code> questions use the same keyword check plus a row match (<code>find_org_rows()</code>/<code>find_item_rows()</code>): answered from the sheet only when a row's Name, Type, Category, or Tenant is actually mentioned; otherwise they fall through to the engine, so a menu question containing "who" or "contact" isn't hijacked.</li>
   <li><strong><a href="#sd-failure">Failure modes</a>:</strong> If the sheet is down on an hours question, the PDF answer is still returned. For specials there's no fallback — an error comes back.</li>
   <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every call re-reads the sheet (only the auth client is cached) — always fresh, but each request pays a network round trip and can hit Google's rate limits. A short cache (e.g. 60 seconds) is the trade-off to discuss.</li>
   <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent isn't needed: the API calls the tools directly from a simple rule; MCP is what lets an external agent (e.g. Claude Desktop) call the same tools.</li>

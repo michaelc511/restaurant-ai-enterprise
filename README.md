@@ -10,13 +10,23 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `menu_rag.py` | Standalone script — pick a cuisine, see chunk metrics, ask questions in a terminal loop |
 | `menu_rag.ipynb` | Notebook version of `menu_rag.py`, same steps as cells |
 | `menu_api.py` | Same RAG pipeline exposed as a FastAPI app (`/ask` endpoint), plus the same terminal mode as `menu_rag.py` when run directly |
+| `engine_api.py` | Parallel FastAPI entry point (`/ask`, `/specials`, `/hours`, `/org`, `/items`) that answers through the engine factory instead of an inline chain — `menu_api.py` stays untouched as the baseline — see `features.html` F12 |
+| `engines/base.py` | `BaseMenuEngine` interface + `get_engine()` factory (`plain_rag`, `langgraph`) — see `features.html` F12 |
+| `engines/plain_rag_engine.py` | Plain RetrievalQA engine — the default (`DEFAULT_ENGINE=plain_rag`) — see `features.html` F12 |
+| `engines/langgraph_engine.py` | LangGraph state-machine engine (route → retrieve → generate → verify) — see `features.html` F13 |
+| `core/llm.py` | Shared LLM/embeddings provider selection (OpenAI or Azure) used by every engine — see `features.html` F2 and F12 |
+| `core/guardrails.py` | Structured intent classifier that rejects off-topic questions before retrieval (`classify_intent`, `is_off_topic`) — see `features.html` F19 |
+| `core/sanitize.py` | Delimiter-wraps every retrieved chunk so its content is treated as data, not instructions (`SanitizingRetriever`) — see `features.html` F22 |
+| `evaluation/` | RAG evals harness — ground-truth fixtures per cuisine, scored on faithfulness / answer relevancy / context precision (`run_evals.py`) — see `features.html` F17 |
+| `.github/workflows/eval_gate.yml` | CI gate — runs `pytest`, then the evals harness — see `features.html` F20 |
+| `tests/` | Fully mocked unit tests for the core modules (no API key, no network) — see `features.html` F23 |
 | `core/telemetry.py` | Token/cost tracking (`track_usage`, `log_usage`, F6) and step-latency/error-rate tracing (`trace_call`, `log_trace`, F9) — see `features.html` F6 and F9 |
 | `core/memory.py` | Ephemeral per-session chat memory (`wrap_with_memory`) — see `features.html` F7 |
 | `core/vectorstore.py` | Cross-encoder re-ranking of retrieved chunks (`wrap_with_reranking`) — see `features.html` F10 |
 | `core/database.py` | Durable per-call usage log + session totals in SQLite (`log_call`, `get_session_totals`) — see `features.html` F11 |
-| `core/sheets.py` | Live daily specials / hours & events read from the `sushi` Google Sheet (`get_daily_specials`, `get_hours_and_events`) — see `features.html` F8 |
+| `core/sheets.py` | Live daily specials / hours & events, plus the company org directory and items list, read from the `sushi` Google Sheet (`get_daily_specials`, `get_hours_and_events`, `get_org`, `get_items`) — see `features.html` F8 |
 | `api/mcp_server.py` | FastMCP server exposing `core/sheets.py`'s functions as MCP tools for agent runtimes (stdio transport) — see `features.html` F8 |
-| `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls both tools |
+| `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
 | `menus/` | The 3 menu PDFs (`sushi.pdf`, `steak.pdf`, `italian.pdf`) |
 | `vectorstores/` | Cached FAISS indexes per cuisine (auto-generated, gitignored — see Notes) |
@@ -101,6 +111,47 @@ curl -X POST http://127.0.0.1:8000/ask \
 
 **Test it — auto-generated docs:** open `http://127.0.0.1:8000/docs` in a browser and try `/ask` right from the page.
 
+## Running — engine API (F12)
+
+Same idea as the FastAPI section above, but answers go through `engines/base.py`'s `get_engine()` factory, so you can switch engines without touching the API:
+
+```
+uvicorn engine_api:app --reload
+```
+
+- `POST /ask` — body: `{"cuisine": "sushi", "question": "...", "session_id": "default", "engine": "langgraph"}` (`session_id` and `engine` are optional; `engine` overrides `DEFAULT_ENGINE` for that one request) — returns `{"cuisine", "answer", "top_match", "engine"}`, plus `usage`/`session_totals` and `trace` when `METRICS` is on
+- `GET /specials?day=Mon` — daily specials from the Google Sheet (F8)
+- `GET /hours?date=2026-10-12` — hours & events from the Google Sheet (F8)
+- `GET /org?type=Department&name=Legal` — company org directory from the sheet's `org` tab (F8)
+- `GET /items?category=System%20Status&tenant=London` — company items from the sheet's `items` tab (F8)
+
+`/ask` also answers org questions ("Who heads Legal?", "What are the office hours?") and items questions ("What's the system status in London?") straight from the sheet when a row matches; otherwise the question goes to the engine as usual.
+
+Off-topic questions are rejected up front when `GUARDRAILS_ENABLED` is on (F19).
+
+`python3 engine_api.py` runs the same terminal loop as `menu_api.py`; with `DEBUG_MODE` on it also asks which engine to use.
+
+## Feature toggles
+
+Set in `.env`. Toggles default to on — set to `false` to turn off.
+
+| Variable | Default | Effect |
+|---|---|---|
+| `DEBUG_MODE` | `true` | Console debug prints; also enables the engine prompt in `engine_api.py`'s terminal mode |
+| `METRICS` | `true` | Token/cost (F6), latency tracing (F9), and SQLite usage log (F11) — included in `/ask` responses |
+| `GUARDRAILS_ENABLED` | `true` | Off-topic intent gating in `engine_api.py` (F19) |
+| `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag` or `langgraph` (F12/F13) |
+| `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
+
+## Tests & evals
+
+```
+pytest                          # F23: fully mocked unit tests, no API key or network
+python -m evaluation.run_evals  # F17: real evals — needs an API key; --cuisine sushi / --engine langgraph
+```
+
+CI (`.github/workflows/eval_gate.yml`, F20) runs both.
+
 ## Running — web UIs (Gradio / Streamlit)
 
 With `uvicorn menu_api:app --reload` already running in one terminal, open a second terminal (venv activated) and run either:
@@ -124,4 +175,4 @@ Both UIs are just front ends — they call `menu_api.py`'s `/ask` endpoint, so t
 - `vectorstores/` is generated automatically the first time each cuisine is embedded, and reused on every run after that to avoid re-embedding (see `build_qa_chain` in `menu_api.py`). It's gitignored — delete it if you want to force a fresh re-embed.
 - F10's cross-encoder (`flashrank`, `ms-marco-MiniLM-L-12-v2`) downloads a small model file (~22MB) to a local cache the first time it runs, then loads from cache on every run after that — same pattern as the vectorstores above, just for the re-ranking model instead of the embeddings.
 - Currently running on plain OpenAI (not Azure OpenAI) since that's the key set in `.env`. The course rubric specifies Azure OpenAI for embeddings — swap which key is set if that distinction matters for grading.
-- `install.sh` (the Homebrew installer script) and `Archive.zip` in this folder are leftover clutter from setup, not part of the project — safe to delete.
+- `install.sh` (the Homebrew installer script) in this folder is leftover clutter from setup, not part of the project — safe to delete.

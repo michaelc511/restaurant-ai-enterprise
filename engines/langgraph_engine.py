@@ -90,7 +90,9 @@ class LangGraphEngine(BaseMenuEngine):  # F13: retrieve/generate/verify as a gra
     def _route_node(self, state: GraphState) -> dict:  # F13: principled replacement for F8's detect_ops_intent
         router = self.llm.with_structured_output(RouteDecision)
         decision = router.invoke(
-            "Is this question about a restaurant's menu, dishes, hours, or policies? "
+            "Is this question about a restaurant's menu, dishes, hours, or policies, or about the "
+            "company's org directory (departments, offices, contacts) or company items "
+            "(announcements, system status, outages, promotions, prices)? "  # F8: org/items tabs
             f"Question: {state['question']}"
         )
         return {"on_topic": decision.on_topic}
