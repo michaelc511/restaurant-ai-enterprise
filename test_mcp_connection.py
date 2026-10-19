@@ -1,6 +1,6 @@
 """F8: Standalone verification for api/mcp_server.py - spawns the real server as a
 subprocess over stdio (the same way an MCP client like Claude Desktop would) and
-exercises all four tools against the live 'sushi' Google Sheet.
+exercises all four tools against the live 'org' Google Sheet.
 
 Run:
     cd menu-4ap

@@ -11974,7 +11974,7 @@ it's actually a Google Sheet underneath.</p>
 <p>At a high level, this splits into three responsibilities:</p>
 
 <ul>
-  <li><strong>The Live Ledger</strong> (the <code>sushi</code> Google Sheet, tabs <code>specials</code>,
+  <li><strong>The Live Ledger</strong> (the <code>org</code> Google Sheet, tabs <code>specials</code>,
   <code>dates</code>, <code>org</code>, and <code>items</code>): the actual no-code data store — restaurant staff edit
   rows directly, no deploy required for a menu change to take effect. <code>org</code> is the parent company's
   directory (one row per office, department, vendor, etc., with a contact) and <code>items</code> holds non-date
@@ -12087,7 +12087,7 @@ account credential.</p>
   </li>
   <li><strong>Share the Google Sheet:</strong>
     <ul>
-      <li>Open your <code>sushi</code> Google Spreadsheet.</li>
+      <li>Open your <code>org</code> Google Spreadsheet.</li>
       <li>Click the <strong>Share</strong> button in the top-right corner.</li>
       <li>Paste the copied service account email (<code>client_email</code>), set permission to
       <strong>Viewer</strong>, and click <strong>Send</strong> / <strong>Share anyway</strong>.</li>
@@ -12996,7 +12996,7 @@ against the live sheet, exactly like a real MCP client would:</p>
 <pre class="cmd"><code>source venv/bin/activate
 python3 test_mcp_connection.py</code></pre>
 <p>Confirms both tools are discovered (name + description, generated from the docstrings) and that each returns
-real rows from the <code>sushi</code> spreadsheet — including a day-filtered call
+real rows from the <code>org</code> spreadsheet — including a day-filtered call
 (<code>daily_specials(day="Fri")</code>) to confirm the filtering logic, not just that the connection works.</p>
 
 <p><strong>2) <code>/specials</code> and <code>/hours</code> via curl</strong> (needs the uvicorn server
@@ -13335,7 +13335,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 <span class="kn">import</span><span class="w"> </span><span class="nn">gspread</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gspread.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIError</span><span class="p">,</span> <span class="n">SpreadsheetNotFound</span><span class="p">,</span> <span class="n">WorksheetNotFound</span>
 
-<span class="n">SPREADSHEET_NAME</span> <span class="o">=</span> <span class="s2">"sushi"</span>
+<span class="n">SPREADSHEET_NAME</span> <span class="o">=</span> <span class="s2">"org"</span>
 <span class="n">SERVICE_ACCOUNT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"secrets"</span> <span class="o">/</span> <span class="s2">"service_account.json"</span>
 
 <span class="n">DAILY_SPECIALS_TAB</span> <span class="o">=</span> <span class="s2">"specials"</span>  <span class="c1"># the actual tab name in the live sheet (not "Daily Specials")</span>
@@ -13700,7 +13700,7 @@ stack trace — this is exactly the failure this project hit for real while buil
 <span class="normal">94</span>
 <span class="normal">95</span>
 <span class="normal">96</span></pre></div></td><td class="code"><div><pre><span></span><span class="sd">"""F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &amp;</span>
-<span class="sd">events) and the company org directory and items list from the 'sushi' Google Sheet</span>
+<span class="sd">events) and the company org directory and items list from the 'org' Google Sheet</span>
 <span class="sd">as MCP tools for agent runtimes. Read logic</span>
 <span class="sd">lives in core/sheets.py; menu_api.py calls those same functions directly for the</span>
 <span class="sd">FastAPI-facing /specials and /hours endpoints - one implementation, two consumers,</span>

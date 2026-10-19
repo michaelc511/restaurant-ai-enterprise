@@ -1,5 +1,5 @@
 """F8: Reads live restaurant-ops data (daily specials, hours & events) plus the
-company org directory and items list (org, items tabs) from the 'sushi' Google
+company org directory and items list (org, items tabs) from the 'org' Google
 Sheet via a service account. Shared by api/mcp_server.py (exposed
 as MCP tools for agents) and menu_api.py (called directly as plain functions) -
 one implementation, two consumers, same pattern F6/F10 already use.
@@ -12,7 +12,7 @@ from typing import Optional
 import gspread
 from gspread.exceptions import APIError, SpreadsheetNotFound, WorksheetNotFound
 
-SPREADSHEET_NAME = "sushi"
+SPREADSHEET_NAME = "org"
 SERVICE_ACCOUNT_PATH = Path(__file__).resolve().parent.parent / "secrets" / "service_account.json"
 
 DAILY_SPECIALS_TAB = "specials"  # the actual tab name in the live sheet (not "Daily Specials")
