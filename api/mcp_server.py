@@ -1,5 +1,6 @@
 """F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &
-events) from the 'sushi' Google Sheet as MCP tools for agent runtimes. Read logic
+events) and the company org directory and items list from the 'sushi' Google Sheet
+as MCP tools for agent runtimes. Read logic
 lives in core/sheets.py; menu_api.py calls those same functions directly for the
 FastAPI-facing /specials and /hours endpoints - one implementation, two consumers,
 same pattern F6/F10 already use. Stateless: every tool call re-authenticates
@@ -20,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastmcp import FastMCP
 
-from core.sheets import get_daily_specials, get_hours_and_events
+from core.sheets import get_daily_specials, get_hours_and_events, get_org, get_items
 
 mcp = FastMCP("restaurant-ops-mcp")
 
@@ -55,6 +56,40 @@ def hours_and_events(target_date: Optional[str] = None) -> list[dict]:
         Close Time, and Staff Notes.
     """
     return get_hours_and_events(target_date)
+
+
+# F8 FastMCP Server Endpoint
+@mcp.tool
+def org_directory(type: Optional[str] = None, name: Optional[str] = None) -> list[dict]:
+    """Look up the company org directory: who heads a department, office hours and
+    contacts, vendors, and so on.
+
+    Args:
+        type: A Type like "Department", "Office", "Vendor", or "Clinic". Omit for every type.
+        name: A Name like "Legal" or "London". Omit for every name.
+
+    Returns:
+        A list of rows, each with Type, Name, Parent, Location, Contact, Email,
+        and Notes.
+    """
+    return get_org(type, name)
+
+
+# F8 FastMCP Server Endpoint
+@mcp.tool
+def company_items(category: Optional[str] = None, tenant: Optional[str] = None) -> list[dict]:
+    """Look up company items: announcements, system status, known outages, promotions,
+    prices, and other non-date facts.
+
+    Args:
+        category: A Category like "System Status" or "Announcement". Omit for every category.
+        tenant: A Tenant like "London" or "Gold". Omit for every tenant.
+
+    Returns:
+        A list of rows, each with App, Tenant, Category, Name, Description, Value,
+        and Applies To.
+    """
+    return get_items(category, tenant)
 
 
 if __name__ == "__main__":

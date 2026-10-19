@@ -1,6 +1,6 @@
 """F8: Standalone verification for api/mcp_server.py - spawns the real server as a
 subprocess over stdio (the same way an MCP client like Claude Desktop would) and
-exercises both tools against the live 'sushi' Google Sheet.
+exercises all four tools against the live 'sushi' Google Sheet.
 
 Run:
     cd menu-4ap
@@ -29,6 +29,18 @@ async def main():
 
         print("\nhours_and_events() - full schedule:")
         result = await client.call_tool("hours_and_events", {})
+        print(result.data)
+
+        print("\norg_directory(name='Legal') - who heads Legal:")
+        result = await client.call_tool("org_directory", {"name": "Legal"})
+        print(result.data)
+
+        print("\norg_directory(type='Office') - office hours:")
+        result = await client.call_tool("org_directory", {"type": "Office"})
+        print(result.data)
+
+        print("\ncompany_items(category='System Status') - IT system status:")
+        result = await client.call_tool("company_items", {"category": "System Status"})
         print(result.data)
 
 

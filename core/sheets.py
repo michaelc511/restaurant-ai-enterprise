@@ -1,5 +1,6 @@
-"""F8: Reads live restaurant-ops data (daily specials, hours & events) from the
-'sushi' Google Sheet via a service account. Shared by api/mcp_server.py (exposed
+"""F8: Reads live restaurant-ops data (daily specials, hours & events) plus the
+company org directory and items list (org, items tabs) from the 'sushi' Google
+Sheet via a service account. Shared by api/mcp_server.py (exposed
 as MCP tools for agents) and menu_api.py (called directly as plain functions) -
 one implementation, two consumers, same pattern F6/F10 already use.
 """
@@ -16,9 +17,19 @@ SERVICE_ACCOUNT_PATH = Path(__file__).resolve().parent.parent / "secrets" / "ser
 
 DAILY_SPECIALS_TAB = "specials"  # the actual tab name in the live sheet (not "Daily Specials")
 HOURS_AND_EVENTS_TAB = "dates"  # the actual tab name in the live sheet (not "Hours & Events")
+ORG_TAB = "org"  # F8: company directory - offices, departments, vendors, etc. with a contact each
+ITEMS_TAB = "items"  # F8: non-date facts per App/Tenant - announcements, statuses, prices, promotions
 
 SPECIALS_KEYWORDS = ("special",)
 HOURS_KEYWORDS = ("hour", "open", "close", "holiday")
+# F8: substring-matched against both the question and each items row's Category, so "any outages?"
+# finds "Known Outage" rows without needing the exact category name
+ITEMS_KEYWORDS = (
+    "announcement", "status", "outage", "release note", "promotion", "deductible", "out-of-pocket",
+    "contract", "amenit", "room type", "list price", "policy update",
+)
+# F8: whole-word match - "who"/"head" as substrings would hit "whole"/"ahead"
+ORG_PATTERN = re.compile(r"\b(who|whom|whose|heads?|contact|email|phone|office|offices|department|manager|director)\b")
 
 WEEKDAY_NAMES = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
 
@@ -76,12 +87,19 @@ def detect_ops_intent(question: str) -> Optional[str]:
     questions outright - but it doesn't replace this heuristic's specials-vs-hours-vs-menu
     routing, so both still run.
 
+    Order matters: items keywords are more specific than org's "who"/"contact", and org runs before
+    hours so "office hours" reads the org tab's per-office hours, not the restaurant's dates tab.
+
     Returns:
-        "specials", "hours", or None (fall through to the RAG chain as normal).
+        "specials", "items", "org", "hours", or None (fall through to the RAG chain as normal).
     """
     q = question.strip().lower()
     if any(kw in q for kw in SPECIALS_KEYWORDS):
         return "specials"
+    if any(kw in q for kw in ITEMS_KEYWORDS):
+        return "items"
+    if ORG_PATTERN.search(q):
+        return "org"
     if any(kw in q for kw in HOURS_KEYWORDS):
         return "hours"
     return None
@@ -166,3 +184,91 @@ def get_hours_and_events(target_date: Optional[str] = None) -> list[dict]:
         wanted = target_date.strip()
         rows = [row for row in rows if str(row.get("Date", "")).strip() == wanted]
     return rows
+
+
+def _same(a: str, b: str) -> bool:  # F8: case/whitespace-insensitive cell match
+    return str(a).strip().lower() == str(b).strip().lower()
+
+
+def _mentions(question: str, phrase: str) -> bool:  # F8: whole-word, so "Product A" doesn't match "a"
+    phrase = str(phrase).strip().lower()
+    return bool(phrase) and re.search(rf"\b{re.escape(phrase)}\b", question.lower()) is not None
+
+
+# F8 FastMCP Server Endpoint
+def get_org(org_type: Optional[str] = None, name: Optional[str] = None) -> list[dict]:
+    """Look up active rows in the company org directory.
+
+    Args:
+        org_type: A Type like "Department", "Office", or "Vendor". Omit for every type.
+        name: A Name like "Legal" or "London". Omit for every name.
+
+    Returns:
+        A list of dicts with keys matching the sheet's columns: Type, Name, Parent,
+        Location, Contact, Email, Notes, Is Active.
+
+    Raises:
+        RuntimeError: if the sheet/tab can't be reached.
+    """
+    rows = [row for row in _open_tab(ORG_TAB).get_all_records() if _is_active(row.get("Is Active", ""))]
+    if org_type:
+        rows = [row for row in rows if _same(row.get("Type", ""), org_type)]
+    if name:
+        rows = [row for row in rows if _same(row.get("Name", ""), name)]
+    return rows
+
+
+# F8 FastMCP Server Endpoint
+def get_items(category: Optional[str] = None, tenant: Optional[str] = None) -> list[dict]:
+    """Look up active rows in the items list (announcements, statuses, prices, promotions).
+
+    Args:
+        category: A Category like "System Status" or "Announcement". Omit for every category.
+        tenant: A Tenant like "London" or "Gold". Omit for every tenant.
+
+    Returns:
+        A list of dicts with keys matching the sheet's columns: App, Tenant, Category,
+        Name, Description, Value, Applies To, Is Active.
+
+    Raises:
+        RuntimeError: if the sheet/tab can't be reached.
+    """
+    rows = [row for row in _open_tab(ITEMS_TAB).get_all_records() if _is_active(row.get("Is Active", ""))]
+    if category:
+        rows = [row for row in rows if _same(row.get("Category", ""), category)]
+    if tenant:
+        rows = [row for row in rows if _same(row.get("Tenant", ""), tenant)]
+    return rows
+
+
+# F8 FastMCP Server Endpoint
+def find_org_rows(question: str) -> list[dict]:
+    """Org rows a free-text question is about: rows whose Name it mentions ("Who heads Legal?"),
+    else every row of a Type it mentions ("What are the office hours?" -> all Offices).
+    [] means nothing matched, so the caller falls through to the RAG engine.
+    """
+    rows = get_org()
+    by_name = [row for row in rows if _mentions(question, row.get("Name", ""))]
+    if by_name:
+        return by_name
+    return [
+        row for row in rows
+        if _mentions(question, row.get("Type", "")) or _mentions(question, f"{row.get('Type', '')}s")
+    ]
+
+
+# F8 FastMCP Server Endpoint
+def find_item_rows(question: str) -> list[dict]:
+    """Items rows a free-text question is about: rows whose Category the question names (exactly, or
+    via a shared ITEMS_KEYWORDS stem), narrowed to any Tenant it also names.
+    [] means nothing matched, so the caller falls through to the RAG engine.
+    """
+    q = question.lower()
+    keywords = [kw for kw in ITEMS_KEYWORDS if kw in q]
+    rows = [
+        row for row in get_items()
+        if str(row.get("Category", "")).strip().lower() in q
+        or any(kw in str(row.get("Category", "")).lower() for kw in keywords)
+    ]
+    for_tenant = [row for row in rows if _mentions(question, row.get("Tenant", ""))]
+    return for_tenant or rows

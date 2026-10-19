@@ -38,5 +38,5 @@ def test_is_off_topic_true_for_off_topic_intent():
 
 
 def test_is_off_topic_false_for_on_topic_intents():
-    for intent in ("menu", "specials", "hours"):
+    for intent in ("menu", "specials", "hours", "org", "items"):  # F8: org/items tabs are on-topic
         assert is_off_topic(IntentClassification(intent=intent, reasoning="")) is False

@@ -13,7 +13,10 @@ from pydantic import BaseModel
 
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.database import init_db, log_call, get_session_totals  # F11
-from core.sheets import get_daily_specials, get_hours_and_events, detect_ops_intent, resolve_target_days  # F8
+from core.sheets import (  # F8
+    get_daily_specials, get_hours_and_events, get_org, get_items, find_org_rows, find_item_rows,
+    detect_ops_intent, resolve_target_days,
+)
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
 from core.llm import build_llm_and_embeddings  # F2/F12/F19
 from engines.base import get_engine  # F12
@@ -59,6 +62,32 @@ def format_hours_events(rows: list[dict]) -> str:  # F8: shared by /ask and the 
         for row in rows
     ]
     return "\n\nGoogle Sheets (F8) - holiday/event schedule for that day:\n" + "\n".join(lines)
+
+
+def format_org_answer(rows: list[dict]) -> str:  # F8: shared by /ask and the CLI
+    lines = [
+        f"{row['Name']} ({row['Type']}) - {row['Contact']}, {row['Email']}, {row['Location']}"
+        + (f". {row['Notes']}" if row.get("Notes") else "")
+        for row in rows
+    ]
+    return "Company directory:\n" + "\n".join(lines)
+
+
+def format_items_answer(rows: list[dict]) -> str:  # F8: shared by /ask and the CLI
+    lines = [
+        f"[{row['App']} / {row['Tenant']}] {row['Category']}: {row['Name']} - {row['Description']}"
+        + (f" ({row['Value']})" if row.get("Value") else "")
+        for row in rows
+    ]
+    return "Company items:\n" + "\n".join(lines)
+
+
+def sheet_rows_for_intent(ops_intent: Optional[str], question: str) -> list[dict]:  # F8: org/items lookup
+    if ops_intent == "org":
+        return find_org_rows(question)
+    if ops_intent == "items":
+        return find_item_rows(question)
+    return []
 
 
 def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc., dedupes "All Week" rows
@@ -118,6 +147,20 @@ def ask(request: AskRequest):
             "answer": answer,
             "top_match": "(F8) Live data from Google Sheets, not a PDF chunk",
         }
+    if ops_intent in ("org", "items"):  # F8: answered from the sheet when it has matching rows
+        try:
+            rows = sheet_rows_for_intent(ops_intent, request.question)
+        except RuntimeError as e:
+            return {"error": str(e)}
+        if rows:  # F8: no match (e.g. "who makes the dragon roll?") falls through to the engine below
+            if DEBUG_MODE:
+                print(f"\n[F8] Accessing MCP data source (Google Sheets) - question routed to {ops_intent}...")
+            answer = format_org_answer(rows) if ops_intent == "org" else format_items_answer(rows)
+            return {
+                "cuisine": cuisine,
+                "answer": answer,
+                "top_match": "(F8) Live data from Google Sheets, not a PDF chunk",
+            }
     # ops_intent == "hours" is NOT short-circuited here - standard hours might genuinely be in the PDF
     # menu, so the engine gets first crack at it below; only falls back to F8 if it comes up empty.
 
@@ -195,6 +238,22 @@ def hours(date: Optional[str] = None):  # F8: same core.sheets logic api/mcp_ser
         return {"error": str(e)}
 
 
+@app.get("/org")
+def org(type: Optional[str] = None, name: Optional[str] = None):  # F8: same core.sheets logic as the MCP tool
+    try:
+        return {"org": get_org(type, name)}
+    except RuntimeError as e:
+        return {"error": str(e)}
+
+
+@app.get("/items")
+def items(category: Optional[str] = None, tenant: Optional[str] = None):  # F8: same core.sheets logic as the MCP tool
+    try:
+        return {"items": get_items(category, tenant)}
+    except RuntimeError as e:
+        return {"error": str(e)}
+
+
 # Only runs when this file is executed directly (python3 engine_api.py),
 # not when uvicorn imports it to serve the API
 if __name__ == "__main__":
@@ -227,6 +286,17 @@ if __name__ == "__main__":
             except RuntimeError as e:
                 print(f"[F8] Error: {e}")
             continue
+        if ops_intent in ("org", "items"):  # F8: same sheet-first, fall-through-on-no-match logic as ask()
+            try:
+                rows = sheet_rows_for_intent(ops_intent, user_query)
+            except RuntimeError as e:
+                print(f"[F8] Error: {e}")
+                continue
+            if rows:
+                if DEBUG_MODE:
+                    print(f"\n[F8] Accessing MCP data source (Google Sheets) - question routed to {ops_intent}...")
+                print(format_org_answer(rows) if ops_intent == "org" else format_items_answer(rows))
+                continue
         # ops_intent == "hours" is NOT short-circuited here - see the matching note in ask() above.
         query_for_engine = with_date_context(user_query) if ops_intent == "hours" else user_query  # F8
         use_memory = ops_intent != "hours"  # F8
