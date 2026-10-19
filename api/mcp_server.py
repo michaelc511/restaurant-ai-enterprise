@@ -1,5 +1,5 @@
 """F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &
-events) and the company org directory and items list from the 'sushi' Google Sheet
+events) and the company org directory and items list from the 'org' Google Sheet
 as MCP tools for agent runtimes. Read logic
 lives in core/sheets.py; menu_api.py calls those same functions directly for the
 FastAPI-facing /specials and /hours endpoints - one implementation, two consumers,

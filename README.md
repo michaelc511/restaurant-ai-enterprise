@@ -24,7 +24,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `core/memory.py` | Ephemeral per-session chat memory (`wrap_with_memory`) — see `features.html` F7 |
 | `core/vectorstore.py` | Cross-encoder re-ranking of retrieved chunks (`wrap_with_reranking`) — see `features.html` F10 |
 | `core/database.py` | Durable per-call usage log + session totals in SQLite (`log_call`, `get_session_totals`) — see `features.html` F11 |
-| `core/sheets.py` | Live daily specials / hours & events, plus the company org directory and items list, read from the `sushi` Google Sheet (`get_daily_specials`, `get_hours_and_events`, `get_org`, `get_items`) — see `features.html` F8 |
+| `core/sheets.py` | Live daily specials / hours & events, plus the company org directory and items list, read from the `org` Google Sheet (`get_daily_specials`, `get_hours_and_events`, `get_org`, `get_items`) — see `features.html` F8 |
 | `api/mcp_server.py` | FastMCP server exposing `core/sheets.py`'s functions as MCP tools for agent runtimes (stdio transport) — see `features.html` F8 |
 | `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
