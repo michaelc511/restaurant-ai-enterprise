@@ -242,12 +242,13 @@ def get_items(category: Optional[str] = None, tenant: Optional[str] = None) -> l
 
 
 # F8 FastMCP Server Endpoint
-def find_org_rows(question: str) -> list[dict]:
+def find_org_rows(question: str, rows: Optional[list[dict]] = None) -> list[dict]:
     """Org rows a free-text question is about: rows whose Name it mentions ("Who heads Legal?"),
     else every row of a Type it mentions ("What are the office hours?" -> all Offices).
     [] means nothing matched, so the caller falls through to the RAG engine.
+    rows: pre-fetched org rows (engine_api.py passes rows read over MCP); omit to read the sheet here.
     """
-    rows = get_org()
+    rows = get_org() if rows is None else rows
     by_name = [row for row in rows if _mentions(question, row.get("Name", ""))]
     if by_name:
         return by_name
@@ -258,15 +259,16 @@ def find_org_rows(question: str) -> list[dict]:
 
 
 # F8 FastMCP Server Endpoint
-def find_item_rows(question: str) -> list[dict]:
+def find_item_rows(question: str, rows: Optional[list[dict]] = None) -> list[dict]:
     """Items rows a free-text question is about: rows whose Category the question names (exactly, or
     via a shared ITEMS_KEYWORDS stem), narrowed to any Tenant it also names.
     [] means nothing matched, so the caller falls through to the RAG engine.
+    rows: pre-fetched items rows (engine_api.py passes rows read over MCP); omit to read the sheet here.
     """
     q = question.lower()
     keywords = [kw for kw in ITEMS_KEYWORDS if kw in q]
     rows = [
-        row for row in get_items()
+        row for row in (get_items() if rows is None else rows)
         if str(row.get("Category", "")).strip().lower() in q
         or any(kw in str(row.get("Category", "")).lower() for kw in keywords)
     ]

@@ -21,6 +21,9 @@ def get_engine(name: str) -> BaseMenuEngine:  # F12: factory - returns the reque
         elif name == "langgraph":  # F13
             from engines.langgraph_engine import LangGraphEngine  # lazy import - avoids a hard dependency at module load
             _engine_instances[name] = LangGraphEngine()
+        elif name == "orchestrator":  # F13: orchestrator + specialist agents
+            from engines.orchestrator_engine import OrchestratorEngine  # lazy import - avoids a hard dependency at module load
+            _engine_instances[name] = OrchestratorEngine()
         else:
             raise ValueError(f"Unknown engine: {name}")
     return _engine_instances[name]

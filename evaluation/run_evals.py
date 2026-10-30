@@ -78,7 +78,7 @@ def report(results: list[EvalScore]) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description="F17: run the RAG eval suite against the checked-in ground-truth fixtures.")
-    parser.add_argument("--engine", default="plain_rag", choices=["plain_rag", "langgraph"])
+    parser.add_argument("--engine", default="plain_rag", choices=["plain_rag", "langgraph", "orchestrator"])  # F13
     parser.add_argument(
         "--cuisine", action="append", dest="cuisines", choices=CUISINES,
         help="repeatable (e.g. --cuisine sushi --cuisine steak); defaults to all cuisines",
