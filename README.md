@@ -14,6 +14,8 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `engines/base.py` | `BaseMenuEngine` interface + `get_engine()` factory (`plain_rag`, `langgraph`) — see `features.html` F12 |
 | `engines/plain_rag_engine.py` | Plain RetrievalQA engine — the default (`DEFAULT_ENGINE=plain_rag`) — see `features.html` F12 |
 | `engines/langgraph_engine.py` | LangGraph state-machine engine (route → retrieve → generate → verify) — see `features.html` F13 |
+| `core/mcp_client.py` | MCP client of `api/mcp_server.py` — every live-sheet read in `engine_api.py` (all engines) and the orchestrator's tool calls go over MCP (F8/F13) |
+| `engines/orchestrator_engine.py` | LangGraph multi-agent engine: guard → orchestrator → menu RAG + MCP-client agents in parallel (tools discovered from `api/mcp_server.py` over MCP) → synthesize → verify (`engine: "orchestrator"`) |
 | `core/llm.py` | Shared LLM/embeddings provider selection (OpenAI or Azure) used by every engine — see `features.html` F2 and F12 |
 | `core/guardrails.py` | Structured intent classifier that rejects off-topic questions before retrieval (`classify_intent`, `is_off_topic`) — see `features.html` F19 |
 | `core/sanitize.py` | Delimiter-wraps every retrieved chunk so its content is treated as data, not instructions (`SanitizingRetriever`) — see `features.html` F22 |
@@ -140,7 +142,8 @@ Set in `.env`. Toggles default to on — set to `false` to turn off.
 | `DEBUG_MODE` | `true` | Console debug prints; also enables the engine prompt in `engine_api.py`'s terminal mode |
 | `METRICS` | `true` | Token/cost (F6), latency tracing (F9), and SQLite usage log (F11) — included in `/ask` responses |
 | `GUARDRAILS_ENABLED` | `true` | Off-topic intent gating in `engine_api.py` (F19) |
-| `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag` or `langgraph` (F12/F13) |
+| `MCP_SERVER` | *(empty)* | MCP server `engine_api.py` and the `orchestrator` engine read live sheet data from — empty = `api/mcp_server.py` in-process; or a script path (stdio) / http URL (F8/F13) |
+| `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag`, `langgraph`, or `orchestrator` (F12/F13); `orchestrator` does its own guardrails and live-data routing, so `engine_api.py` skips its F19/F8 pre-routing for it |
 | `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
 
 ## Tests & evals

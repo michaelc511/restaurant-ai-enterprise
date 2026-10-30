@@ -13,10 +13,8 @@ from pydantic import BaseModel
 
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.database import init_db, log_call, get_session_totals  # F11
-from core.sheets import (  # F8
-    get_daily_specials, get_hours_and_events, get_org, get_items, find_org_rows, find_item_rows,
-    detect_ops_intent, resolve_target_days,
-)
+from core.sheets import find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days  # F8: pure helpers, no sheet reads
+from core.mcp_client import call_mcp_tool  # F8: every live-sheet read goes over MCP via api/mcp_server.py
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
 from core.llm import build_llm_and_embeddings  # F2/F12/F19
 from engines.base import get_engine  # F12
@@ -29,6 +27,7 @@ DEFAULT_ENGINE = os.environ.get("DEFAULT_ENGINE", "plain_rag")  # F12: which eng
 GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "false"  # F19
 
 AVAILABLE_CUISINES = ["sushi", "steak", "italian"]
+SELF_ROUTING_ENGINES = {"orchestrator"}  # F13: engines with their own guard + live-data agents - skip F19/F8 routing here
 
 app = FastAPI()
 
@@ -84,16 +83,16 @@ def format_items_answer(rows: list[dict]) -> str:  # F8: shared by /ask and the 
 
 def sheet_rows_for_intent(ops_intent: Optional[str], question: str) -> list[dict]:  # F8: org/items lookup
     if ops_intent == "org":
-        return find_org_rows(question)
+        return find_org_rows(question, call_mcp_tool("org_directory"))
     if ops_intent == "items":
-        return find_item_rows(question)
+        return find_item_rows(question, call_mcp_tool("company_items"))
     return []
 
 
 def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc., dedupes "All Week" rows
     rows, seen = [], set()
     for d in resolve_target_days(question):
-        for row in get_daily_specials(d.strftime("%a")):
+        for row in call_mcp_tool("daily_specials", {"day": d.strftime("%a")}):
             if row["Dish Name"] not in seen:
                 seen.add(row["Dish Name"])
                 rows.append(row)
@@ -103,7 +102,7 @@ def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow
 def hours_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc.
     rows = []
     for d in resolve_target_days(question):
-        rows.extend(get_hours_and_events(d.isoformat()))
+        rows.extend(call_mcp_tool("hours_and_events", {"target_date": d.isoformat()}))
     return rows
 
 
@@ -127,14 +126,17 @@ def ask(request: AskRequest):
     if request.question.strip().lower() == "tt":  # F11: totals-only shortcut, works regardless of DEBUG_MODE
         return {"cuisine": cuisine, "session_totals": get_session_totals(request.session_id)}
 
-    if GUARDRAILS_ENABLED:  # F19: reject off-topic questions before they ever reach retrieval/generation
+    engine_name = request.engine or DEFAULT_ENGINE  # F12
+    self_routing = engine_name in SELF_ROUTING_ENGINES  # F13
+
+    if GUARDRAILS_ENABLED and not self_routing:  # F19: reject off-topic questions before they ever reach retrieval/generation
         classification = classify_intent(guardrails_llm, request.question)
         if DEBUG_MODE:
             print(f"\n[F19] Intent: {classification.intent} - {classification.reasoning}")
         if is_off_topic(classification):
             return {"cuisine": cuisine, "answer": OFF_TOPIC_MESSAGE, "top_match": "(F19) Rejected - off-topic"}
 
-    ops_intent = detect_ops_intent(request.question)  # F8: route obvious specials/hours questions to the live sheet
+    ops_intent = None if self_routing else detect_ops_intent(request.question)  # F8: route obvious specials/hours questions to the live sheet
     if ops_intent == "specials":  # F8: specials only ever live in the sheet, never in the PDF menus - go straight there
         if DEBUG_MODE:
             print("\n[F8] Accessing MCP data source (Google Sheets) - question routed to specials...")
@@ -169,7 +171,6 @@ def ask(request: AskRequest):
     question_for_engine = with_date_context(request.question) if ops_intent == "hours" else request.question
     use_memory = ops_intent != "hours"  # F8: hours questions bypass Ephemeral Chat Memory (F7), same reasoning as menu_api.py
 
-    engine_name = request.engine or DEFAULT_ENGINE  # F12
     engine = get_engine(engine_name)  # F12
 
     def invoke_engine():
@@ -223,33 +224,33 @@ def ask(request: AskRequest):
 
 
 @app.get("/specials")
-def specials(day: Optional[str] = None):  # F8: same core.sheets logic api/mcp_server.py exposes as an MCP tool
+def specials(day: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
     try:
-        return {"specials": get_daily_specials(day)}
+        return {"specials": call_mcp_tool("daily_specials", {"day": day})}
     except RuntimeError as e:
         return {"error": str(e)}
 
 
 @app.get("/hours")
-def hours(date: Optional[str] = None):  # F8: same core.sheets logic api/mcp_server.py exposes as an MCP tool
+def hours(date: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
     try:
-        return {"hours": get_hours_and_events(date)}
+        return {"hours": call_mcp_tool("hours_and_events", {"target_date": date})}
     except RuntimeError as e:
         return {"error": str(e)}
 
 
 @app.get("/org")
-def org(type: Optional[str] = None, name: Optional[str] = None):  # F8: same core.sheets logic as the MCP tool
+def org(type: Optional[str] = None, name: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
     try:
-        return {"org": get_org(type, name)}
+        return {"org": call_mcp_tool("org_directory", {"type": type, "name": name})}
     except RuntimeError as e:
         return {"error": str(e)}
 
 
 @app.get("/items")
-def items(category: Optional[str] = None, tenant: Optional[str] = None):  # F8: same core.sheets logic as the MCP tool
+def items(category: Optional[str] = None, tenant: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
     try:
-        return {"items": get_items(category, tenant)}
+        return {"items": call_mcp_tool("company_items", {"category": category, "tenant": tenant})}
     except RuntimeError as e:
         return {"error": str(e)}
 
@@ -263,8 +264,10 @@ if __name__ == "__main__":
 
     cli_session_id = "cli"
     if DEBUG_MODE:  # F13: let a developer override DEFAULT_ENGINE per run, for testing F12's factory
-        engine_choice = input(f"\nWhich engine? 1) {DEFAULT_ENGINE} [default, press Enter]  2) LangGraph: ").strip()
-        cli_engine_name = "langgraph" if engine_choice == "2" else DEFAULT_ENGINE
+        engine_choice = input(
+            f"\nWhich engine? 1) {DEFAULT_ENGINE} [default, press Enter]  2) LangGraph  3) Orchestrator: "
+        ).strip()
+        cli_engine_name = {"2": "langgraph", "3": "orchestrator"}.get(engine_choice, DEFAULT_ENGINE)  # F13
         print(f"[DEBUG] DEFAULT_ENGINE is '{DEFAULT_ENGINE}' - using engine: {cli_engine_name}")
     else:
         cli_engine_name = DEFAULT_ENGINE  # F12: no prompt outside DEBUG_MODE, always the .env default
@@ -277,7 +280,7 @@ if __name__ == "__main__":
         if user_query.strip().lower() == "tt":  # F11: totals-only shortcut, works regardless of DEBUG_MODE
             print(f"\n[F11] Session Total (DB) - {get_session_totals(cli_session_id)}")
             continue
-        ops_intent = detect_ops_intent(user_query)  # F8: route obvious specials/hours questions to the live sheet
+        ops_intent = None if cli_engine_name in SELF_ROUTING_ENGINES else detect_ops_intent(user_query)  # F8/F13
         if ops_intent == "specials":  # F8: specials only ever live in the sheet, never in the PDF menus - go straight there
             if DEBUG_MODE:
                 print("\n[F8] Accessing MCP data source (Google Sheets) - question routed to specials...")
