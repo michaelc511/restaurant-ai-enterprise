@@ -3,11 +3,15 @@ import streamlit as st
 
 API_URL = "http://127.0.0.1:8000"
 
-available_cuisines = ["sushi", "steak", "italian"]
+try:  # F12: collections come from the active domain pack via engine_api.py; menu_api.py has no /collections
+    _collections = requests.get(f"{API_URL}/collections", timeout=5).json()
+    available_cuisines, collection_label = _collections["collections"], _collections["label"].title()
+except (requests.RequestException, KeyError, ValueError):
+    available_cuisines, collection_label = ["sushi", "steak", "italian"], "Cuisine"
 
 st.title("Menu RAG Demo")
 
-cuisine = st.selectbox("Cuisine", available_cuisines)
+cuisine = st.selectbox(collection_label, available_cuisines)
 question = st.text_area("Question", "What rolls are on the menu?")
 
 if st.button("Ask"):

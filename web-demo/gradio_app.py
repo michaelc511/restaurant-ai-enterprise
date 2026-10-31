@@ -3,7 +3,11 @@ import requests
 
 API_URL = "http://127.0.0.1:8000"
 
-available_cuisines = ["sushi", "steak", "italian"]
+try:  # F12: collections come from the active domain pack via engine_api.py; menu_api.py has no /collections
+    _collections = requests.get(f"{API_URL}/collections", timeout=5).json()
+    available_cuisines, collection_label = _collections["collections"], _collections["label"].title()
+except (requests.RequestException, KeyError, ValueError):
+    available_cuisines, collection_label = ["sushi", "steak", "italian"], "Cuisine"
 
 
 def ask_menu(cuisine, question):
@@ -58,7 +62,7 @@ def get_hours(cuisine):
 with gr.Blocks(title="Menu RAG Demo") as demo:
     gr.Markdown("# Menu RAG Demo")
 
-    cuisine_input = gr.Dropdown(label="Cuisine", choices=available_cuisines, value="sushi")
+    cuisine_input = gr.Dropdown(label=collection_label, choices=available_cuisines, value=available_cuisines[0])
     question_input = gr.Textbox(label="Question", value="What rolls are on the menu?", lines=2)
     ask_btn = gr.Button("Ask")
     answer_output = gr.Textbox(label="Answer")

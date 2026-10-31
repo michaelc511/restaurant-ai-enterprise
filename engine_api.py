@@ -93,7 +93,7 @@ def sheet_rows_for_intent(ops_intent: Optional[str], question: str) -> list[dict
 def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc., dedupes "All Week" rows
     rows, seen = [], set()
     for d in resolve_target_days(question):
-        for row in call_mcp_tool("daily_specials", {"day": d.strftime("%a")}):
+        for row in call_mcp_tool(domain.SPECIALS_TOOL, {"day": d.strftime("%a")}):  # F12: the domain's specials tool
             if row["Dish Name"] not in seen:
                 seen.add(row["Dish Name"])
                 rows.append(row)
@@ -103,7 +103,7 @@ def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow
 def hours_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc.
     rows = []
     for d in resolve_target_days(question):
-        rows.extend(call_mcp_tool("hours_and_events", {"target_date": d.isoformat()}))
+        rows.extend(call_mcp_tool(domain.HOURS_TOOL, {"target_date": d.isoformat()}))  # F12: the domain's hours tool
     return rows
 
 
@@ -122,7 +122,7 @@ def with_date_context(question: str) -> str:  # F8: shared by /ask and the CLI
 def ask(request: AskRequest):
     cuisine = request.cuisine.strip().lower()
     if cuisine not in AVAILABLE_CUISINES:
-        return {"error": f"Unknown cuisine. Choose one of {AVAILABLE_CUISINES}"}
+        return {"error": f"Unknown {domain.COLLECTION_LABEL}. Choose one of {AVAILABLE_CUISINES}"}
 
     if request.question.strip().lower() == "tt":  # F11: totals-only shortcut, works regardless of DEBUG_MODE
         return {"cuisine": cuisine, "session_totals": get_session_totals(request.session_id)}
@@ -224,18 +224,27 @@ def ask(request: AskRequest):
     return response
 
 
+@app.get("/collections")
+def collections():  # F12: lets the web UIs build their dropdown from the active domain pack
+    return {"domain": domain.NAME, "label": domain.COLLECTION_LABEL, "collections": AVAILABLE_CUISINES}
+
+
 @app.get("/specials")
 def specials(day: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
+    if not domain.SPECIALS_TOOL:  # F12: e.g. the hr pack has no specials tab
+        return {"error": f"The '{domain.NAME}' domain has no specials."}
     try:
-        return {"specials": call_mcp_tool("daily_specials", {"day": day})}
+        return {"specials": call_mcp_tool(domain.SPECIALS_TOOL, {"day": day})}
     except RuntimeError as e:
         return {"error": str(e)}
 
 
 @app.get("/hours")
 def hours(date: Optional[str] = None):  # F8: served over MCP by api/mcp_server.py
+    if not domain.HOURS_TOOL:  # F12: e.g. the hr pack has no hours & events tab
+        return {"error": f"The '{domain.NAME}' domain has no hours & events data."}
     try:
-        return {"hours": call_mcp_tool("hours_and_events", {"target_date": date})}
+        return {"hours": call_mcp_tool(domain.HOURS_TOOL, {"target_date": date})}
     except RuntimeError as e:
         return {"error": str(e)}
 
@@ -259,9 +268,9 @@ def items(category: Optional[str] = None, tenant: Optional[str] = None):  # F8: 
 # Only runs when this file is executed directly (python3 engine_api.py),
 # not when uvicorn imports it to serve the API
 if __name__ == "__main__":
-    cuisine = input(f"Which menu cuisine would you like ({'/'.join(AVAILABLE_CUISINES)})? ").strip().lower()
+    cuisine = input(f"Which {domain.COLLECTION_LABEL} would you like ({'/'.join(AVAILABLE_CUISINES)})? ").strip().lower()
     while cuisine not in AVAILABLE_CUISINES:
-        cuisine = input(f"Please choose one of menu {'/'.join(AVAILABLE_CUISINES)}: ").strip().lower()
+        cuisine = input(f"Please choose one of {'/'.join(AVAILABLE_CUISINES)}: ").strip().lower()
 
     cli_session_id = "cli"
     if DEBUG_MODE:  # F13: let a developer override DEFAULT_ENGINE per run, for testing F12's factory

@@ -10,7 +10,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `menu_rag.py` | Standalone script — pick a cuisine, see chunk metrics, ask questions in a terminal loop |
 | `menu_rag.ipynb` | Notebook version of `menu_rag.py`, same steps as cells |
 | `menu_api.py` | Same RAG pipeline exposed as a FastAPI app (`/ask` endpoint), plus the same terminal mode as `menu_rag.py` when run directly |
-| `engine_api.py` | Parallel FastAPI entry point (`/ask`, `/specials`, `/hours`, `/org`, `/items`) that answers through the engine factory instead of an inline chain — `menu_api.py` stays untouched as the baseline — see `features.html` F12 |
+| `engine_api.py` | Parallel FastAPI entry point (`/ask`, `/collections`, `/specials`, `/hours`, `/org`, `/items`) that answers through the engine factory instead of an inline chain — `menu_api.py` stays untouched as the baseline — see `features.html` F12 |
 | `engines/base.py` | `BaseMenuEngine` interface + `get_engine()` factory (`plain_rag`, `langgraph`) — see `features.html` F12 |
 | `engines/plain_rag_engine.py` | Plain RetrievalQA engine — the default (`DEFAULT_ENGINE=plain_rag`) — see `features.html` F12 |
 | `engines/langgraph_engine.py` | LangGraph state-machine engine (route → retrieve → generate → verify) — see `features.html` F13.1 |
@@ -31,7 +31,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
 | `core/domain.py` | Domain pack loader — reads `DOMAIN` and imports `domains/<DOMAIN>/domain.py`, so shared code has no restaurant-specific constants |
-| `domains/README.md` | How a domain pack is laid out and how to add one |
+| `domains/README.md` | How a domain pack is laid out and how to add one — see `features.html` F12:12 |
 | `domains/hr/` | Second domain pack: Northwind Labs employee handbooks (`engineering`, `sales`, `operations`) and their eval fixtures, from the hr-assistant app — run with `DOMAIN=hr` |
 | `domains/restaurant/sheets.py` | Restaurant-only sheet readers (`specials` and `dates` tabs) — `get_daily_specials`, `get_hours_and_events` (F8) |
 | `domains/restaurant/tools.py` | Restaurant MCP tools (`daily_specials`, `hours_and_events`) registered on `api/mcp_server.py` for the active domain (F8) |
@@ -128,7 +128,8 @@ uvicorn engine_api:app --reload
 ```
 
 - `POST /ask` — body: `{"cuisine": "sushi", "question": "...", "session_id": "default", "engine": "langgraph"}` (`session_id` and `engine` are optional; `engine` overrides `DEFAULT_ENGINE` for that one request) — returns `{"cuisine", "answer", "top_match", "engine"}`, plus `usage`/`session_totals` and `trace` when `METRICS` is on
-- `GET /specials?day=Mon` — daily specials from the Google Sheet (F8)
+- `GET /collections` — the active domain pack's name, collection label and collections; the web UIs build their dropdown from it (F12)
+- `GET /specials?day=Mon` — daily specials from the Google Sheet (F8); an error in a domain with no specials tool
 - `GET /hours?date=2026-10-12` — hours & events from the Google Sheet (F8)
 - `GET /org?type=Department&name=Legal` — company org directory from the sheet's `org` tab (F8)
 - `GET /items?category=System%20Status&tenant=London` — company items from the sheet's `items` tab (F8)
