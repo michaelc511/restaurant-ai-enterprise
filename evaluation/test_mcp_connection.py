@@ -3,9 +3,9 @@ subprocess over stdio (the same way an MCP client like Claude Desktop would) and
 exercises all four tools against the live 'org' Google Sheet.
 
 Run:
-    cd menu-4ap
+    cd restaurant-ai-platform
     source venv/bin/activate
-    python3 test_mcp_connection.py
+    python3 evaluation/test_mcp_connection.py
 """
 import asyncio
 

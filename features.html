@@ -468,7 +468,7 @@
 <body>
 
 <h1 id="top">Features</h1>
-<p>Master doc for feature work added on top of the base RAG pipeline (<code>menu_api.py</code>).
+<p>Master doc for feature work added on top of the base RAG pipeline (<code>legacy/menu_api.py</code>). For the folder layout, see <a href="#project-structure">Project Structure</a>.
 Each feature is numbered to match <code>checklist.csv</code>. Online documentation: <a href="https://michaelc511.github.io/restaurant-ai-enterprise/features.html" target="_blank" rel="noopener">https://michaelc511.github.io/restaurant-ai-enterprise/features.html</a></p>
 
 <h2 id="contents">Table of Contents</h2>
@@ -512,6 +512,7 @@ Each feature is numbered to match <code>checklist.csv</code>. Online documentati
   <li><a href="#f21">F21 — API Authentication &amp; Rate Limiting (NI)</a></li>
   <li><a href="#f22">F22 — Prompt-Injection Defense</a></li>
   <li><a href="#f23">F23 — Unit Tests for Core Modules</a></li>
+  <li><a href="#project-structure">Project Structure: Shared Core, Domain Packs, Legacy</a></li>
 </ul>
 
 <h2 id="roadmap">Project Roadmap: The Build in Six Phases <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
@@ -1307,6 +1308,7 @@ the latency, error-rate, and cost alerts.</p>
   <a href="#f21">API Authentication &amp; Rate Limiting (F21)</a>
   <a href="#f22">Prompt-Injection Defense (F22)</a>
   <a href="#f23">Unit Tests for Core Modules (F23)</a>
+  <a href="#project-structure">Project Structure</a>
 </nav>
 
 <h1 class="phase-header"><span class="phase-title"><span class="phase-num">Phase 1</span>Shuttlecraft (Baseline Proof-of-Concept & Serving)</span><img class="phase-header-img" src="images/shuttleG.png" alt="Starfleet shuttlecraft"></h1>
@@ -1330,14 +1332,14 @@ AZURE_OPENAI_API_KEY=...</code></pre>
 
 <h3 class="hl-title">2) Run with Python (CLI, no server)</h3>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Builds/loads the FAISS vectorstores, then prompts you to pick a cuisine (sushi/steak/italian) and drops
 into an interactive Q&amp;A loop (<code>q</code> to quit). Good for a quick check, but this path never hits
 the <code>/ask</code> endpoint.</p>
 
 <h3 class="hl-title">3) Run with uvicorn (FastAPI server)</h3>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <p>Leave this running in its own terminal — it's required before testing via curl/Postman/Streamlit/Gradio,
 since all of them send HTTP requests to <code>http://127.0.0.1:8000</code>.</p>
 
@@ -1358,7 +1360,7 @@ idea as Streamlit, hitting the same <code>/ask</code> endpoint.</p>
 defaults to <strong>on</strong> if not set at all. To turn it off, add this line to the <code>.env</code>
 file at the repo root (same file that holds <code>OPENAI_API_KEY</code>):</p>
 <pre class="cmd"><code>DEBUG_MODE=false</code></pre>
-<p>Restart whichever process you're running (uvicorn or <code>python3 menu_api.py</code>) for the change to
+<p>Restart whichever process you're running (uvicorn or <code>python3 legacy/menu_api.py</code>) for the change to
 take effect — it's only read once, at import time. See the DEBUG_MODE section below for exactly what this
 silences.</p>
 
@@ -1470,7 +1472,7 @@ integration) only exists because this first, rough version proved the underlying
 <p>Maps to <code>checklist.csv</code> day 1, "Prototype" — the first working version of the RAG pipeline, built
 as a notebook before it became <code>menu_api.py</code>.</p>
 
-<p><strong>Where:</strong> <code>prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb</code>
+<p><strong>Where:</strong> <code>legacy/prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb</code>
 — the original notebook. Later cleaned up into a standalone <code>menu_rag.py</code> script (and back into a
 matching <code>menu_rag.ipynb</code>), per <code>project-notes.txt</code>'s <code>ADDITIONAL FEATURES</code>
 section.</p>
@@ -1486,8 +1488,8 @@ section.</p>
 
 <p><strong class="hl-title">How to run:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_rag.py</code></pre>
-<p>Or open <code>prototype/Demo_01_...ipynb</code> or <code>menu_rag.ipynb</code> in VS Code/Cursor (Jupyter +
+python3 legacy/menu_rag.py</code></pre>
+<p>Or open <code>legacy/prototype/Demo_01_...ipynb</code> or <code>legacy/menu_rag.ipynb</code> in VS Code/Cursor (Jupyter +
 Python extensions), select this folder's <code>venv</code> as the kernel, and run all cells. Either way you get
 the same chunk-metrics print, sample query, and interactive question loop <code>menu_api.py</code>'s CLI mode
 (F2/F3) later inherited.</p>
@@ -1764,7 +1766,7 @@ sound, so it's deliberately deferred until after that question is answered.
 <h3 id="f1-sysdesign">F1:9 System Design <a class="h3-up" href="#f1" title="Back to F1">↑ F1</a></h3>
 <p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
 <ul>
-  <li><strong><a href="#sd-product">Product</a>:</strong> A notebook prototype (<code>prototype/</code>) proves the idea is worth building before any API or infra exists — cheapest way to learn if retrieval actually answers menu questions.</li>
+  <li><strong><a href="#sd-product">Product</a>:</strong> A notebook prototype (<code>legacy/prototype/</code>) proves the idea is worth building before any API or infra exists — cheapest way to learn if retrieval actually answers menu questions.</li>
   <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Trade-off: notebooks are fast to iterate but not testable or deployable; everything after F1 moves logic into importable modules.</li>
   <li><strong><a href="#sd-evals">Evals &amp; observability</a>:</strong> Gap to discuss: the prototype is judged by eye. That's the gap F17 later closes with scored ground-truth questions.</li>
 </ul>
@@ -1819,7 +1821,7 @@ selected provider is actually reachable before the app does any real work.</p>
 
 <p><strong>Where:</strong> near the top of <code>menu_api.py</code>, right after the provider is chosen
 (OpenAI vs. Azure OpenAI) — runs once at import time, so it fires whether the module is loaded by
-<code>uvicorn</code> or by <code>python3 menu_api.py</code> directly.</p>
+<code>uvicorn</code> or by <code>python3 legacy/menu_api.py</code> directly.</p>
 
 <p><strong>What it does</strong> (gated by <code>if DEBUG_MODE:</code>):</p>
 <ul>
@@ -1829,9 +1831,9 @@ selected provider is actually reachable before the app does any real work.</p>
 
 <p><strong class="hl-title">How to test:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <p>Watch the terminal at startup — you'll see the provider line and the connectivity test response before the
-"Application startup complete" log. Same output appears if you run <code>python3 menu_api.py</code> instead.
+"Application startup complete" log. Same output appears if you run <code>python3 legacy/menu_api.py</code> instead.
 Set <code>DEBUG_MODE=false</code> in <code>.env</code> and restart to confirm both lines disappear.</p>
 
 <p class="back-to-top"><a href="#f2">↑ Back to F2</a></p>
@@ -2524,7 +2526,7 @@ Set <code>DEBUG_MODE=false</code> in <code>.env</code> and restart to confirm bo
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -2746,7 +2748,7 @@ right after <code>build_qa_chain(cuisine)</code> runs for the cuisine you picked
 
 <p><strong class="hl-title">How to test:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine — the two chunk-stat lines print immediately after the vectorstore is built/loaded, before
 the sample answer. This only runs in the CLI path (not <code>/ask</code>), since that's the only place
 <code>docs</code> — the raw chunk list — is available; the FastAPI path only keeps the built <code>qa_chain</code>,
@@ -3442,7 +3444,7 @@ not the intermediate chunks. Set <code>DEBUG_MODE=false</code> and re-run to con
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -3653,7 +3655,7 @@ date — which matters now that F8 feeds this same chain resolved dates for hour
 
 <p><strong class="hl-title">How to test:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "what is the capital of France"}'</code></pre>
 <p>Confirms the off-topic redirect guideline: expect something like "I don't have that information. However, if
@@ -3794,7 +3796,7 @@ endpoint.</p>
 
 <p><strong class="hl-title">How to test:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask \
   -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "What rolls are on the menu?"}'</code></pre>
@@ -4492,7 +4494,7 @@ response includes <code>answer</code> and <code>top_match</code>. Same endpoint 
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -4605,7 +4607,7 @@ import time — meaning all three cuisines' FAISS indexes are built or loaded fr
 app even accepts its first request. This is the direct fix for the CLI's per-run cost: a request only ever pays
 for retrieval + one LLM call, never for re-chunking or re-embedding.</dd>
 <dt>L141 <code>app = FastAPI()</code></dt>
-<dd>The single app instance <code>uvicorn menu_api:app</code> serves — this is the object the ASGI server
+<dd>The single app instance <code>uvicorn legacy.menu_api:app</code> serves — this is the object the ASGI server
 imports by name, which is exactly the piece that was missing when <code>uvicorn menu_app:app</code> was pointed
 at the wrong module name (a real error hit earlier in this project).</dd>
 <dt>L147-150 <code>class AskRequest(BaseModel)</code></dt>
@@ -4710,7 +4712,7 @@ call <code>/ask</code> over HTTP; neither talks to the RAG chain directly.</p>
 
 <p><strong class="hl-title">How to test:</strong></p>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000   # must be running first</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000   # must be running first</code></pre>
 <pre class="cmd"><code>streamlit run web-demo/streamlit_app.py</code></pre>
 <p>or</p>
 <pre class="cmd"><code>python3 web-demo/gradio_app.py</code></pre>
@@ -5195,7 +5197,7 @@ the <code>[F6] Tokens - ...</code> and <code>[F6] Session Total - ...</code> lin
   <li>adds the resulting <code>usage</code> object to the JSON response returned by <code>/ask</code></li>
 </ul>
 
-<p><strong>Function: <code>__main__</code> CLI block</strong> (<code>python3 menu_api.py</code>)</p>
+<p><strong>Function: <code>__main__</code> CLI block</strong> (<code>python3 legacy/menu_api.py</code>)</p>
 <ul>
   <li>wraps both <code>qa_chain.invoke()</code> calls (the 3.2 sample query and the 3.3 interactive loop) in the same <code>with track_usage(session_usage_totals) as cb:</code> pattern</li>
   <li>calls <code>log_usage(cb, session_usage_totals)</code> after each, which prints a <code>[F6] Tokens - ...</code> line with prompt/completion/total tokens and cost, instead of returning a <code>UsageInfo</code>/JSON object</li>
@@ -5215,11 +5217,11 @@ the <code>[F6] Tokens - ...</code> and <code>[F6] Session Total - ...</code> lin
 <p class="back-to-top"><a href="#f6">↑ Back to F6</a></p>
 <h3 class="hl-title" id="f6-9">F6:9 Usage Guide: How to run</h3>
 <pre class="cmd"><code>source venv/bin/activate                       # if using the project venv
-uvicorn menu_api:app --reload --port 8000       # starts the FastAPI server</code></pre>
+uvicorn legacy.menu_api:app --reload --port 8000       # starts the FastAPI server</code></pre>
 
 <div class="note">
 This <code>uvicorn</code> server must be running BEFORE testing via curl/Python/Streamlit/Gradio/Postman below —
-they all send HTTP requests to it over localhost. Running <code>python3 menu_api.py</code> directly does NOT
+they all send HTTP requests to it over localhost. Running <code>python3 legacy/menu_api.py</code> directly does NOT
 start this server — it runs a separate CLI loop (see <code>__main__</code> block) — but In-Code Token &amp; Cost Accounting (F6) tracking now works
 there too (see method 5 below), since that loop wraps its own <code>qa_chain.invoke()</code> calls.
 </div>
@@ -5259,7 +5261,7 @@ Response body.</p>
 
 <p><strong>5) CLI</strong> — no server needed:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine, then after the sample query AND after every question you type in the interactive loop, two
 lines print: <code>[F6] Tokens - ...</code> (this call) and <code>[F6] Session Total - ...</code>
 (cumulative since you started the CLI).</p>
@@ -6248,7 +6250,7 @@ lines print: <code>[F6] Tokens - ...</code> (this call) and <code>[F6] Session T
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -6747,7 +6749,7 @@ and prepended to the question rather than injected as structured messages.</p>
 
 <p><strong>1) CLI</strong> — simplest, one continuous session per run:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <ol>
   <li>Pick a cuisine, e.g. <code>sushi</code>.</li>
   <li>At a prompt, ask something with a specific answer: <code>What sushi rolls do you have?</code></li>
@@ -6768,7 +6770,7 @@ and only when <code>DEBUG_MODE</code> is on (default) — set <code>DEBUG_MODE=f
 disappears while memory itself keeps working silently underneath.</p>
 
 <p><strong>2) <code>/ask</code> — testing session isolation</strong> (needs the uvicorn server running):</p>
-<pre class="cmd"><code>uvicorn menu_api:app --reload --port 8000</code></pre>
+<pre class="cmd"><code>uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "What sushi rolls do you have?", "session_id": "test1"}'
 
@@ -7615,7 +7617,7 @@ carry over, confirming sessions are isolated from each other.</p>
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -8442,7 +8444,7 @@ lines (CLI path only), same pattern as In-Code Token &amp; Cost Accounting (F6)'
 
 <p><strong>1) Local metrics only</strong> — no external account needed:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine and ask a question — right after the In-Code Token &amp; Cost Accounting (F6)/Relational DB
 &amp; Text-to-SQL Tool (F11) lines, look for:</p>
 <pre><code>[F9] Latency - retriever: 210.3ms, llm: 980.7ms, total: 1191.5ms
@@ -8451,7 +8453,7 @@ python3 menu_api.py</code></pre>
 <code>DEBUG_MODE</code>-gated feature in this doc.</p>
 
 <p><strong>2) <code>/ask</code> via curl</strong> (needs the uvicorn server running):</p>
-<pre class="cmd"><code>uvicorn menu_api:app --reload --port 8000</code></pre>
+<pre class="cmd"><code>uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "What rolls are on the menu?"}'</code></pre>
 <p>The response includes a <code>trace</code> object alongside <code>usage</code>/<code>session_totals</code>.</p>
@@ -9455,7 +9457,7 @@ strictly opt-in and adds nothing to the request path when it's off.</p>
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -9761,7 +9763,7 @@ This has to be a genuine <code>BaseRetriever</code> subclass, not a bare functio
 <p class="back-to-top"><a href="#f10">↑ Back to F10</a></p>
 <h3 class="hl-title" id="f10-4">F10:4 Testing Guide: How to test Cross-Encoder Re-ranking (F10)</h3>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine and ask a question. There's no separate debug print for this one (re-ranking happens silently inside retrieval) — the way to actually see the effect is to compare answer quality/relevance before and after, since the underlying mechanism is: FAISS retrieves a handful of candidate chunks per question, and the cross-encoder picks the best <code>top_k</code> (default 3) of those to actually hand to the LLM.</p>
 <p>To directly verify the re-ranking mechanics without spending any API tokens, this was tested standalone during development with a stub retriever returning 3 fake passages (an irrelevant "weather" sentence plus two menu-relevant ones) — the reranker consistently pushed the irrelevant one out and ordered the relevant two by actual query relevance, and a full <code>RetrievalQA</code> chain construction with a fake LLM confirmed <code>RerankingRetriever</code> passes Pydantic validation and works end-to-end through the real chain-building code path.</p>
 
@@ -10602,7 +10604,7 @@ Updated for Modular Engine Strategy Factory (F12): <code>get_retriever()</code> 
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -10900,7 +10902,7 @@ Neither UI currently handles the <code>tt</code> shortcut gracefully — both un
 
 <p><strong>1) CLI</strong> — writes + prints on every question:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine, ask a question. After the sample query and every interactive question, you'll see
 <code>[F6] Tokens - ...</code> (this call) followed by <code>[F11] Session Total (DB) - ...</code>
 (cumulative, read fresh from <code>usage.db</code> — not reset if you kill and restart the script).</p>
@@ -10911,7 +10913,7 @@ python3 menu_api.py</code></pre>
 the old rows are still there, plus the new one.</p>
 
 <p><strong>3) <code>/ask</code> via curl</strong> (needs the uvicorn server running):</p>
-<pre class="cmd"><code>uvicorn menu_api:app --reload --port 8000</code></pre>
+<pre class="cmd"><code>uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine": "sushi", "question": "What rolls are on the menu?", "session_id": "test1"}'</code></pre>
 <p>The response's <code>session_totals</code> field is now the durable, SQL-backed total — call <code>/ask</code>
@@ -11769,7 +11771,7 @@ both. (Don't type <code>tt</code> into either UI — see the note above.)</p>
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -12184,7 +12186,7 @@ agent as a tool-call error, and what feeds the checklist's "Invocation Success R
 Caught by actually testing against the live sheet, not assumed: the setup notes described the tabs as
 <code>Daily Specials</code>/<code>Hours &amp; Events</code>, but the real spreadsheet has them named
 <code>specials</code>/<code>dates</code>. <code>core/sheets.py</code>'s tab-name constants were fixed to match
-reality after <code>test_mcp_connection.py</code> caught the mismatch as a live <code>WorksheetNotFound</code> →
+reality after <code>evaluation/test_mcp_connection.py</code> caught the mismatch as a live <code>WorksheetNotFound</code> →
 <code>RuntimeError</code>, exactly the failure path this error handling was built to catch.
 </div>
 
@@ -12202,7 +12204,7 @@ reality after <code>test_mcp_connection.py</code> caught the mismatch as a live 
   <li><strong>Path gotcha, fixed:</strong> running <code>python3 api/mcp_server.py</code> directly only puts
   <code>api/</code> on <code>sys.path</code>, not the project root, so <code>from core.sheets import ...</code>
   would fail with <code>ModuleNotFoundError</code> for any real MCP client launching it this way (confirmed by
-  actually running <code>test_mcp_connection.py</code> before the fix). <code>api/mcp_server.py</code> now
+  actually running <code>evaluation/test_mcp_connection.py</code> before the fix). <code>api/mcp_server.py</code> now
   inserts the project root onto <code>sys.path</code> at the top of the file, before the <code>core</code>
   import, so it works regardless of how or from where it's launched.</li>
 </ul>
@@ -12910,7 +12912,7 @@ reality after <code>test_mcp_connection.py</code> caught the mismatch as a live 
     <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
 
-<span class="c1"># Only runs when this file is executed directly (python3 menu_api.py),</span>
+<span class="c1"># Only runs when this file is executed directly (python3 legacy/menu_api.py),</span>
 <span class="c1"># not when uvicorn imports it to serve the API</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu cuisine would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -13040,14 +13042,14 @@ same as they already do for <code>/ask</code>:</p>
 <p><strong>1) Standalone MCP verification</strong> — spawns the real server over stdio and calls all four tools
 against the live sheet, exactly like a real MCP client would:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 test_mcp_connection.py</code></pre>
+python3 evaluation/test_mcp_connection.py</code></pre>
 <p>Confirms both tools are discovered (name + description, generated from the docstrings) and that each returns
 real rows from the <code>org</code> spreadsheet — including a day-filtered call
 (<code>daily_specials(day="Fri")</code>) to confirm the filtering logic, not just that the connection works.</p>
 
 <p><strong>2) <code>/specials</code> and <code>/hours</code> via curl</strong> (needs the uvicorn server
 running):</p>
-<pre class="cmd"><code>uvicorn menu_api:app --reload --port 8000</code></pre>
+<pre class="cmd"><code>uvicorn legacy.menu_api:app --reload --port 8000</code></pre>
 <pre class="cmd"><code>curl "http://127.0.0.1:8000/specials?day=Fri"
 curl "http://127.0.0.1:8000/hours?date=2026-09-07"</code></pre>
 <p>Both return live data straight from the sheet — edit a row in Google Sheets and re-run the same curl to
@@ -13055,7 +13057,7 @@ confirm the change shows up immediately, with no restart needed (nothing is cach
 
 <p><strong>3) CLI</strong> — no server needed, calls <code>core/sheets.py</code> directly:</p>
 <pre class="cmd"><code>source venv/bin/activate
-python3 menu_api.py</code></pre>
+python3 legacy/menu_api.py</code></pre>
 <p>Pick a cuisine, then at the question prompt type <code>specials</code> or <code>hours</code> instead of a real
 question — each prints the live rows and loops back for another question, same as <code>tt</code> does for
 Relational DB &amp; Text-to-SQL Tool (F11)'s totals.</p>
@@ -13857,7 +13859,7 @@ spawned directly by an MCP client as a subprocess (cwd is whatever the client ha
 <dd>Named constants instead of inline string literals repeated at each call site — and the comments flag a real
 bug this project hit: the tabs were first assumed to be named <code>"Daily Specials"</code>/<code>"Hours & Events"</code>
 (matching the checklist's human-readable feature names) but the actual live spreadsheet uses
-<code>"specials"</code>/<code>"dates"</code>. <code>test_mcp_connection.py</code> caught this as a live
+<code>"specials"</code>/<code>"dates"</code>. <code>evaluation/test_mcp_connection.py</code> caught this as a live
 <code>WorksheetNotFound</code> error before it shipped.</dd>
 <dt>sheets.py L29-46 <code>resolve_target_days</code></dt>
 <dd>A deliberately narrow regex/keyword date parser, not a general NLP date library — it handles "tomorrow",
@@ -13888,7 +13890,7 @@ without this line explicitly adding the parent directory first.</dd>
 separate, hand-written schema to keep in sync; the schema an MCP client sees is derived straight from the same
 source of truth a human reading the code would use.</dd>
 <dt>mcp_server.py L46 <code>if __name__ == "__main__": mcp.run(transport="stdio")</code></dt>
-<dd><strong>stdio, not HTTP:</strong> a local MCP client (Claude Desktop, or <code>test_mcp_connection.py</code>'s
+<dd><strong>stdio, not HTTP:</strong> a local MCP client (Claude Desktop, or <code>evaluation/test_mcp_connection.py</code>'s
 <code>fastmcp.Client</code>) spawns this file as a subprocess and communicates over its stdin/stdout pipes rather
 than opening a network port — the standard transport for a locally-installed MCP server.</dd>
 <dt>menu_api.py L205-219 <code>detect_ops_intent</code> routing in <code>ask()</code></dt>
@@ -14398,7 +14400,7 @@ Modular Engine Strategy Factory (F12) doesn't replace any prior work — <code>P
 <p class="back-to-top"><a href="#f12">↑ Back to F12</a></p>
 <h3 id="f12-1">F12:3 Integration Guide: Integration: engine_api.py (F12.1 — Parallel Entry Point)</h3>
 
-<p>Not one of the original 21 checklist days — added while implementing F12, and worth tracking on its own line rather than folding silently into F12: the original plan assumed <code>/ask</code> in <code>menu_api.py</code> itself would get updated to call <code>get_engine(...)</code> directly. Instead, <strong><code>menu_api.py</code> stays completely untouched</strong>, by explicit choice — kept around as a known-good, always-runnable baseline (<code>python3 menu_api.py</code> / <code>uvicorn menu_api:app</code> still work exactly as before, unaffected by anything below). Everything that depends on the new factory lives in a second, parallel FastAPI app instead. Added to <code>checklist.csv</code>/<code>checklist.html</code> as day 12.1, right after Modular Engine Strategy Factory (F12).</p>
+<p>Not one of the original 21 checklist days — added while implementing F12, and worth tracking on its own line rather than folding silently into F12: the original plan assumed <code>/ask</code> in <code>menu_api.py</code> itself would get updated to call <code>get_engine(...)</code> directly. Instead, <strong><code>menu_api.py</code> stays completely untouched</strong>, by explicit choice — kept around as a known-good, always-runnable baseline (<code>python3 legacy/menu_api.py</code> / <code>uvicorn legacy.menu_api:app</code> still work exactly as before, unaffected by anything below). Everything that depends on the new factory lives in a second, parallel FastAPI app instead. Added to <code>checklist.csv</code>/<code>checklist.html</code> as day 12.1, right after Modular Engine Strategy Factory (F12).</p>
 
 <p><strong>Trade-off:</strong> FastMCP Server Endpoint (F8)'s ops-intent helpers (<code>format_specials_answer</code>, <code>format_hours_events</code>, <code>specials_for_question</code>, <code>hours_for_question</code>, <code>with_date_context</code>), the <code>/specials</code>/<code>/hours</code> routes, and the CLI loop are all <strong>duplicated</strong> between <code>menu_api.py</code> and <code>engine_api.py</code> rather than shared, since sharing them would mean editing <code>menu_api.py</code>. The two files' F8 logic has to be kept in sync by hand going forward — the System Prompt &amp; Persona (F3.1) guideline about stating specific policy details, added mid-session, already had to be applied to both files for exactly this reason.</p>
 
@@ -14416,7 +14418,7 @@ Modular Engine Strategy Factory (F12) doesn't replace any prior work — <code>P
 <pre class="cmd"><code>source venv/bin/activate
 python3 engine_api.py</code></pre>
 <p>Pick a cuisine and, if <code>DEBUG_MODE</code> is on, an engine (Enter for <code>DEFAULT_ENGINE</code>, or
-<code>2</code> for LangGraph), then ask a question. Run <code>python3 menu_api.py</code> separately (before or
+<code>2</code> for LangGraph), then ask a question. Run <code>python3 legacy/menu_api.py</code> separately (before or
 after) with the same question to confirm the two give the same answer and neither affects the other's state.</p>
 
 <p><strong>2) FastAPI</strong> — curl, Postman, or the Gradio/Streamlit UIs are three ways to hit the same
@@ -18744,7 +18746,7 @@ for q in ['What rolls do you have?', 'Are you open on Sunday?', 'What are todays
 <p><strong class="hl-title">3) Full <code>/ask</code> path — on-topic and off-topic</strong>, through
 <code>menu_api.py</code> or <code>engine_api.py</code> served via uvicorn:</p>
 <pre class="cmd"><code>source venv/bin/activate
-uvicorn menu_api:app --reload --port 8000    # in one terminal
+uvicorn legacy.menu_api:app --reload --port 8000    # in one terminal
 
 curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
   -d '{"cuisine":"italian","question":"Can you help me write a resignation letter?"}'
@@ -20299,6 +20301,76 @@ instead of the first object that happens to be nearby.</p>
   <tr><td>What's covered</td><td>Database, sheets, vectorstore/re-ranking, sanitize, guardrails, evaluation scoring (45 tests).</td><td>Not covered: <code>core/memory.py</code>, <code>core/telemetry.py</code>, the engines, and <code>engine_api.py</code>.</td><td>Next: FastAPI <code>TestClient</code> tests for <code>/ask</code> with a mocked engine.</td></tr>
 </table>
 
+
+<p class="back-to-top"><a href="#top">↑ Back to top</a></p>
+
+<h2 id="project-structure">Project Structure: Shared Core, Domain Packs, Legacy <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
+
+<p>The repo is split three ways. <strong>Shared code</strong> holds every feature (F2&ndash;F23) once and knows
+nothing about restaurants. <strong>Domain packs</strong> in <code>domains/</code> hold everything that changes per
+domain — documents, eval fixtures, prompts, intents, live-data tools — and the <code>DOMAIN</code> env var picks one
+(see <a href="#f12-domains">F12:12</a>). <strong><code>legacy/</code></strong> keeps the original single-file app as
+the frozen baseline. Run every command from the repo root.</p>
+
+<pre class="cmd"><code>restaurant-ai-platform/
+├── engine_api.py              # FastAPI + CLI entry point - answers through the engine factory (F12.1)
+├── core/                      # shared logic, no domain-specific text
+│   ├── domain.py              #   loads domains/&lt;DOMAIN&gt;/domain.py (F12)
+│   ├── llm.py                 #   OpenAI / Azure provider selection (F2)
+│   ├── vectorstore.py         #   FAISS + BM25 hybrid, re-ranking, sanitizing (F3/F10/F18/F22)
+│   ├── memory.py              #   chat memory (F7/F16)
+│   ├── telemetry.py           #   tokens, cost, latency (F6/F9)
+│   ├── database.py            #   SQLite usage log (F11)
+│   ├── guardrails.py          #   intent gating (F19)
+│   ├── sanitize.py            #   prompt-injection defense (F22)
+│   ├── sheets.py              #   Google Sheet client + shared org/items tabs (F8)
+│   └── mcp_client.py          #   MCP client of api/mcp_server.py (F8/F13.2)
+├── engines/                   # swappable answer strategies behind BaseMenuEngine (F12)
+│   ├── base.py                #   interface + get_engine() factory
+│   ├── plain_rag_engine.py    #   plain_rag (default)
+│   ├── langgraph_engine.py    #   langgraph - F13.1
+│   └── orchestrator_engine.py #   orchestrator - F13.2 Agentic RAG LG
+├── api/mcp_server.py          # FastMCP server: shared org/items tools + the domain's tools (F8)
+├── domains/                   # one pack per domain - pick with DOMAIN=&lt;name&gt;
+│   ├── README.md              #   how to add a domain
+│   ├── restaurant/            #   default: sushi, steak, italian menus
+│   │   ├── domain.py          #     collections, prompts, intents, live-data settings
+│   │   ├── docs/*.pdf         #     source documents
+│   │   ├── evals/*.json       #     F17 ground-truth fixtures
+│   │   ├── sheets.py          #     specials + dates tab readers
+│   │   └── tools.py           #     daily_specials, hours_and_events MCP tools
+│   └── hr/                    #   Northwind Labs handbooks: engineering, sales, operations
+│       ├── domain.py
+│       ├── docs/*.pdf
+│       └── evals/*.json
+├── evaluation/                # checks that need real keys (F17/F20)
+│   ├── run_evals.py           #   python -m evaluation.run_evals [--engine ...]
+│   ├── scoring.py, ground_truth.py
+│   └── test_mcp_connection.py #   live Google Sheet check over MCP
+├── tests/                     # fully mocked pytest suite (F23) - no key, no network
+├── web-demo/                  # Gradio + Streamlit UIs; dropdown from GET /collections
+├── legacy/                    # frozen baseline - not developed further
+│   ├── menu_api.py            #   original FastAPI app (uvicorn legacy.menu_api:app)
+│   ├── menu_rag.py, menu_rag.ipynb   # original CLI script + notebook
+│   ├── flask_app.py           #   older Flask version of /ask
+│   └── prototype/             #   F1 course notebook
+├── blogs/, features.html, checklist.html, README.md   # docs
+├── .github/workflows/eval_gate.yml                    # F20 CI gate
+└── vectorstores/&lt;DOMAIN&gt;/&lt;collection&gt;/             # built FAISS indexes (gitignored)</code></pre>
+
+<table class="cost-table">
+  <tr><th>Part</th><th>Changes when…</th><th>Example</th></tr>
+  <tr><td>Shared (<code>core/</code>, <code>engines/</code>, <code>engine_api.py</code>, <code>api/</code>)</td>
+      <td>a feature is added or fixed — every domain gets it at once</td><td>F22 sanitizing, F13.2 orchestrator</td></tr>
+  <tr><td>Domain pack (<code>domains/&lt;name&gt;/</code>)</td>
+      <td>a new domain is added, or one domain's wording or documents change</td><td><code>domains/hr/</code></td></tr>
+  <tr><td>Legacy (<code>legacy/</code>)</td>
+      <td>never, unless explicitly asked — it's the known-good baseline new work is compared against</td>
+      <td><code>legacy/menu_api.py</code></td></tr>
+</table>
+
+<p>Gitignored and local only: <code>.env</code>, <code>secrets/</code> (Google service-account key),
+<code>vectorstores/</code>, <code>usage.db</code>, <code>chat_history.db</code>, <code>venv/</code>.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 

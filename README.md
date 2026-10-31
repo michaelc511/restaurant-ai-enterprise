@@ -6,10 +6,11 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 
 | File | Purpose |
 |---|---|
-| `prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb` | Original prototype notebook |
-| `menu_rag.py` | Standalone script — pick a cuisine, see chunk metrics, ask questions in a terminal loop |
-| `menu_rag.ipynb` | Notebook version of `menu_rag.py`, same steps as cells |
-| `menu_api.py` | Same RAG pipeline exposed as a FastAPI app (`/ask` endpoint), plus the same terminal mode as `menu_rag.py` when run directly |
+| `legacy/` | The original single-file app, kept as the frozen baseline — run everything from the repo root |
+| `legacy/prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb` | Original prototype notebook |
+| `legacy/menu_rag.py` | Standalone script — pick a cuisine, see chunk metrics, ask questions in a terminal loop |
+| `legacy/menu_rag.ipynb` | Notebook version of `menu_rag.py`, same steps as cells |
+| `legacy/menu_api.py` | Same RAG pipeline exposed as a FastAPI app (`/ask` endpoint), plus the same terminal mode as `menu_rag.py` when run directly |
 | `engine_api.py` | Parallel FastAPI entry point (`/ask`, `/collections`, `/specials`, `/hours`, `/org`, `/items`) that answers through the engine factory instead of an inline chain — `menu_api.py` stays untouched as the baseline — see `features.html` F12 |
 | `engines/base.py` | `BaseMenuEngine` interface + `get_engine()` factory (`plain_rag`, `langgraph`) — see `features.html` F12 |
 | `engines/plain_rag_engine.py` | Plain RetrievalQA engine — the default (`DEFAULT_ENGINE=plain_rag`) — see `features.html` F12 |
@@ -28,7 +29,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `core/database.py` | Durable per-call usage log + session totals in SQLite (`log_call`, `get_session_totals`) — see `features.html` F11 |
 | `core/sheets.py` | Live daily specials / hours & events, plus the company org directory and items list, read from the `org` Google Sheet (`get_daily_specials`, `get_hours_and_events`, `get_org`, `get_items`) — see `features.html` F8 |
 | `api/mcp_server.py` | FastMCP server exposing `core/sheets.py`'s functions as MCP tools for agent runtimes (stdio transport) — see `features.html` F8 |
-| `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
+| `evaluation/test_mcp_connection.py` | Standalone verification script (live Google Sheet; run `python3 evaluation/test_mcp_connection.py`) for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
 | `core/domain.py` | Domain pack loader — reads `DOMAIN` and imports `domains/<DOMAIN>/domain.py`, so shared code has no restaurant-specific constants |
 | `domains/README.md` | How a domain pack is laid out and how to add one — see `features.html` F12:12 |
@@ -73,22 +74,22 @@ OPENAI_API_KEY=your-key-here
 ## Running — terminal mode
 
 ```
-python3 menu_rag.py
+python3 legacy/menu_rag.py
 ```
 or
 ```
-python3 menu_api.py
+python3 legacy/menu_api.py
 ```
 Both prompt you to pick a cuisine, print chunk metrics and a sample query, then loop letting you ask your own questions until you type `q`.
 
-Or open `menu_rag.ipynb` in VS Code / Cursor (install the **Jupyter** and **Python** extensions if the kernel picker doesn't show up), select this folder's `venv` as the kernel, and run all cells.
+Or open `legacy/menu_rag.ipynb` in VS Code / Cursor (install the **Jupyter** and **Python** extensions if the kernel picker doesn't show up), select this folder's `venv` as the kernel, and run all cells.
 
 ## Running — FastAPI
 
 Start the API (from this folder, venv activated):
 
 ```
-uvicorn menu_api:app --reload
+uvicorn legacy.menu_api:app --reload
 ```
 
 This builds (or loads from the `vectorstores/` cache) a RAG chain for each cuisine at startup, then serves one endpoint:
@@ -165,7 +166,7 @@ CI (`.github/workflows/eval_gate.yml`, F20) runs both.
 
 ## Running — web UIs (Gradio / Streamlit)
 
-With `uvicorn menu_api:app --reload` already running in one terminal, open a second terminal (venv activated) and run either:
+With `uvicorn legacy.menu_api:app --reload` already running in one terminal, open a second terminal (venv activated) and run either:
 
 **Gradio:**
 ```
