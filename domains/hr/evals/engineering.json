@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How many PTO days do engineers get per year?",
+    "expected_answer": "Engineering employees accrue 20 days of PTO per year, and up to 5 unused days can be carried over into the next calendar year."
+  },
+  {
+    "question": "What are the core hours for engineers?",
+    "expected_answer": "Engineers must be available between 10:00 AM and 3:00 PM local office time, Monday through Friday, and work a 40-hour week."
+  },
+  {
+    "question": "How many days a week can engineers work remotely?",
+    "expected_answer": "Up to 3 days per week. Tuesdays and Thursdays are in-office anchor days; fully remote work needs written approval from the Head of Engineering."
+  },
+  {
+    "question": "What is the on-call stipend?",
+    "expected_answer": "On-call engineers receive $400 per on-call week, plus 1 extra day of PTO to use within 60 days."
+  },
+  {
+    "question": "How quickly must an on-call page be acknowledged?",
+    "expected_answer": "Within 15 minutes. Otherwise it escalates to the secondary on-call engineer, then the engineering manager on duty."
+  },
+  {
+    "question": "What is the annual learning budget for engineers?",
+    "expected_answer": "Each engineer has a $2,000 annual learning budget for courses, books, and conferences; conference travel needs manager approval at least 30 days ahead."
+  },
+  {
+    "question": "How much is the home-office stipend?",
+    "expected_answer": "Engineers get a one-time $750 home-office stipend for a monitor, chair, or desk, plus a laptop refresh every 3 years."
+  },
+  {
+    "question": "How many paid sick days do employees get each year?",
+    "expected_answer": "Every employee receives 8 paid sick days per year, separate from PTO. A doctor's note is only required for absences longer than 3 consecutive work days."
+  },
+  {
+    "question": "How long is paid parental leave for the primary caregiver?",
+    "expected_answer": "Parental leave is 16 weeks fully paid for the primary caregiver (and 8 weeks fully paid for the secondary caregiver)."
+  },
+  {
+    "question": "When is open enrollment for health benefits?",
+    "expected_answer": "Open enrollment runs from November 2 to November 20, 2026. New hires must enroll within 30 days of their start date."
+  }
+]

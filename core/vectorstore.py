@@ -26,7 +26,7 @@ from core.sanitize import SanitizingRetriever, wrap_with_sanitization  # F22
 
 _ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2")  # F10: cross-encoder re-ranking model
 
-VECTORSTORE_DIR = "vectorstores"  # F12: shared by every engine's get_retriever() call
+VECTORSTORE_DIR = f"vectorstores/{domain.NAME}"  # F12: one index folder per domain pack, shared by every engine
 
 
 def rerank_documents(query: str, docs: List[Document], top_k: int = 3) -> List[Document]:
