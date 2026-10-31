@@ -5,8 +5,10 @@ import json
 from pathlib import Path
 from typing import TypedDict
 
-FIXTURES_DIR = Path(__file__).parent / "fixtures"  # F17: one JSON file per cuisine
-CUISINES = ["sushi", "steak", "italian"]  # F12: same set as engines/plain_rag_engine.py's AVAILABLE_CUISINES
+from core.domain import domain  # F12
+
+FIXTURES_DIR = domain.EVALS_DIR  # F17/F12: one JSON file per cuisine, in the active domain pack
+CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
 
 
 class EvalCase(TypedDict):
@@ -16,7 +18,7 @@ class EvalCase(TypedDict):
 
 def load_ground_truth(cuisine: str) -> list[EvalCase]:
     """F17: one cuisine's fixed test questions + known-good answers, read from
-    evaluation/fixtures/<cuisine>.json."""
+    domains/<DOMAIN>/evals/<cuisine>.json."""
     path = FIXTURES_DIR / f"{cuisine}.json"
     with open(path) as f:
         return json.load(f)

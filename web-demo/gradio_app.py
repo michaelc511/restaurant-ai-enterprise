@@ -29,7 +29,7 @@ def ask_menu(cuisine, question):
 
 def get_specials(day):
     # F8: hits menu_api.py's /specials endpoint directly - core/sheets.py's live Google Sheet data,
-    # not the RAG chain, so this never touches menus/ or FAISS.
+    # not the RAG chain, so this never touches the menu PDFs or FAISS.
     resp = requests.get(f"{API_URL}/specials", params={"day": day} if day else {})
     resp.raise_for_status()
     data = resp.json()

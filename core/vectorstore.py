@@ -21,6 +21,7 @@ from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_text_splitters import RecursiveCharacterTextSplitter  # F3
 
+from core.domain import domain  # F12
 from core.sanitize import SanitizingRetriever, wrap_with_sanitization  # F22
 
 _ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2")  # F10: cross-encoder re-ranking model
@@ -70,7 +71,7 @@ def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> SanitizingRetriev
     # F18: BM25 has no on-disk index of its own (langchain rebuilds it in memory from the raw
     # chunks each run), so parse + split the PDF unconditionally. This is cheap/local/no API
     # calls - the FAISS embedding step below is the expensive part the on-disk index still saves.
-    loader = PyPDFLoader(f"menus/{cuisine}.pdf")
+    loader = PyPDFLoader(str(domain.DOCS_DIR / f"{cuisine}.pdf"))  # F12: the active domain's docs
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     docs = text_splitter.split_documents(documents)

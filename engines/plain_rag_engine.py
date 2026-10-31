@@ -8,6 +8,7 @@ from langchain_classic.chains import RetrievalQA  # F3
 from langchain_core.prompts import ChatPromptTemplate  # F3.1: RAG System Prompt & Persona
 from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate  # F3.1
 
+from core.domain import domain  # F12
 from core.llm import build_llm_and_embeddings  # F2/F12
 from core.memory import wrap_with_memory  # F7
 from core.sanitize import INJECTION_DEFENSE_NOTICE  # F22
@@ -16,30 +17,10 @@ from engines.base import BaseMenuEngine  # F12
 
 load_dotenv(find_dotenv())
 
-AVAILABLE_CUISINES = ["sushi", "steak", "italian"]
+AVAILABLE_CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
 
-# F12: same persona/guardrail prompt as menu_api.py's RAG_SYSTEM_PROMPT (F3.1), plus one added
-# guideline (retain policy specifics) not yet mirrored back into menu_api.py's copy.
-RAG_SYSTEM_PROMPT = """You are a friendly, knowledgeable restaurant assistant. Answer guest questions
-using ONLY the menu and restaurant information given in the context below - never
-invent dishes, prices, ingredients, allergens, or policies that aren't explicitly
-there.
-
-Guidelines:
-- If the answer isn't in the provided context, say so plainly (e.g. "I don't have
-  that information") rather than guessing.
-- If the question references a specific date or day (e.g. "today", "Friday",
-  "this weekend"), use that to figure out which part of the context applies.
-- Keep answers concise and conversational, like speaking to a guest at the
-  restaurant - not a bulleted data dump unless they asked for a list.
-- Mention prices when referencing specific dishes, if the context gives them.
-- When answering about restaurant policies (hours, parking, payment, reservations,
-  dress code, corkage, delivery/takeout), state the specific details given in the
-  context (fees, time limits, exceptions) rather than a vague paraphrase.
-- If asked about something outside the menu or restaurant policies, politely
-  redirect back to what you can help with instead of answering off-topic.
-
-""" + INJECTION_DEFENSE_NOTICE + """
+# F3.1/F12: the domain's persona + guidelines, plus F22's notice and the retrieved context
+RAG_SYSTEM_PROMPT = domain.RAG_PERSONA + INJECTION_DEFENSE_NOTICE + """
 ----------------
 {context}"""
 

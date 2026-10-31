@@ -19,7 +19,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `core/llm.py` | Shared LLM/embeddings provider selection (OpenAI or Azure) used by every engine — see `features.html` F2 and F12 |
 | `core/guardrails.py` | Structured intent classifier that rejects off-topic questions before retrieval (`classify_intent`, `is_off_topic`) — see `features.html` F19 |
 | `core/sanitize.py` | Delimiter-wraps every retrieved chunk so its content is treated as data, not instructions (`SanitizingRetriever`) — see `features.html` F22 |
-| `evaluation/` | RAG evals harness — ground-truth fixtures per cuisine, scored on faithfulness / answer relevancy / context precision (`run_evals.py`) — see `features.html` F17 |
+| `evaluation/` | RAG evals harness — scores the ground-truth fixtures in `domains/restaurant/evals/`, scored on faithfulness / answer relevancy / context precision (`run_evals.py`) — see `features.html` F17 |
 | `.github/workflows/eval_gate.yml` | CI gate — runs `pytest`, then the evals harness — see `features.html` F20 |
 | `tests/` | Fully mocked unit tests for the core modules (no API key, no network) — see `features.html` F23 |
 | `core/telemetry.py` | Token/cost tracking (`track_usage`, `log_usage`, F6) and step-latency/error-rate tracing (`trace_call`, `log_trace`, F9) — see `features.html` F6 and F9 |
@@ -30,7 +30,12 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `api/mcp_server.py` | FastMCP server exposing `core/sheets.py`'s functions as MCP tools for agent runtimes (stdio transport) — see `features.html` F8 |
 | `test_mcp_connection.py` | Standalone verification script for `api/mcp_server.py` — spawns it over stdio and calls all four tools |
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
-| `menus/` | The 3 menu PDFs (`sushi.pdf`, `steak.pdf`, `italian.pdf`) |
+| `core/domain.py` | Domain pack loader — reads `DOMAIN` and imports `domains/<DOMAIN>/domain.py`, so shared code has no restaurant-specific constants |
+| `domains/README.md` | How a domain pack is laid out and how to add one |
+| `domains/restaurant/sheets.py` | Restaurant-only sheet readers (`specials` and `dates` tabs) — `get_daily_specials`, `get_hours_and_events` (F8) |
+| `domains/restaurant/tools.py` | Restaurant MCP tools (`daily_specials`, `hours_and_events`) registered on `api/mcp_server.py` for the active domain (F8) |
+| `domains/restaurant/domain.py` | Restaurant pack: collections, persona/plan/synthesis prompts, F19 intent labels and off-topic reply |
+| `domains/restaurant/` | Restaurant domain pack: `docs/` holds the 3 menu PDFs (`sushi.pdf`, `steak.pdf`, `italian.pdf`), `evals/` the F17 ground-truth fixtures per cuisine |
 | `vectorstores/` | Cached FAISS indexes per cuisine (auto-generated, gitignored — see Notes) |
 | `web-demo/gradio_app.py` | Gradio UI, calls `menu_api.py` over HTTP |
 | `web-demo/streamlit_app.py` | Streamlit UI, calls `menu_api.py` over HTTP |
@@ -143,6 +148,7 @@ Set in `.env`. Toggles default to on — set to `false` to turn off.
 | `METRICS` | `true` | Token/cost (F6), latency tracing (F9), and SQLite usage log (F11) — included in `/ask` responses |
 | `GUARDRAILS_ENABLED` | `true` | Off-topic intent gating in `engine_api.py` (F19) |
 | `MCP_SERVER` | *(empty)* | MCP server `engine_api.py` and the `orchestrator` engine read live sheet data from — empty = `api/mcp_server.py` in-process; or a script path (stdio) / http URL (F8/F13) |
+| `DOMAIN` | `restaurant` | Which `domains/<name>/` pack is active — docs, eval fixtures, prompts and intents (see `domains/README.md`) |
 | `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag`, `langgraph`, or `orchestrator` (F12/F13); `orchestrator` does its own guardrails and live-data routing, so `engine_api.py` skips its F19/F8 pre-routing for it |
 | `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
 

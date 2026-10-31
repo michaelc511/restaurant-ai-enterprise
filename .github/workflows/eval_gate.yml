@@ -43,6 +43,6 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
       - run: pip install -r requirements.txt
-      # menus/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh
+      # domains/restaurant/docs/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh
       # FAISS index from PDF on every run - see core/vectorstore.py's get_retriever().
       - run: python -m evaluation.run_evals

@@ -54,7 +54,7 @@ available_cuisines = ["sushi", "steak", "italian"]
 cuisine = input(f"Which menu would you like ({'/'.join(available_cuisines)})? ").strip().lower()
 while cuisine not in available_cuisines:
     cuisine = input(f"Please choose one of {'/'.join(available_cuisines)}: ").strip().lower()
-menu = f"menus/{cuisine}.pdf"
+menu = f"domains/restaurant/docs/{cuisine}.pdf"
 
 # 2.1 Load and chunk PDFs using PyPDFLoader 
 loader = PyPDFLoader(menu)

@@ -7,12 +7,13 @@ import asyncio
 import pytest
 
 import api.mcp_server as mcp_server
+import domains.restaurant.tools as restaurant_tools
 from core.mcp_client import call_mcp_tool, call_mcp_tools, list_mcp_tools
 from core.sanitize import CONTEXT_START
 
 
 def test_call_mcp_tool_returns_rows_as_dicts(monkeypatch):
-    monkeypatch.setattr(mcp_server, "get_daily_specials", lambda day: [{"Dish Name": "Test Special", "Day": day}])
+    monkeypatch.setattr(restaurant_tools, "get_daily_specials", lambda day: [{"Dish Name": "Test Special", "Day": day}])
 
     rows = call_mcp_tool("daily_specials", {"day": "Fri"})
 
@@ -35,7 +36,7 @@ def test_call_mcp_tool_drops_none_args(monkeypatch):
 def test_call_mcp_tool_raises_runtime_error_on_tool_failure(monkeypatch):
     def broken(day=None):
         raise RuntimeError("sheet down")
-    monkeypatch.setattr(mcp_server, "get_daily_specials", broken)
+    monkeypatch.setattr(restaurant_tools, "get_daily_specials", broken)
 
     with pytest.raises(RuntimeError, match="sheet down"):  # F8: same contract core.sheets has
         call_mcp_tool("daily_specials")
@@ -54,7 +55,7 @@ def test_call_mcp_tools_sanitizes_results_and_reports_errors(monkeypatch):
 
     def broken(target_date=None):
         raise RuntimeError("sheet down")
-    monkeypatch.setattr(mcp_server, "get_hours_and_events", broken)
+    monkeypatch.setattr(restaurant_tools, "get_hours_and_events", broken)
 
     ok, failed = asyncio.run(call_mcp_tools([
         {"name": "company_items", "args": {}},
