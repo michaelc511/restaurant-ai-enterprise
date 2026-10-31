@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How many PTO days do Operations employees get?",
+    "expected_answer": "Operations employees accrue 15 days of PTO per year, rising to 20 days after 5 years of service."
+  },
+  {
+    "question": "What are the shift times in Operations?",
+    "expected_answer": "The day shift runs 7:00 AM to 3:30 PM and the evening shift runs 2:00 PM to 10:30 PM, Monday through Friday."
+  },
+  {
+    "question": "How far in advance must a shift swap be approved?",
+    "expected_answer": "Shift swaps must be approved by a shift lead at least 48 hours in advance."
+  },
+  {
+    "question": "What safety gear is required on the warehouse floor?",
+    "expected_answer": "Steel-toe safety boots and high-visibility vests at all times, plus hearing protection in marked high-noise zones."
+  },
+  {
+    "question": "How often must forklift certification be renewed?",
+    "expected_answer": "Every 3 years; only employees with a current certification may operate forklifts."
+  },
+  {
+    "question": "How quickly must a workplace injury be reported?",
+    "expected_answer": "All injuries and near-misses must be reported to a shift lead and logged in the safety portal within 24 hours."
+  },
+  {
+    "question": "What is the overtime pay rate?",
+    "expected_answer": "Non-exempt employees are paid 1.5 times their regular rate for hours over 40 in a work week, and overtime must be approved by a shift lead first."
+  },
+  {
+    "question": "How many paid sick days do employees get each year?",
+    "expected_answer": "Every employee receives 8 paid sick days per year, separate from PTO. A doctor's note is only required for absences longer than 3 consecutive work days."
+  },
+  {
+    "question": "When is open enrollment for health benefits?",
+    "expected_answer": "Open enrollment runs from November 2 to November 20, 2026. New hires must enroll within 30 days of their start date."
+  },
+  {
+    "question": "Does Northwind Labs match 401(k) contributions?",
+    "expected_answer": "Yes - contributions are matched dollar-for-dollar up to 5% of salary, after 90 days of employment."
+  }
+]

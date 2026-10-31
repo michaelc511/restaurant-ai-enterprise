@@ -32,6 +32,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `secrets/service_account.json` | Google service account key for `core/sheets.py` (gitignored — not committed) |
 | `core/domain.py` | Domain pack loader — reads `DOMAIN` and imports `domains/<DOMAIN>/domain.py`, so shared code has no restaurant-specific constants |
 | `domains/README.md` | How a domain pack is laid out and how to add one |
+| `domains/hr/` | Second domain pack: Northwind Labs employee handbooks (`engineering`, `sales`, `operations`) and their eval fixtures, from the hr-assistant app — run with `DOMAIN=hr` |
 | `domains/restaurant/sheets.py` | Restaurant-only sheet readers (`specials` and `dates` tabs) — `get_daily_specials`, `get_hours_and_events` (F8) |
 | `domains/restaurant/tools.py` | Restaurant MCP tools (`daily_specials`, `hours_and_events`) registered on `api/mcp_server.py` for the active domain (F8) |
 | `domains/restaurant/domain.py` | Restaurant pack: collections, persona/plan/synthesis prompts, F19 intent labels and off-topic reply |
@@ -148,7 +149,7 @@ Set in `.env`. Toggles default to on — set to `false` to turn off.
 | `METRICS` | `true` | Token/cost (F6), latency tracing (F9), and SQLite usage log (F11) — included in `/ask` responses |
 | `GUARDRAILS_ENABLED` | `true` | Off-topic intent gating in `engine_api.py` (F19) |
 | `MCP_SERVER` | *(empty)* | MCP server `engine_api.py` and the `orchestrator` engine read live sheet data from — empty = `api/mcp_server.py` in-process; or a script path (stdio) / http URL (F8/F13) |
-| `DOMAIN` | `restaurant` | Which `domains/<name>/` pack is active — docs, eval fixtures, prompts and intents (see `domains/README.md`) |
+| `DOMAIN` | `restaurant` | Which `domains/<name>/` pack is active — `restaurant` or `hr`; FAISS indexes go in `vectorstores/<DOMAIN>/` — docs, eval fixtures, prompts and intents (see `domains/README.md`) |
 | `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag`, `langgraph`, or `orchestrator` (F12/F13); `orchestrator` does its own guardrails and live-data routing, so `engine_api.py` skips its F19/F8 pre-routing for it |
 | `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
 

@@ -1,0 +1,42 @@
+[
+  {
+    "question": "How many PTO days do Sales employees get per year?",
+    "expected_answer": "Sales employees accrue 18 days of PTO per year, and up to 3 unused days can be carried over into the next calendar year."
+  },
+  {
+    "question": "When are commissions paid?",
+    "expected_answer": "Monthly, on the 15th of the month after the deal closes and the customer's first payment is received."
+  },
+  {
+    "question": "What commission rate do account executives earn on new deals?",
+    "expected_answer": "Account executives earn 10% commission on first-year contract value; renewals earn 4%."
+  },
+  {
+    "question": "What is the client entertainment limit?",
+    "expected_answer": "$150 per client attendee per event; any single event above $1,000 total needs pre-approval from the Head of Sales."
+  },
+  {
+    "question": "Can I book premium economy for a long flight?",
+    "expected_answer": "Yes, for flights of 6 hours or more. Flights under 6 hours must be booked in economy class."
+  },
+  {
+    "question": "How soon must expense reports be submitted?",
+    "expected_answer": "Within 30 days of the expense, with itemized receipts for anything over $25."
+  },
+  {
+    "question": "How many days a week can Sales employees work remotely?",
+    "expected_answer": "Up to 2 days per week. Mondays are in-office for the weekly pipeline review, and client-site days count as in-office days."
+  },
+  {
+    "question": "How many paid sick days do employees get each year?",
+    "expected_answer": "Every employee receives 8 paid sick days per year, separate from PTO. A doctor's note is only required for absences longer than 3 consecutive work days."
+  },
+  {
+    "question": "How long is paid parental leave for the primary caregiver?",
+    "expected_answer": "Parental leave is 16 weeks fully paid for the primary caregiver (and 8 weeks fully paid for the secondary caregiver)."
+  },
+  {
+    "question": "Does Northwind Labs match 401(k) contributions?",
+    "expected_answer": "Yes - contributions are matched dollar-for-dollar up to 5% of salary, after 90 days of employment."
+  }
+]

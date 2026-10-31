@@ -4,6 +4,12 @@ Everything domain-specific lives in `domains/<name>/`. The shared code (`core/`,
 `engine_api.py`) reads the active pack through `core/domain.py`, picked by the `DOMAIN` env var
 (default `restaurant`).
 
+## Packs
+
+- `restaurant` (default): sushi, steak and italian menus, plus specials/hours tools.
+- `hr`: Northwind Labs employee handbooks (engineering, sales, operations); shared org/items
+  tools only.
+
 ## What a pack contains
 
 | Path | Purpose |
@@ -20,8 +26,7 @@ Everything domain-specific lives in `domains/<name>/`. The shared code (`core/`,
 1. Copy `domains/restaurant/` to `domains/<name>/`.
 2. Replace the PDFs in `docs/` and the fixtures in `evals/`, one per collection.
 3. Edit `domain.py`: `NAME`, `COLLECTIONS`, the prompts and the intent labels (keep `off_topic`).
-4. Run with `DOMAIN=<name>`. Use a separate `vectorstores/` folder per domain, since indexes are
-   stored by collection name.
+4. Run with `DOMAIN=<name>`. Indexes are built on first use in `vectorstores/<name>/`.
 5. `pytest`, then `python -m evaluation.run_evals` with your API key.
 
 Shared by every domain: the `org` and `items` tabs and their `org_directory` / `company_items`
