@@ -56,7 +56,7 @@
 
 <p>Before building a web server, a database, or a UI, one question needed an answer as cheaply as possible: <em>can an LLM answer questions correctly if you just hand it the right document?</em></p>
 
-<p>The prototype, <code>prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb</code>, answers that in nine notebook steps:</p>
+<p>The prototype, <code>legacy/prototype/Demo_01_Building_a_RAG_Powered_FAQ_Agent_with_Custom_Knowledge.ipynb</code>, answers that in nine notebook steps:</p>
 <ul>
   <li>Load an FAQ text file with <code>TextLoader</code> and split it into 500-character chunks with a 50-character overlap (<code>CharacterTextSplitter</code>).</li>
   <li>Embed the chunks with Azure OpenAI's <code>text-embedding-ada-002</code> and store them in a FAISS vector index.</li>
@@ -98,14 +98,14 @@ else:
 
 <p><code>menu_api.py</code> turns the RAG pipeline into a FastAPI app:</p>
 
-<pre><code>uvicorn menu_api:app --reload</code></pre>
+<pre><code>uvicorn legacy.menu_api:app --reload</code></pre>
 
 <ul>
   <li><strong>Build once, reuse forever.</strong> At startup, a RAG chain is built for each of the three cuisines (sushi, steak, italian) and kept in a dictionary. FAISS indexes are loaded from the <code>vectorstores/</code> folder if they already exist, so restarts don't re-embed every menu.</li>
   <li><strong><code>POST /ask</code></strong> takes <code>{"cuisine": "sushi", "question": "...", "session_id": "..."}</code> and returns the answer plus <code>top_match</code>, the menu chunk that best supported it. When metrics are on, the response also includes token usage, session cost totals, and a latency breakdown.</li>
   <li><strong><code>GET /specials</code> and <code>GET /hours</code></strong> expose live restaurant-ops data from a Google Sheet.</li>
   <li><strong>Validated input.</strong> The request body is a Pydantic model (<code>AskRequest</code>), and an unknown cuisine gets a clear error listing the valid choices.</li>
-  <li><strong>Two ways to run.</strong> <code>uvicorn</code> serves the API; running <code>python3 menu_api.py</code> directly starts an interactive terminal loop with the same pipeline.</li>
+  <li><strong>Two ways to run.</strong> <code>uvicorn</code> serves the API; running <code>python3 legacy/menu_api.py</code> directly starts an interactive terminal loop with the same pipeline.</li>
 </ul>
 
 <div class="dialogue">
@@ -116,7 +116,7 @@ else:
 
 <p><strong>A note on "asynchronous":</strong> the route handlers are written as regular <code>def</code> functions, not <code>async def</code>. FastAPI runs plain <code>def</code> handlers in a worker thread pool, so a slow LLM call doesn't block the server's event loop. The responses aren't streamed; each answer is returned in one piece when it's ready.</p>
 
-<p>The repo also includes <code>flask_app.py</code>, a minimal Flask version of <code>/ask</code> that reuses the same chains. It's a useful side-by-side comparison, but FastAPI is the main backend that every later feature builds on.</p>
+<p>The repo also includes <code>legacy/flask_app.py</code>, a minimal Flask version of <code>/ask</code> that reuses the same chains. It's a useful side-by-side comparison, but FastAPI is the main backend that every later feature builds on.</p>
 
 <hr>
 

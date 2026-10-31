@@ -23,6 +23,10 @@ from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessag
 from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
+import sys  # F12: moved to legacy/ - put the repo root on sys.path so "core" imports when run directly
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.memory import wrap_with_memory  # F7
 from core.vectorstore import wrap_with_reranking  # F10
@@ -318,7 +322,7 @@ def hours(date: Optional[str] = None):  # F8: same core.sheets logic api/mcp_ser
     except RuntimeError as e:
         return {"error": str(e)}
 
-# Only runs when this file is executed directly (python3 menu_api.py),
+# Only runs when this file is executed directly (python3 legacy/menu_api.py),
 # not when uvicorn imports it to serve the API
 if __name__ == "__main__":
     cuisine = input(f"Which menu cuisine would you like ({'/'.join(available_cuisines)})? ").strip().lower()
