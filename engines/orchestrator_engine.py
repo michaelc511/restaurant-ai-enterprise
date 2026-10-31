@@ -21,6 +21,7 @@ from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessag
 from langgraph.graph import StateGraph, END  # F13
 from pydantic import BaseModel, Field
 
+from core.domain import domain  # F12
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
 from core.llm import build_llm_and_embeddings  # F2/F12
 from core.mcp_client import list_mcp_tools, call_mcp_tools  # F8/F13
@@ -31,7 +32,7 @@ from engines.base import BaseMenuEngine  # F12
 
 load_dotenv(find_dotenv())
 
-AVAILABLE_CUISINES = ["sushi", "steak", "italian"]
+AVAILABLE_CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
 MAX_RETRIES = 2  # F13: bounded verify -> re-synthesize loop
 MAX_TOOL_CALLS = 4  # F13: cap one planning turn's tool calls, so a confused model can't fan out unbounded sheet reads
 GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "false"  # F19
@@ -39,31 +40,12 @@ GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "fa
 
 # ---- prompts / structured outputs ----
 
-PLAN_PROMPT = """You are the orchestrator for a restaurant assistant. Decide which specialists
-this question needs (one or both):
-- menu: dishes, ingredients, prices, allergens, standard hours, and policies from the menu PDF.
-- live_data: daily specials, holiday hours/closures/events, the company org directory, or company
-  items (announcements, system status, outages, promotions).
+PLAN_PROMPT = domain.PLAN_PROMPT  # F12
 
-Question: {question}"""
+MCP_AGENT_PROMPT = domain.MCP_AGENT_PROMPT  # F12
 
-MCP_AGENT_PROMPT = """You are the live-data specialist. Call the tools needed to answer the
-question - nothing else. Today is {weekday}, {today}. Resolve relative dates ("tomorrow",
-"Friday") to an ISO date for hours_and_events, or a short weekday ("Fri") for daily_specials."""
-
-# F13: same persona/guardrail rules as langgraph_engine.py's RAG_SYSTEM_PROMPT (F3.1), widened to
-# cover live-data tool results alongside menu chunks
-SYNTHESIZE_SYSTEM_PROMPT = """You are a friendly, knowledgeable restaurant assistant. Answer guest questions
-using ONLY the menu excerpts and live-data results given in the context below - never invent
-dishes, prices, ingredients, allergens, hours, or policies that aren't explicitly there.
-
-Guidelines:
-- If the answer isn't in the provided context, say so plainly rather than guessing.
-- Keep answers concise and conversational, like speaking to a guest at the restaurant.
-- Mention prices when referencing specific dishes, if the context gives them.
-- Live-data results (specials, holiday hours, closures) override the menu's standard info.
-
-""" + INJECTION_DEFENSE_NOTICE + """
+# F13: the domain's synthesis persona (F3.1 rules widened to live-data results), plus F22's notice
+SYNTHESIZE_SYSTEM_PROMPT = domain.SYNTHESIZE_PERSONA + INJECTION_DEFENSE_NOTICE + """
 ----------------
 {context}"""
 

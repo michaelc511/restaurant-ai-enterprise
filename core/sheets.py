@@ -1,8 +1,8 @@
-"""F8: Reads live restaurant-ops data (daily specials, hours & events) plus the
-company org directory and items list (org, items tabs) from the 'org' Google
-Sheet via a service account. Shared by api/mcp_server.py (exposed
-as MCP tools for agents) and menu_api.py (called directly as plain functions) -
-one implementation, two consumers, same pattern F6/F10 already use.
+"""F8: Reads the company org directory and items list (org, items tabs) from the 'org'
+Google Sheet via a service account, and owns the shared client, tab opening, date
+resolution and keyword routing. Domain-specific tabs live in the domain pack (F12:
+domains/restaurant/sheets.py for specials and hours & events). Shared by
+api/mcp_server.py (exposed as MCP tools for agents) and menu_api.py (called directly).
 """
 import re
 from datetime import date, timedelta
@@ -12,16 +12,16 @@ from typing import Optional
 import gspread
 from gspread.exceptions import APIError, SpreadsheetNotFound, WorksheetNotFound
 
+from core.domain import domain  # F12
+
 SPREADSHEET_NAME = "org"
 SERVICE_ACCOUNT_PATH = Path(__file__).resolve().parent.parent / "secrets" / "service_account.json"
 
-DAILY_SPECIALS_TAB = "specials"  # the actual tab name in the live sheet (not "Daily Specials")
-HOURS_AND_EVENTS_TAB = "dates"  # the actual tab name in the live sheet (not "Hours & Events")
 ORG_TAB = "org"  # F8: company directory - offices, departments, vendors, etc. with a contact each
 ITEMS_TAB = "items"  # F8: non-date facts per App/Tenant - announcements, statuses, prices, promotions
 
-SPECIALS_KEYWORDS = ("special",)
-HOURS_KEYWORDS = ("hour", "open", "close", "holiday")
+SPECIALS_KEYWORDS = domain.SPECIALS_KEYWORDS  # F12: from the active domain pack
+HOURS_KEYWORDS = domain.HOURS_KEYWORDS  # F12
 # F8: substring-matched against both the question and each items row's Category, so "any outages?"
 # finds "Known Outage" rows without needing the exact category name
 ITEMS_KEYWORDS = (
@@ -135,57 +135,6 @@ def _is_active(value: str) -> bool:
     return str(value).strip().lower() in ("true", "yes", "y", "1", "active")
 
 
-# F8 FastMCP Server Endpoint
-def get_daily_specials(day: Optional[str] = None) -> list[dict]:
-    """Look up today's (or a given weekday's) active daily specials.
-
-    Args:
-        day: A weekday like "Mon", "Fri", or "All Week". If omitted, returns every
-            active special regardless of day.
-
-    Returns:
-        A list of dicts, one per active special, with keys matching the sheet's
-        columns: Day, Dish Name, Category, Description, Price, Allergens.
-
-    Raises:
-        RuntimeError: if the sheet/tab can't be reached (missing, renamed, a
-            network issue, or a Google Sheets API rate limit).
-    """
-    rows = _open_tab(DAILY_SPECIALS_TAB).get_all_records()
-    specials = [row for row in rows if _is_active(row.get("Is Active", ""))]
-    if day and day.strip().lower() != "all week":
-        wanted = day.strip().lower()
-        specials = [
-            row for row in specials
-            if str(row.get("Day", "")).strip().lower() in (wanted, "all week")
-        ]
-    return specials
-
-
-# F8 FastMCP Server Endpoint
-def get_hours_and_events(target_date: Optional[str] = None) -> list[dict]:
-    """Look up hours, holiday schedules, or closure notices.
-
-    Args:
-        target_date: A specific date matching the sheet's Date column format
-            (e.g. "2026-08-27"). If omitted, returns every row in the tab.
-
-    Returns:
-        A list of dicts, one per matching row, with keys matching the sheet's
-        columns: Date, Day, Event / Holiday, Status, Open Time, Close Time,
-        Staff Notes.
-
-    Raises:
-        RuntimeError: if the sheet/tab can't be reached (missing, renamed, a
-            network issue, or a Google Sheets API rate limit).
-    """
-    rows = _open_tab(HOURS_AND_EVENTS_TAB).get_all_records()
-    if target_date:
-        wanted = target_date.strip()
-        rows = [row for row in rows if str(row.get("Date", "")).strip() == wanted]
-    return rows
-
-
 def _same(a: str, b: str) -> bool:  # F8: case/whitespace-insensitive cell match
     return str(a).strip().lower() == str(b).strip().lower()
 
@@ -274,3 +223,10 @@ def find_item_rows(question: str, rows: Optional[list[dict]] = None) -> list[dic
     ]
     for_tenant = [row for row in rows if _mentions(question, row.get("Tenant", ""))]
     return for_tenant or rows
+
+
+def __getattr__(name: str):  # F12: menu_api.py (frozen baseline) still imports these two from here
+    if name in ("get_daily_specials", "get_hours_and_events"):
+        from domains.restaurant import sheets as restaurant_sheets
+        return getattr(restaurant_sheets, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

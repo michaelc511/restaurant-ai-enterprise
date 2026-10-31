@@ -15,6 +15,7 @@ from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace
 from core.database import init_db, log_call, get_session_totals  # F11
 from core.sheets import find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days  # F8: pure helpers, no sheet reads
 from core.mcp_client import call_mcp_tool  # F8: every live-sheet read goes over MCP via api/mcp_server.py
+from core.domain import domain  # F12
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
 from core.llm import build_llm_and_embeddings  # F2/F12/F19
 from engines.base import get_engine  # F12
@@ -26,7 +27,7 @@ METRICS = os.environ.get("METRICS", "true").lower() != "false"  # F6/F9/F11: tra
 DEFAULT_ENGINE = os.environ.get("DEFAULT_ENGINE", "plain_rag")  # F12: which engine answers by default
 GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "false"  # F19
 
-AVAILABLE_CUISINES = ["sushi", "steak", "italian"]
+AVAILABLE_CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
 SELF_ROUTING_ENGINES = {"orchestrator"}  # F13: engines with their own guard + live-data agents - skip F19/F8 routing here
 
 app = FastAPI()

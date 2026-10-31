@@ -8,6 +8,7 @@ import pytest
 from gspread.exceptions import APIError, SpreadsheetNotFound, WorksheetNotFound
 
 import core.sheets as sheets
+import domains.restaurant.sheets as restaurant_sheets
 
 
 class FixedDate(dt.date):
@@ -127,7 +128,7 @@ def test_get_daily_specials_filters_inactive_rows(monkeypatch):
     ]
     monkeypatch.setattr(sheets, "_open_tab", lambda tab: FakeWorksheet(rows))
 
-    specials = sheets.get_daily_specials()
+    specials = restaurant_sheets.get_daily_specials()
 
     assert [s["Dish Name"] for s in specials] == ["Soup"]
 
@@ -140,7 +141,7 @@ def test_get_daily_specials_filters_by_day_including_all_week(monkeypatch):
     ]
     monkeypatch.setattr(sheets, "_open_tab", lambda tab: FakeWorksheet(rows))
 
-    specials = sheets.get_daily_specials(day="Mon")
+    specials = restaurant_sheets.get_daily_specials(day="Mon")
 
     assert {s["Dish Name"] for s in specials} == {"Monday Only", "Always On"}
 
@@ -152,7 +153,7 @@ def test_get_hours_and_events_filters_by_target_date(monkeypatch):
     ]
     monkeypatch.setattr(sheets, "_open_tab", lambda tab: FakeWorksheet(rows))
 
-    result = sheets.get_hours_and_events(target_date="2026-09-04")
+    result = restaurant_sheets.get_hours_and_events(target_date="2026-09-04")
 
     assert result == [{"Date": "2026-09-04", "Status": "Closed"}]
 
@@ -161,7 +162,7 @@ def test_get_hours_and_events_returns_all_rows_when_no_target_date(monkeypatch):
     rows = [{"Date": "2026-09-03"}, {"Date": "2026-09-04"}]
     monkeypatch.setattr(sheets, "_open_tab", lambda tab: FakeWorksheet(rows))
 
-    assert sheets.get_hours_and_events() == rows
+    assert restaurant_sheets.get_hours_and_events() == rows
 
 
 # --- get_org / get_items / find_org_rows / find_item_rows (mocked worksheet) ----

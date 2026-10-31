@@ -10,6 +10,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import AIMessage
 
 import api.mcp_server as mcp_server
+import domains.restaurant.tools as restaurant_tools
 import engines.orchestrator_engine as orch
 from core.guardrails import IntentClassification, OFF_TOPIC_MESSAGE
 from core.sanitize import CONTEXT_START
@@ -73,7 +74,7 @@ def test_menu_only_plan_uses_the_menu_agent_and_skips_tools(build_engine):
 
 
 def test_live_data_plan_calls_the_chosen_tool_and_sanitizes_its_output(build_engine, monkeypatch):
-    monkeypatch.setattr(mcp_server, "get_daily_specials", lambda day: [{"Dish Name": "Test Special", "Day": day}])
+    monkeypatch.setattr(restaurant_tools, "get_daily_specials", lambda day: [{"Dish Name": "Test Special", "Day": day}])
     llm = fake_llm(use_menu=False, use_live_data=True,
                    tool_calls=[{"name": "daily_specials", "args": {"day": "Fri"}, "id": "c1"}])
     engine, retriever = build_engine(llm)
@@ -88,7 +89,7 @@ def test_live_data_plan_calls_the_chosen_tool_and_sanitizes_its_output(build_eng
 
 
 def test_both_specialists_run_when_the_plan_needs_both(build_engine, monkeypatch):
-    monkeypatch.setattr(mcp_server, "get_hours_and_events", lambda target_date: [{"Status": "Closed"}])
+    monkeypatch.setattr(restaurant_tools, "get_hours_and_events", lambda target_date: [{"Status": "Closed"}])
     llm = fake_llm(use_menu=True, use_live_data=True,
                    tool_calls=[{"name": "hours_and_events", "args": {"target_date": "2026-12-25"}, "id": "c1"}])
     engine, retriever = build_engine(llm)
@@ -113,7 +114,7 @@ def test_unknown_tool_name_is_skipped(build_engine):
 def test_sheet_failure_is_reported_as_unavailable_not_raised(build_engine, monkeypatch):
     def broken(day):
         raise RuntimeError("sheet down")
-    monkeypatch.setattr(mcp_server, "get_daily_specials", broken)
+    monkeypatch.setattr(restaurant_tools, "get_daily_specials", broken)
     llm = fake_llm(use_menu=False, use_live_data=True,
                    tool_calls=[{"name": "daily_specials", "args": {}, "id": "c1"}])
     engine, _ = build_engine(llm)

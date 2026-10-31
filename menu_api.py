@@ -116,7 +116,7 @@ RAG_PROMPT = ChatPromptTemplate.from_messages([
 
 
 def build_qa_chain(cuisine: str):
-    menu = f"menus/{cuisine}.pdf"
+    menu = f"domains/restaurant/docs/{cuisine}.pdf"
     # Index path for the vectorstore
     index_path = f"{VECTORSTORE_DIR}/{cuisine}"
 

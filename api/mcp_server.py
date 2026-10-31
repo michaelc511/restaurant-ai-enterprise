@@ -1,9 +1,8 @@
-"""F8: FastMCP server - exposes live restaurant-ops data (daily specials, hours &
-events) and the company org directory and items list from the 'org' Google Sheet
-as MCP tools for agent runtimes. Read logic
-lives in core/sheets.py; menu_api.py calls those same functions directly for the
-FastAPI-facing /specials and /hours endpoints - one implementation, two consumers,
-same pattern F6/F10 already use. Stateless: every tool call re-authenticates
+"""F8: FastMCP server - exposes the company org directory and items list from the 'org'
+Google Sheet as MCP tools for agent runtimes, plus the active domain pack's own tools
+(F12: domains/<DOMAIN>/tools.py - for restaurant, daily specials and hours & events).
+Read logic lives in core/sheets.py and domains/<DOMAIN>/sheets.py; menu_api.py calls
+those same functions directly for its /specials and /hours endpoints. Stateless: every tool call re-authenticates
 against the same cached client and re-reads the sheet fresh, no data cached
 between calls and no per-session state kept across invocations.
 
@@ -19,43 +18,20 @@ from typing import Optional
 # "core" wouldn't otherwise be importable. Add the project root explicitly.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import importlib
+
 from fastmcp import FastMCP
 
-from core.sheets import get_daily_specials, get_hours_and_events, get_org, get_items
+from core.domain import DOMAIN, domain  # F12
+from core.sheets import get_org, get_items
 
-mcp = FastMCP("restaurant-ops-mcp")
+mcp = FastMCP(domain.MCP_SERVER_NAME)  # F12: e.g. "restaurant-ops-mcp"
 
-
-# F8 FastMCP Server Endpoint
-@mcp.tool
-def daily_specials(day: Optional[str] = None) -> list[dict]:
-    """Look up today's (or a given weekday's) active daily specials for the sushi menu.
-
-    Args:
-        day: A weekday like "Mon", "Fri", or "All Week". Omit to get every active
-            special regardless of day.
-
-    Returns:
-        A list of specials, each with Day, Dish Name, Category, Description,
-        Price, and Allergens.
-    """
-    return get_daily_specials(day)
-
-
-# F8 FastMCP Server Endpoint
-@mcp.tool
-def hours_and_events(target_date: Optional[str] = None) -> list[dict]:
-    """Look up restaurant hours, holiday schedules, or closure notices.
-
-    Args:
-        target_date: A specific date, e.g. "2026-08-27". Omit to get the full
-            hours & events schedule.
-
-    Returns:
-        A list of rows, each with Date, Day, Event / Holiday, Status, Open Time,
-        Close Time, and Staff Notes.
-    """
-    return get_hours_and_events(target_date)
+try:  # F12: a domain pack may have no live-data tools of its own
+    importlib.import_module(f"domains.{DOMAIN}.tools").register(mcp)
+except ModuleNotFoundError as e:
+    if e.name != f"domains.{DOMAIN}.tools":
+        raise
 
 
 # F8 FastMCP Server Endpoint
