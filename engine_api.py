@@ -265,7 +265,7 @@ if __name__ == "__main__":
     cli_session_id = "cli"
     if DEBUG_MODE:  # F13: let a developer override DEFAULT_ENGINE per run, for testing F12's factory
         engine_choice = input(
-            f"\nWhich engine? 1) {DEFAULT_ENGINE} [default, press Enter]  2) LangGraph  3) Orchestrator: "
+            f"\nWhich engine? 1) {DEFAULT_ENGINE} [default, press Enter]  2) LangGraph  3) Agentic RAG LG: "
         ).strip()
         cli_engine_name = {"2": "langgraph", "3": "orchestrator"}.get(engine_choice, DEFAULT_ENGINE)  # F13
         print(f"[DEBUG] DEFAULT_ENGINE is '{DEFAULT_ENGINE}' - using engine: {cli_engine_name}")

@@ -496,7 +496,9 @@ Each feature is numbered to match <code>checklist.csv</code>. Online documentati
   <li><a href="#f8">F8 — FastMCP Server Endpoint</a></li>
   <li class="section-index-phase">Phase 3 — D7 (Multi-Engine & Agent Frameworks)</li>
   <li><a href="#f12">F12 — Modular Engine Strategy Factory</a></li>
-  <li><a href="#f13">F13 — LangGraph State Machine Engine</a></li>
+  <li><a href="#f13">F13 — LangGraph Engines</a></li>
+  <li><a href="#f131">F13.1 — LangGraph State Machine Engine</a></li>
+  <li><a href="#f132">F13.2 — Agentic RAG LG</a></li>
   <li><a href="#f14">F14 — CrewAI Multi-Role Engine (NI)</a></li>
   <li><a href="#f15">F15 — AutoGen Multi-Agent Engine (NI)</a></li>
   <li class="section-index-phase">Phase 4 — NCC-1701 (Resilience, Evals & Hybrid Retrieval)</li>
@@ -572,8 +574,10 @@ strategies behind clean interfaces.</p>
   <span class="f-tags"><strong>Tags:</strong> Strategy Pattern, Software Architecture, Pluggable Architecture, Factory Pattern, Base Engine</span></li>
   <li><strong><a href="#f12-1">F12.1 — Parallel Entry Point</a>:</strong> A backward-compatible second entry point built on the same factory, proving the multi-engine architecture via the Strangler Fig pattern without touching the original API.
   <span class="f-tags"><strong>Tags:</strong> Strangler Fig Pattern, API Versioning, Backward Compatibility, System Migration, Zero Downtime</span></li>
-  <li><strong><a href="#f13">F13 — LangGraph StateGraph Engine</a>:</strong> Graph-based cyclical reasoning, conditional branching, and retry logic. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f13-langgraph.html" target="_blank" rel="noopener">Blog article: LangGraph - F13</a>)
+  <li><strong><a href="#f131">F13.1 — LangGraph StateGraph Engine</a>:</strong> Graph-based cyclical reasoning, conditional branching, and retry logic. (<a href="https://michaelc511fullstack.blogspot.com/2026/09/f13-langgraph.html" target="_blank" rel="noopener">Blog article: LangGraph - F13</a>)
   <span class="f-tags"><strong>Tags:</strong> LangGraph, Agentic AI, Cyclic State Machines, Self-Correction, Loop Engineering, Graph Architecture</span></li>
+  <li><strong><a href="#f132">F13.2 — Agentic RAG LG</a>:</strong> An orchestrator plans which specialists a question needs, then a Menu RAG agent and an MCP Tools agent run in parallel and a verifier checks the merged answer. (<a href="https://michaelc511fullstack.blogspot.com/2026/10/multi-agent-orchestration-model-context.html" target="_blank" rel="noopener">Blog article: Multi-Agent Orchestration &amp; Model Context Protocol - F13.2</a>)
+  <span class="f-tags"><strong>Tags:</strong> Agentic RAG, LangGraph, Multi-Agent Orchestration, MCP Client, Tool Calling, Parallel Agents</span></li>
   <li><a href="#f14">F14 — CrewAI Multi-Agent Coordination (NI)</a>: Collaborative task delegation between specialized role-based personas.
   <span class="f-tags"><strong>Tags:</strong> Multi-Agent Systems, CrewAI, Role Delegation, Autonomous Agents, Persona Orchestration</span></li>
   <li><a href="#f15">F15 — AutoGen Collaborative Swarm (NI)</a>: Conversational consensus loops between user proxy and assistant agents.
@@ -616,7 +620,7 @@ adversarial input, and proving the supporting code holds up under test, independ
 
 <div class="note">
 <strong>Status note:</strong> bold items above are actually built and verified — Phases 1 and 2 (F0&ndash;F11) in
-full, plus F12/F12.1, F13, F16, F17, F18, F19, F20, F22, and F23. The unbolded items (F14, F15, F21), marked <strong>(NI)</strong> for "not implemented", are detailed,
+full, plus F12/F12.1, F13 (F13.1/F13.2), F16, F17, F18, F19, F20, F22, and F23. The unbolded items (F14, F15, F21), marked <strong>(NI)</strong> for "not implemented", are detailed,
 planned write-ups — architecture and intent decided, not yet implemented — same distinction the individual
 F-sections below make in their own Status lines.
 </div>
@@ -652,7 +656,9 @@ F-sections below make in their own Status lines.
   <li><a href="#f8">F8 — FastMCP Server Endpoint</a></li>
   <li><a href="#f12">F12 — Modular Engine Strategy Factory</a></li>
   <li><a href="#f12-1">F12.1 — Parallel Entry Point</a></li>
-  <li><a href="#f13">F13 — LangGraph State Machine Engine</a></li>
+  <li><a href="#f13">F13 — LangGraph Engines</a></li>
+  <li><a href="#f131">F13.1 — LangGraph State Machine Engine</a></li>
+  <li><a href="#f132">F13.2 — Agentic RAG LG</a></li>
   <li><a href="#f14">F14 — CrewAI Multi-Role Engine</a></li>
   <li><a href="#f15">F15 — AutoGen Multi-Agent Engine</a></li>
   <li><a href="#f19">F19 — Query Guardrails &amp; Intent Gating</a></li>
@@ -720,9 +726,10 @@ F-sections below make in their own Status lines.
   <li><strong>Evals</strong> — <span class="cov-yes">✅</span> <a href="#f17">F17</a>, <a href="#f20">F20</a>, <a href="#f23">F23</a></li>
   <li><strong>Observability &amp; Production Hardening</strong> — <span class="cov-yes">✅</span> <a href="#f9">F9</a>, <a href="#f11">F11</a>, <a href="#f21">F21</a>, <a href="#f22">F22</a></li>
 </ul>
-<p><strong>3 Agentic engine types to choose from</strong> (pick one via <a href="#f12">F12</a>'s strategy factory):</p>
+<p><strong>4 Agentic engine types to choose from</strong> (pick one via <a href="#f12">F12</a>'s strategy factory):</p>
 <ul class="engine-types">
-  <li><strong><a href="#f13">LangGraph State Machine (F13)</a></strong> — a single agent following an explicit graph that checks and retries its own work. Most predictable and cheapest to run; best when you need deterministic, auditable step-by-step control flow.</li>
+  <li><strong><a href="#f131">LangGraph State Machine (F13.1)</a></strong> — a single agent following an explicit graph that checks and retries its own work. Most predictable and cheapest to run; best when you need deterministic, auditable step-by-step control flow.</li>
+  <li><strong><a href="#f132">Agentic RAG LG (F13.2)</a></strong> — an orchestrator plans which specialists to use, then a Menu RAG agent and an MCP Tools agent run in parallel and a verifier checks the merged answer. Best when a question mixes menu facts with live data (specials, hours, org, company items).</li>
   <li><strong><a href="#f14">CrewAI Multi-Role (F14)</a></strong> — splits the work across specialized roles (e.g. a "menu expert" + a "policy expert") that each own one slice of the answer, then merges them. Best when a question spans multiple domains of expertise.</li>
   <li><strong><a href="#f15">AutoGen Multi-Agent (F15)</a></strong> — two agents converse — one proposes, one critiques — iterating until they agree. Best for accuracy-critical answers, catching mistakes a single pass would miss, at the cost of more rounds and tokens.</li>
 </ul>
@@ -1217,7 +1224,7 @@ for 6 chunks. The LLM calls dominate, so streaming the answer is the biggest per
   <tr><td>Cache repeated answers</td><td>Same question → stored answer, no LLM call (exact match, or by similar meaning)</td>
       <td>Not built</td></tr>
   <tr><td>Graceful degradation</td><td>A safe reply ("please ask staff") instead of an error or a guess</td>
-      <td>Partial — F8 keeps the PDF answer when the sheet fails; F13 doesn't yet</td></tr>
+      <td>Partial — F8 and F13.2 keep the PDF answer when the sheet fails; F13.1 doesn't yet</td></tr>
   <tr><td>Load shedding / rate limits</td><td>Protect the system and the budget under spikes</td>
       <td>Planned (F21)</td></tr>
   <tr><td>Durable state</td><td>Survive restarts and multiple instances</td>
@@ -1285,7 +1292,8 @@ the latency, error-rate, and cost alerts.</p>
   <span class="toc-phase-label">Phase 3 — D7 (Multi-Engine & Agent Frameworks)</span>
   <a href="#f12">Modular Engine Strategy Factory (F12)</a>
   <a href="#f12-1">Parallel Entry Point (F12.1)</a>
-  <a href="#f13">LangGraph State Machine Engine (F13)</a>
+  <a href="#f131">LangGraph State Machine Engine (F13.1)</a>
+  <a href="#f132">Agentic RAG LG (F13.2)</a>
   <a href="#f14">CrewAI Multi-Role Engine (F14)</a>
   <a href="#f15">AutoGen Multi-Agent Engine (F15)</a>
   <span class="toc-phase-label">Phase 4 — NCC-1701 (Resilience, Evals & Hybrid Retrieval)</span>
@@ -1372,7 +1380,7 @@ console output:</p>
   <li>the <code>Using provider: ...</code> line and the startup LLM connectivity test (<code>Test prompt response: ...</code>)</li>
   <li>the CLI's chunk stats (<code>Total chunks: ...</code>, <code>Average chunk size: ...</code>)</li>
   <li>the <code>[F8] Accessing MCP data source...</code> notice</li>
-  <li>the F13 CLI prompt to override <code>DEFAULT_ENGINE</code> per run</li>
+  <li>the F13 CLI prompt to override <code>DEFAULT_ENGINE</code> per run (<code>1) plain_rag  2) LangGraph  3) Agentic RAG LG</code>)</li>
   <li>the <code>[F6]</code>/<code>[F9]</code>/<code>[F11]</code> console print lines — but only when <code>METRICS</code>
   is also on; <code>DEBUG_MODE</code> no longer decides whether tracking happens, only whether it prints</li>
 </ul>
@@ -11936,24 +11944,19 @@ real ceiling here, not the SQL itself.
 <p class="f-toc">
 Jump to:
 <a href="#f8-1">F8:1 FastMCP Server Endpoint</a> ·
-<a href="#f8-2">F8:2 Architecture Summary: TBA</a> ·
+<a href="#f8-2">F8:2 Architecture Summary</a> ·
 <a href="#f8-3">F8:3 Integration Guide (api/mcp_server.py)</a> ·
 <a href="#f8-4">F8:4 Testing Guide</a> ·
 <a href="#f8-5">F8:5 Source Code Reference (core/sheets.py)</a> ·
 <a href="#f8-6">F8:6 Source Code Reference (api/mcp_server.py)</a> ·
-<a href="#f8-7">F8:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f8-8">F8:8 Technical Deep Dive: TBA</a> ·
+<a href="#f8-7">F8:7 Line-by-Line Deep Dive</a> ·
+<a href="#f8-8">F8:8 Technical Deep Dive</a> ·
 <a href="#f8-9">F8:9 Setup Guide</a> ·
 <a href="#f8-10">F8:10 Integration Guide (menu_api.py)</a> ·
 <a href="#f8-11">F8:11 Integration Guide (the CLI, Gradio &amp; Streamlit UIs)</a> ·
+<a href="#f8-13">F8:13 Integration Guide (core/mcp_client.py)</a> ·
 <a href="#f8-sysdesign">F8:12 System Design</a>
 </p>
-
-<h3 id="f8-2">F8:2 Architecture Summary: TBA</h3>
-
-<h3 id="f8-7">F8:7 Line-by-Line Deep Dive: TBA</h3>
-
-<h3 id="f8-8">F8:8 Technical Deep Dive: TBA</h3>
 
 <table class="blog-box">
 <tr><td>
@@ -11986,7 +11989,8 @@ it's actually a Google Sheet underneath.</p>
   reimplementing the read logic wherever it's needed.</li>
   <li><strong>The Two Frontends</strong> (<code>api/mcp_server.py</code>'s MCP tools for agents,
   <code>menu_api.py</code>'s <code>/specials</code> and <code>/hours</code> endpoints for everything else, plus
-  <code>engine_api.py</code>'s <code>/org</code> and <code>/items</code>): thin
+  <code>engine_api.py</code>'s <code>/specials</code>, <code>/hours</code>, <code>/org</code> and <code>/items</code>,
+  which call those MCP tools through <code>core/mcp_client.py</code> — see <a href="#f8-13">F8:13</a>): thin
   wrappers around the same shared functions — one implementation, two consumers, the same pattern In-Code Token
   &amp; Cost Accounting (F6) and Cross-Encoder Re-ranking (F10) already use.</li>
 </ul>
@@ -12012,6 +12016,48 @@ the GitHub Repository &amp; Code Details link.</p>
 
 </td></tr>
 </table>
+
+<h3 id="f8-2">F8:2 Architecture Summary: One MCP Server, Three Kinds of Client</h3>
+
+<p><strong>MCP (Model Context Protocol)</strong> is the open standard Anthropic introduced for connecting AI
+applications to tools and data. An MCP <em>server</em> publishes capabilities (tools, resources, prompts) with
+JSON schemas; an MCP <em>client</em> inside an AI app discovers them with <code>tools/list</code> and runs them with
+<code>tools/call</code>, over JSON-RPC 2.0 on a transport such as stdio or HTTP. Any MCP-compatible host — Claude
+Desktop, Claude Code, or our own engines — can use the same server without custom glue code. This project uses the
+<strong>tools</strong> primitive only.</p>
+
+<pre class="cmd"><code>                 Google Sheet "org"  (tabs: specials, dates, org, items)
+                              ▲
+                              │ gspread (service account)
+                      core/sheets.py   ── shared reader
+                       ▲            ▲
+        direct import  │            │  wrapped as 4 MCP tools
+                       │     api/mcp_server.py  (FastMCP "restaurant-ops-mcp")
+                       │            ▲      ▲                     ▲
+                menu_api.py         │      │ MCP                 │ MCP (stdio)
+             (frozen baseline)      │      │                     │
+                    core/mcp_client.py     │              Claude Desktop /
+                     ▲            ▲        │              any MCP host
+        call_mcp_tool│            │list_mcp_tools / call_mcp_tools
+               engine_api.py   engines/orchestrator_engine.py (F13.2)
+         (/specials /hours /org /items + /ask routing)</code></pre>
+
+<ul>
+  <li><strong>Tools exposed</strong> — <code>daily_specials(day)</code>, <code>hours_and_events(target_date)</code>,
+  <code>org_directory(type, name)</code>, <code>company_items(category, tenant)</code>. Each schema is generated
+  from the Python signature and docstring.</li>
+  <li><strong>Client 1: <code>engine_api.py</code></strong> — deterministic rule (<code>detect_ops_intent()</code>)
+  decides <em>when</em>; <code>call_mcp_tool()</code> makes the call over MCP. Applies to <code>plain_rag</code>
+  and <code>langgraph</code>.</li>
+  <li><strong>Client 2: F13.2's MCP Tools agent</strong> — discovers the tools at startup and lets the LLM choose
+  tools and arguments (see <a href="#f132">F13.2</a>).</li>
+  <li><strong>Client 3: external MCP hosts</strong> — <code>python3 api/mcp_server.py</code> runs the server over
+  stdio, e.g. for Claude Desktop.</li>
+  <li><strong>Not a client:</strong> <code>menu_api.py</code> still imports <code>core/sheets.py</code> directly,
+  since it is the frozen baseline.</li>
+  <li><strong>Transport</strong> — <code>MCP_SERVER</code> empty runs the server object in-process (full protocol,
+  no subprocess); a script path uses stdio; an http URL uses a remote server.</li>
+</ul>
 
 <div class="toolbox">
 <strong>Tools &amp; Libraries</strong> (per <code>checklist.csv</code>'s "Primary Tools &amp; Libraries" for #8):
@@ -13866,6 +13912,169 @@ agent runtimes — rather than forcing every consumer through the same protocol 
 </div>
 </div>
 
+<h3 id="f8-7">F8:7 Line-by-Line Deep Dive: api/mcp_server.py and core/mcp_client.py</h3>
+
+<p><strong><code>api/mcp_server.py</code></strong> (see <a href="#f8-6">F8:6</a> for the full file):</p>
+<ul>
+  <li><strong>Line 20</strong> — puts the project root on <code>sys.path</code>. An MCP host launches
+  <code>api/mcp_server.py</code> as a script, which only adds <code>api/</code>, so <code>import core</code> would
+  fail without it.</li>
+  <li><strong>Line 26</strong> — <code>FastMCP("restaurant-ops-mcp")</code>: the server's name, which hosts show in
+  their tool lists.</li>
+  <li><strong>Lines 30–92</strong> — four <code>@mcp.tool</code> functions. Type hints become the JSON input schema
+  (<code>Optional[str] = None</code> → optional string), and the docstring becomes the description the model reads
+  when choosing a tool — so the docstrings are prompt text, not just comments. Each body is one call into
+  <code>core/sheets.py</code>.</li>
+  <li><strong>Line 96</strong> — <code>mcp.run(transport="stdio")</code>: standalone mode, the server reads JSON-RPC
+  from stdin and writes to stdout.</li>
+</ul>
+
+<p><strong><code>core/mcp_client.py</code></strong> (see <a href="#f8-13">F8:13</a> for the full file):</p>
+<ul>
+  <li><strong><code>_mcp_target()</code></strong> — returns <code>MCP_SERVER</code> if set; otherwise lazily imports
+  the <code>mcp</code> server object. FastMCP's <code>Client</code> accepts all three: a server object
+  (in-memory transport), a <code>.py</code> path (stdio subprocess), or a URL (HTTP).</li>
+  <li><strong><code>list_mcp_tools()</code></strong> — <code>client.list_tools()</code> is MCP's
+  <code>tools/list</code>; each tool is reshaped to <code>{"type": "function", "function": {...}}</code>, the
+  format LangChain's <code>bind_tools()</code> expects.</li>
+  <li><strong><code>call_mcp_tools()</code></strong> — one session for the whole batch;
+  <code>raise_on_error=False</code> plus <code>result.is_error</code> turn a failing tool into
+  <code>"unavailable (...)"</code> text; each result is passed through <code>sanitize_content()</code> (F22).</li>
+  <li><strong><code>call_mcp_tool()</code></strong> — sync wrapper (<code>asyncio.run</code>) for
+  <code>engine_api.py</code>; drops <code>None</code> args so omitted filters stay omitted; returns
+  <code>result.data</code> (the tool's structured return value) and raises <code>RuntimeError</code> on error —
+  the same contract as <code>core/sheets.py</code>.</li>
+</ul>
+
+<h3 id="f8-8">F8:8 Technical Deep Dive: Why MCP, and What It Costs</h3>
+
+<p><strong>Why put a protocol between our own code and our own sheet?</strong> Before F13.2, MCP only served
+outside hosts and <code>engine_api.py</code> imported <code>core/sheets.py</code> directly. Routing every
+<code>engine_api.py</code> read through MCP means there is one interface to the live data for every consumer —
+external hosts, the deterministic router, and the agent — so a tool added to <code>api/mcp_server.py</code> is
+immediately available to all of them, and the agent's tool list can't drift from what the server actually
+offers.</p>
+
+<p><strong>Discovery instead of hard-coding.</strong> The F13.2 agent never names a tool in code; it gets the list
+from <code>tools/list</code>. That is the main thing MCP adds over a plain function call.</p>
+
+<p><strong>Costs.</strong> Each <code>call_mcp_tool()</code> opens a client session (in-process by default, so no
+subprocess or network hop, but still protocol overhead); a stdio target spawns a subprocess per session; and
+<code>asyncio.run()</code> means these helpers must be called from sync code. The sheet itself is still read live
+on every call — no caching (see <a href="#f8-sysdesign">F8:12</a>).</p>
+
+<p><strong>Security.</strong> Sheet cells are edited by staff, so they are untrusted input: agent-facing results are
+sanitized (F22) before reaching a prompt. The server is read-only — no tool writes to the sheet — and the
+service-account key stays server-side.</p>
+
+<p><strong>Not built.</strong> MCP <em>resources</em> and <em>prompts</em> primitives, authentication on an HTTP
+transport, and the checklist's "Tool Discovery Latency" / "Invocation Success Rate" metrics as tracked numbers.</p>
+
+<p class="tags"><strong>Tags:</strong> MCP, Model Context Protocol, Anthropic, Tool Discovery, FastMCP, F8</p>
+
+<p class="back-to-top"><a href="#f8">↑ Back to F8</a></p>
+<h3 id="f8-13">F8:13 Integration Guide: core/mcp_client.py — engine_api.py Reads Live Data Over MCP</h3>
+
+<p>Until the orchestrator engine (<a href="#f132">F13.2 Agentic RAG LG</a>) shipped, <code>api/mcp_server.py</code>
+was only reachable by an external MCP client (e.g. Claude Desktop); <code>engine_api.py</code> imported
+<code>core/sheets.py</code> and called it directly. Now <strong>every live-sheet read in <code>engine_api.py</code>
+goes over MCP</strong>, through one shared client. <code>menu_api.py</code> is unchanged — it keeps its direct
+<code>core.sheets</code> calls as the frozen baseline.</p>
+
+<ul>
+  <li><strong><code>call_mcp_tool(name, args)</code></strong> — synchronous single call for
+  <code>engine_api.py</code>'s deterministic routing (<code>/specials</code>, <code>/hours</code>, <code>/org</code>,
+  <code>/items</code>, and the F8 routing inside <code>/ask</code>). Drops <code>None</code> args and raises
+  <code>RuntimeError</code> on a tool error — the same contract <code>core.sheets</code> has, so the existing
+  <code>except RuntimeError</code> clauses still apply.</li>
+  <li><strong><code>list_mcp_tools()</code></strong> — discovers the server's tools as OpenAI-style function
+  schemas for <code>bind_tools()</code>; used by F13.2's MCP Tools agent.</li>
+  <li><strong><code>call_mcp_tools(calls)</code></strong> — runs an LLM's chosen tool calls over one MCP session;
+  errors come back as <code>"unavailable (...)"</code> text and every result is sanitized (F22).</li>
+  <li><strong><code>MCP_SERVER</code></strong> env var — empty (default) = <code>api/mcp_server.py</code>'s server
+  object in-process (still the full MCP protocol, no subprocess per call); or a script path (stdio) or http URL.</li>
+  <li><strong><code>core/sheets.py</code></strong> — <code>find_org_rows()</code>/<code>find_item_rows()</code> now
+  accept pre-fetched <code>rows</code>, so <code>engine_api.py</code> passes rows read over MCP; omitted, they
+  still read the sheet themselves.</li>
+</ul>
+
+<pre class="cmd"><code>MCP_SERVER=                         # default: in-process api/mcp_server.py
+MCP_SERVER=api/mcp_server.py        # stdio subprocess
+MCP_SERVER=http://host:port/mcp      # a running MCP server over http</code></pre>
+
+<p><strong>Tests:</strong> <code>tests/test_mcp_client.py</code> — 5 mocked tests (rows returned as dicts,
+<code>None</code> args dropped, tool error → <code>RuntimeError</code>, tool discovery schema shape, batch results
+sanitized with errors reported as "unavailable").</p>
+
+<h4>Source: core/mcp_client.py — full file</h4>
+<div class="code-block">
+<div class="code-block-title"><span>core/mcp_client.py</span><span class="role">Shared MCP client of api/mcp_server.py (F8/F13.2) — 64 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  # F8: MCP client - the one way engine_api.py and its engines read live sheet data, over the Model
+<span class="ln">  2</span>  # Context Protocol from api/mcp_server.py instead of importing core.sheets directly. plain_rag and
+<span class="ln">  3</span>  # langgraph get it through engine_api.py&#x27;s F8 routing; the orchestrator (F13)&#x27;s MCP Tools agent uses
+<span class="ln">  4</span>  # the discovery/batch helpers to let the LLM pick tools. menu_api.py keeps its direct core.sheets calls.
+<span class="ln">  5</span>  import asyncio
+<span class="ln">  6</span>  import os
+<span class="ln">  7</span>  from typing import Any, Optional
+<span class="ln">  8</span>  
+<span class="ln">  9</span>  from core.sanitize import sanitize_content  # F22
+<span class="ln"> 10</span>  
+<span class="ln"> 11</span>  MCP_SERVER = os.environ.get(&quot;MCP_SERVER&quot;, &quot;&quot;)  # F8: &quot;&quot; = in-process api/mcp_server.py; or a script path / http URL
+<span class="ln"> 12</span>  
+<span class="ln"> 13</span>  
+<span class="ln"> 14</span>  def _mcp_target():
+<span class="ln"> 15</span>      &quot;&quot;&quot;F8: MCP_SERVER if set (a script path like &quot;api/mcp_server.py&quot; for stdio, or an http URL), else
+<span class="ln"> 16</span>      the server object in-process - still the full MCP protocol, without spawning a subprocess per call.&quot;&quot;&quot;
+<span class="ln"> 17</span>      if MCP_SERVER:
+<span class="ln"> 18</span>          return MCP_SERVER
+<span class="ln"> 19</span>      from api.mcp_server import mcp  # lazy import - only needed for the in-process default
+<span class="ln"> 20</span>      return mcp
+<span class="ln"> 21</span>  
+<span class="ln"> 22</span>  
+<span class="ln"> 23</span>  async def list_mcp_tools() -&gt; list[dict]:
+<span class="ln"> 24</span>      &quot;&quot;&quot;F13: discover the server&#x27;s tools at runtime, as OpenAI-style function schemas for bind_tools() -
+<span class="ln"> 25</span>      a tool added to api/mcp_server.py shows up here with no engine change.&quot;&quot;&quot;
+<span class="ln"> 26</span>      from fastmcp import Client  # lazy import - avoids a hard dependency at module load
+<span class="ln"> 27</span>      async with Client(_mcp_target()) as client:
+<span class="ln"> 28</span>          tools = await client.list_tools()
+<span class="ln"> 29</span>      return [
+<span class="ln"> 30</span>          {&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: t.name, &quot;description&quot;: t.description or &quot;&quot;, &quot;parameters&quot;: t.input_schema}}
+<span class="ln"> 31</span>          for t in tools
+<span class="ln"> 32</span>      ]
+<span class="ln"> 33</span>  
+<span class="ln"> 34</span>  
+<span class="ln"> 35</span>  async def call_mcp_tools(calls: list[dict]) -&gt; list[str]:
+<span class="ln"> 36</span>      &quot;&quot;&quot;F13: run an LLM&#x27;s chosen tool calls over one MCP session, sanitizing each result (F22) - errors
+<span class="ln"> 37</span>      come back as &quot;unavailable (...)&quot; text so the LLM can say so rather than the request failing.&quot;&quot;&quot;
+<span class="ln"> 38</span>      from fastmcp import Client  # lazy import - avoids a hard dependency at module load
+<span class="ln"> 39</span>      results = []
+<span class="ln"> 40</span>      async with Client(_mcp_target()) as client:
+<span class="ln"> 41</span>          for call in calls:
+<span class="ln"> 42</span>              result = await client.call_tool(call[&quot;name&quot;], call[&quot;args&quot;], raise_on_error=False)
+<span class="ln"> 43</span>              text = &quot;\n&quot;.join(getattr(block, &quot;text&quot;, &quot;&quot;) for block in result.content)
+<span class="ln"> 44</span>              if result.is_error:  # F8: e.g. core.sheets&#x27; RuntimeError when the sheet is unreachable
+<span class="ln"> 45</span>                  text = f&quot;unavailable ({text})&quot;
+<span class="ln"> 46</span>              results.append(sanitize_content(f&quot;{call[&#x27;name&#x27;]}({call[&#x27;args&#x27;]}) -&gt; {text}&quot;))  # F22: sheet cells are untrusted too
+<span class="ln"> 47</span>      return results
+<span class="ln"> 48</span>  
+<span class="ln"> 49</span>  
+<span class="ln"> 50</span>  async def _call_mcp_tool(name: str, args: dict) -&gt; Any:
+<span class="ln"> 51</span>      from fastmcp import Client  # lazy import - avoids a hard dependency at module load
+<span class="ln"> 52</span>      async with Client(_mcp_target()) as client:
+<span class="ln"> 53</span>          result = await client.call_tool(name, args, raise_on_error=False)
+<span class="ln"> 54</span>      if result.is_error:
+<span class="ln"> 55</span>          raise RuntimeError(&quot;\n&quot;.join(getattr(block, &quot;text&quot;, &quot;&quot;) for block in result.content))
+<span class="ln"> 56</span>      return result.data
+<span class="ln"> 57</span>  
+<span class="ln"> 58</span>  
+<span class="ln"> 59</span>  def call_mcp_tool(name: str, args: Optional[dict] = None) -&gt; list[dict]:
+<span class="ln"> 60</span>      &quot;&quot;&quot;F8: synchronous single tool call for engine_api.py&#x27;s deterministic routing. Raises RuntimeError
+<span class="ln"> 61</span>      on a tool error, the same contract core.sheets has, so callers&#x27; existing except clauses still apply.
+<span class="ln"> 62</span>      Uses asyncio.run, so call it from sync code (FastAPI runs sync endpoints in a worker thread).&quot;&quot;&quot;
+<span class="ln"> 63</span>      args = {k: v for k, v in (args or {}).items() if v is not None}
+<span class="ln"> 64</span>      return asyncio.run(_call_mcp_tool(name, args))</code></pre>
+</div>
+
 <h3 id="f8-sysdesign">F8:12 System Design <a class="h3-up" href="#f8" title="Back to F8">↑ F8</a></h3>
 <p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
 <ul>
@@ -13874,7 +14083,7 @@ agent runtimes — rather than forcing every consumer through the same protocol 
   <li><strong><a href="#sd-architecture">Systems design</a>:</strong> <code>org</code>/<code>items</code> questions use the same keyword check plus a row match (<code>find_org_rows()</code>/<code>find_item_rows()</code>): answered from the sheet only when a row's Name, Type, Category, or Tenant is actually mentioned; otherwise they fall through to the engine, so a menu question containing "who" or "contact" isn't hijacked.</li>
   <li><strong><a href="#sd-failure">Failure modes</a>:</strong> If the sheet is down on an hours question, the PDF answer is still returned. For specials there's no fallback — an error comes back.</li>
   <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Every call re-reads the sheet (only the auth client is cached) — always fresh, but each request pays a network round trip and can hit Google's rate limits. A short cache (e.g. 60 seconds) is the trade-off to discuss.</li>
-  <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent isn't needed: the API calls the tools directly from a simple rule; MCP is what lets an external agent (e.g. Claude Desktop) call the same tools.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent isn't needed: <code>engine_api.py</code> calls the MCP tools from a simple rule, through <code>core/mcp_client.py</code> (<code>menu_api.py</code> still calls <code>core/sheets.py</code> directly). When one is: F13.2's MCP Tools agent discovers the same tools and lets the LLM choose.</li>
 </ul>
 
 <p><strong>Trade-offs:</strong></p>
@@ -13886,10 +14095,9 @@ agent runtimes — rather than forcing every consumer through the same protocol 
   <tr><td>Hours: engine answers from the PDF, then sheet events are appended</td><td>Regular hours from the menu plus live exceptions (holidays).</td><td>Two sources can disagree, and the answer is two pieces glued together.</td><td>Merge both into the prompt and let the model give one answer, with the sheet marked as the override.</td></tr>
 </table>
 
-<p><strong>Framework fit:</strong> today the API calls the sheet tools directly from a keyword rule — no agent.
-A LangChain agent (<code>create_agent</code>) with three tools (menu retrieval, <code>daily_specials</code>,
-<code>hours_and_events</code>) is the natural upgrade: the model picks the tool, so phrasing like "what's good
-today?" still reaches specials. Cost: an extra LLM decision per question, and less predictable paths. See
+<p><strong>Framework fit:</strong> <code>plain_rag</code> and <code>langgraph</code> still reach the sheet tools
+from a keyword rule — no agent. <a href="#f132">F13.2 Agentic RAG LG</a> is the agentic upgrade: its MCP Tools
+agent lets the model pick the tool, so phrasing like "what's good today?" still reaches specials. Cost: an extra LLM decision per question, and less predictable paths. See
 <a href="#sd-frameworks">the framework comparison</a>.</p>
 
 
@@ -15115,36 +15323,45 @@ framework is best": don't bet on one, make them swappable and measure. See
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 
-<h2 id="f13">F13 — LangGraph State Machine Engine <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
+<h2 id="f13">F13 — LangGraph Engines <a class="h2-top" href="#top" title="Back to top">↑ top</a></h2>
+
+<div class="note">
+<strong>F13 has two engines</strong>, both built on LangGraph and selectable side by side through <a href="#f12">F12</a>'s factory:
+<a href="#f131">F13.1 LangGraph State Machine Engine</a> (<code>engine: "langgraph"</code> — one agent, fixed route → retrieve → generate → verify path) and
+<a href="#f132">F13.2 Agentic RAG LG</a> (<code>engine: "orchestrator"</code> — an orchestrator plus Menu RAG and MCP Tools agents running in parallel).
+</div>
+
+<h3 id="f131">F13.1 — LangGraph State Machine Engine <a class="h3-up" href="#f13" title="Back to F13">↑ F13</a></h3>
 
 <p class="f-toc">
 Jump to:
-<a href="#f13-1">F13:1 LangGraph State Machine Engine</a> ·
-<a href="#f13-2">F13:2 Architecture Summary: TBA</a> ·
-<a href="#f13-3">F13:3 Integration Guide: TBA</a> ·
-<a href="#f13-4">F13:4 Testing Guide</a> ·
-<a href="#f13-5">F13:5 Source Code Reference (engines/langgraph_engine.py)</a> ·
-<a href="#f13-6">F13:6 Source Code Reference: TBA</a> ·
-<a href="#f13-7">F13:7 Line-by-Line Deep Dive: TBA</a> ·
-<a href="#f13-8">F13:8 Technical Deep Dive: TBA</a> ·
-<a href="#f13-sysdesign">F13:9 System Design</a>
+<a href="#f13-1">F13.1:1 LangGraph State Machine Engine</a> ·
+<a href="#f13-2">F13.1:2 Architecture Summary: TBA</a> ·
+<a href="#f13-3">F13.1:3 Integration Guide: TBA</a> ·
+<a href="#f13-4">F13.1:4 Testing Guide</a> ·
+<a href="#f13-5">F13.1:5 Source Code Reference (engines/langgraph_engine.py)</a> ·
+<a href="#f13-6">F13.1:6 Source Code Reference: TBA</a> ·
+<a href="#f13-7">F13.1:7 Line-by-Line Deep Dive: TBA</a> ·
+<a href="#f13-8">F13.1:8 Technical Deep Dive: TBA</a> ·
+<a href="#f13-sysdesign">F13.1:9 System Design</a> ·
+<a href="#f132">F13.2 Agentic RAG LG</a>
 </p>
 
-<h3 id="f13-2">F13:2 Architecture Summary: TBA</h3>
+<h3 id="f13-2">F13.1:2 Architecture Summary: TBA</h3>
 
-<h3 id="f13-3">F13:3 Integration Guide: TBA</h3>
+<h3 id="f13-3">F13.1:3 Integration Guide: TBA</h3>
 
-<h3 id="f13-6">F13:6 Source Code Reference: TBA</h3>
+<h3 id="f13-6">F13.1:6 Source Code Reference: TBA</h3>
 
-<h3 id="f13-7">F13:7 Line-by-Line Deep Dive: TBA</h3>
+<h3 id="f13-7">F13.1:7 Line-by-Line Deep Dive: TBA</h3>
 
-<h3 id="f13-8">F13:8 Technical Deep Dive: TBA</h3>
+<h3 id="f13-8">F13.1:8 Technical Deep Dive: TBA</h3>
 
 <table class="blog-box">
 <tr><td>
 
-<p class="back-to-top"><a href="#f13">↑ Back to F13</a></p>
-<h3 id="f13-1">F13:1 LangGraph State Machine Engine: From One Fixed Answer to a Graph That Can Check Itself</h3>
+<p class="back-to-top"><a href="#f131">↑ Back to F13.1</a></p>
+<h3 id="f13-1">F13.1:1 LangGraph State Machine Engine: From One Fixed Answer to a Graph That Can Check Itself</h3>
 
 <p>Every engine behind Modular Engine Strategy Factory (F12) until now has run the same three unconditional steps:
 retrieve, generate, done. That's fine when retrieval hands back the right chunks and the model's first answer is
@@ -15253,8 +15470,8 @@ running instead of a single chain.</p>
 The off-topic HTTP test caught a real bug this way: <code>engine_api.py</code>'s <code>/ask</code> unconditionally read <code>result["source_documents"][0]</code> for <code>top_match</code> — safe for every engine so far, since <code>PlainRagEngine</code>'s FAISS retriever always returns at least one chunk even for a nonsense question, but <code>LangGraphEngine</code>'s <code>_redirect_node</code> legitimately returns an empty list, which crashed the endpoint with an <code>IndexError</code> before any response was sent. Fixed with a one-line guard (<code>engine_api.py:140</code>): <code>top_match = result["source_documents"][0].page_content if result["source_documents"] else ""</code>.
 </div>
 
-<p class="back-to-top"><a href="#f13">↑ Back to F13</a></p>
-<h3 class="hl-title" id="f13-4">F13:4 Testing Guide: How to test LangGraph State Machine Engine (F13)</h3>
+<p class="back-to-top"><a href="#f131">↑ Back to F13.1</a></p>
+<h3 class="hl-title" id="f13-4">F13.1:4 Testing Guide: How to test LangGraph State Machine Engine (F13)</h3>
 
 <p><strong>Setup</strong> — install the new dependency (already added to <code>requirements.txt</code>):</p>
 <pre class="cmd"><code>source venv/bin/activate
@@ -15304,8 +15521,8 @@ loop itself is exercised deterministically with a scripted fake LLM/retriever in
 above) — that's the reliable way to see <code>_after_verify</code>'s <code>"retry"</code> branch and the
 bounded-termination behavior without depending on the model happening to produce an ungrounded answer.</p>
 
-<p class="back-to-top"><a href="#f13">↑ Back to F13</a></p>
-<h3 id="f13-5">F13:5 Source Code Reference: engines/langgraph_engine.py — full file</h3>
+<p class="back-to-top"><a href="#f131">↑ Back to F13.1</a></p>
+<h3 id="f13-5">F13.1:5 Source Code Reference: engines/langgraph_engine.py — full file</h3>
 <div class="code-block">
 <div class="code-block-title"><span>engines/langgraph_engine.py</span><span class="role">Defines LangGraphEngine (F13), the route/retrieve/generate/verify graph behind the factory — 175 lines</span></div>
 <div class="pyhl"><table class="pyhltable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">  1</span>
@@ -15660,7 +15877,7 @@ bounded-termination behavior without depending on the model happening to produce
 </pre></div></td></tr></table></div>
 </div>
 
-<h3 id="f13-sysdesign">F13:9 System Design <a class="h3-up" href="#f13" title="Back to F13">↑ F13</a></h3>
+<h3 id="f13-sysdesign">F13.1:9 System Design <a class="h3-up" href="#f131" title="Back to F13.1">↑ F13.1</a></h3>
 <p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
 <ul>
   <li><strong><a href="#sd-agents">Agents</a>:</strong> When an agent is the right design: when you need to check your own answer and retry. Graph: <code>route → retrieve → generate → verify</code>, looping back with the verifier's feedback if the answer isn't grounded.</li>
@@ -15693,6 +15910,676 @@ bounded-termination behavior without depending on the model happening to produce
   less code.</li>
 </ul>
 <p>Full comparison: <a href="#sd-frameworks">System Design → agent frameworks</a>.</p>
+
+
+
+<h3 id="f132">F13.2 — Agentic RAG LG (Orchestrator) <a class="h3-up" href="#f13" title="Back to F13">↑ F13</a></h3>
+
+<p class="f-toc">
+Jump to:
+<a href="#f132-1">F13.2:1 Agentic RAG LG</a> ·
+<a href="#f132-2">F13.2:2 Architecture Summary</a> ·
+<a href="#f132-3">F13.2:3 Integration Guide</a> ·
+<a href="#f132-4">F13.2:4 Testing Guide</a> ·
+<a href="#f132-5">F13.2:5 Source Code Reference (engines/orchestrator_engine.py)</a> ·
+<a href="#f132-6">F13.2:6 Source Code Reference (tests/test_orchestrator_engine.py)</a> ·
+<a href="#f132-7">F13.2:7 Line-by-Line Deep Dive</a> ·
+<a href="#f132-8">F13.2:8 Technical Deep Dive</a> ·
+<a href="#f132-sysdesign">F13.2:9 System Design</a>
+</p>
+
+<div class="note">
+<strong>Status: Implemented.</strong> A third engine behind Modular Engine Strategy Factory (F12)'s
+<code>BaseMenuEngine</code>, in a new <code>engines/orchestrator_engine.py</code>. Where F13.1's graph is one
+agent walking a fixed path (route → retrieve → generate → verify), Agentic RAG LG splits the work across agents
+with their own role: an <strong>orchestrator</strong> that plans which specialists a question needs, a
+<strong>Menu RAG agent</strong> over the PDFs, an <strong>MCP Tools agent</strong> that reads the live Google
+Sheet through FastMCP Server Endpoint (F8)'s MCP server, and a <strong>guard/verifier</strong> on the way in and
+out. The two specialists run in parallel (LangGraph fan-out/fan-in). <code>langgraph_engine.py</code> is
+untouched — both are selectable side by side. Engine key: <code>"orchestrator"</code>; CLI label:
+<code>3) Agentic RAG LG</code>.</div>
+
+<table class="blog-box">
+<tr><td>
+
+<p class="back-to-top"><a href="#f132">↑ Back to F13.2</a></p>
+<h3 id="f132-1">F13.2:1 Agentic RAG LG: From One Fixed Path to an Orchestrator That Picks Its Specialists</h3>
+
+<p>F13.1's graph can check and retry its own answer, but it only knows one data source: the menu PDFs. Live data
+— daily specials, holiday hours, the org directory, company items — never reached an engine. Instead,
+<code>engine_api.py</code> ran a keyword check (<code>detect_ops_intent()</code>, F8) <em>before</em> the engine
+and either answered from the sheet directly or glued sheet rows onto the PDF answer afterwards. "What's good
+today?" doesn't contain the word "special", so it never reached the specials tab.</p>
+
+<p>Agentic RAG LG moves that decision inside the engine and hands it to the LLM. The orchestrator reads the
+question and returns a structured plan (<code>use_menu</code>, <code>use_live_data</code>). The Menu RAG agent
+retrieves from the PDFs; the MCP Tools agent discovers the tools <code>api/mcp_server.py</code> exposes, lets the
+LLM pick which ones to call and with what arguments ("tomorrow" → an ISO date), and calls them over the Model
+Context Protocol. Then one synthesis step merges both into a single answer, and a verifier checks it is grounded
+in what came back — same bounded retry as F13.1.</p>
+
+<h4>The Big Picture: Four Agents, Two in Parallel</h4>
+
+<ul>
+  <li><strong>Guard</strong> (<code>_guard_node</code>): Query Guardrails &amp; Intent Gating (F19)'s
+  <code>classify_intent()</code>, run as the graph's first node — an off-topic question goes to
+  <code>redirect</code> before any planning or retrieval call is spent.</li>
+  <li><strong>Orchestrator</strong> (<code>_plan_node</code>, then <code>_synthesize_node</code>): plans with a
+  structured <code>OrchestratorPlan</code>; an empty plan falls back to the menu. Later merges both specialists'
+  output with the same persona rules as RAG System Prompt &amp; Persona (F3.1), widened to say live data overrides
+  the menu's standard info.</li>
+  <li><strong>Menu RAG agent</strong> (<code>_menu_agent_node</code>): the shared <code>get_retriever()</code>
+  (FAISS/BM25 hybrid F18 + re-ranking F10 + sanitizing F22) — no new retrieval code.</li>
+  <li><strong>MCP Tools agent</strong> (<code>_mcp_agent_node</code>): an MCP client of
+  <code>api/mcp_server.py</code> via <code>core/mcp_client.py</code>. <code>bind_tools()</code> lets the LLM choose;
+  hallucinated tool names are dropped and the fan-out is capped at <code>MAX_TOOL_CALLS = 4</code>.</li>
+  <li><strong>Verifier</strong> (<code>_verify_node</code>): structured <code>VerifyDecision</code> over menu
+  excerpts <em>and</em> live data; ungrounded → re-synthesize with the feedback, at most
+  <code>MAX_RETRIES = 2</code> attempts.</li>
+</ul>
+
+<h4>What's Imported (and Why)</h4>
+<ul>
+  <li><code>langgraph.graph.StateGraph</code>, <code>END</code> — same as F13.1; new here is the fan-out
+  (<code>plan</code> → both specialists) and fan-in (<code>add_edge(["menu_agent", "mcp_agent"], "synthesize")</code>).</li>
+  <li><code>core.mcp_client.list_mcp_tools</code> / <code>call_mcp_tools</code> — tool discovery and batch
+  calls over MCP (see F8's <a href="#f8-13">F8:13</a>).</li>
+  <li><code>core.guardrails</code> (F19), <code>core.sanitize</code> (F22), <code>core.llm</code> (F2/F12),
+  <code>core.vectorstore</code>, <code>core.memory</code> (F7) — the same shared helpers every engine uses.</li>
+  <li><code>langchain_core.messages.SystemMessage</code>/<code>HumanMessage</code> — the MCP agent's tool-choosing
+  call, with today's date in the system message so relative dates resolve.</li>
+  <li><code>pydantic.BaseModel</code> — <code>OrchestratorPlan</code> and <code>VerifyDecision</code> for
+  <code>with_structured_output()</code>.</li>
+</ul>
+
+<p>For the full, step-by-step code implementation, please refer to the GitHub Repository &amp; Code Details link.</p>
+
+<p class="tags"><strong>Tags:</strong> Agentic RAG, Multi-Agent Orchestration, LangGraph, MCP Client, Tool Calling, Parallel Agents, F13.2</p>
+
+</td></tr>
+</table>
+
+<h3 id="f132-2">F13.2:2 Architecture Summary: Orchestrator → Specialists in Parallel → Synthesize → Verify</h3>
+
+<pre class="cmd"><code>guard ──off_topic──► redirect ──► END
+  │ on_topic
+  ▼
+plan (orchestrator)
+  ├──► menu_agent  (PDF retriever)      ─┐
+  └──► mcp_agent   (MCP client → tools) ─┤  fan-in: waits for both
+                                         ▼
+                                    synthesize ◄──retry──┐
+                                         │               │
+                                         ▼               │
+                                      verify ──not grounded & attempts &lt; 2
+                                         │ grounded / out of retries
+                                         ▼
+                                        END</code></pre>
+
+<ul>
+  <li><strong>Parallel writes never collide</strong> — the menu agent writes only <code>documents</code>, the MCP
+  agent only <code>tool_results</code>; a skipped specialist returns an empty list instead of not writing.</li>
+  <li><strong>One graph for all three menus</strong> — <code>cuisine</code> travels in state (F13.1 compiles one
+  graph per cuisine).</li>
+  <li><strong>Self-routing engine</strong> — <code>engine_api.py</code>'s <code>SELF_ROUTING_ENGINES =
+  {"orchestrator"}</code> skips its own F19 gate and F8 keyword routing for this engine, since the graph does both
+  itself. Other engines keep that pre-routing.</li>
+  <li><strong>Return shape unchanged</strong> — <code>{"result", "source_documents"}</code>; tool results are
+  appended as <code>Document</code>s with <code>metadata={"source": "mcp_tools"}</code>, so
+  <code>top_match</code>, F6/F9 tracking and F11 logging work as for any engine.</li>
+</ul>
+
+<h3 id="f132-3">F13.2:3 Integration Guide: What Actually Got Touched</h3>
+
+<ul>
+  <li><code>engines/orchestrator_engine.py</code> — new; see <a href="#f132-5">F13.2:5</a>.</li>
+  <li><code>core/mcp_client.py</code> — new; shared MCP client (see <a href="#f8-13">F8:13</a>).</li>
+  <li><code>engines/base.py</code> — <code>get_engine("orchestrator")</code> branch, lazy import.</li>
+  <li><code>engine_api.py</code> — <code>SELF_ROUTING_ENGINES</code>; F19/F8 pre-routing skipped for it; CLI
+  prompt <code>1) plain_rag  2) LangGraph  3) Agentic RAG LG</code>.</li>
+  <li><code>evaluation/run_evals.py</code> — <code>--engine orchestrator</code> added to the choices.</li>
+  <li><code>tests/test_orchestrator_engine.py</code>, <code>tests/test_mcp_client.py</code> — new, fully mocked.</li>
+  <li><code>README.md</code> — Files rows and the <code>MCP_SERVER</code> / <code>DEFAULT_ENGINE</code> toggles.</li>
+  <li><strong>Not touched:</strong> <code>engines/langgraph_engine.py</code> (F13.1) and <code>menu_api.py</code>.
+  <code>requirements.txt</code> unchanged — <code>langgraph</code> and <code>fastmcp</code> were already there.</li>
+</ul>
+
+<h3 class="hl-title" id="f132-4">F13.2:4 Testing Guide: How to Test Agentic RAG LG (F13.2)</h3>
+
+<p><strong class="hl-title">1) Run the unit suite</strong> — fake LLM, fake retrievers, MCP calls monkeypatched; no
+API key or network:</p>
+<pre class="cmd"><code>source venv/bin/activate
+pytest tests/test_orchestrator_engine.py tests/test_mcp_client.py -v</code></pre>
+<pre class="cmd"><code>tests/test_orchestrator_engine.py::test_off_topic_question_is_redirected_without_planning_or_retrieval PASSED
+tests/test_orchestrator_engine.py::test_menu_only_plan_uses_the_menu_agent_and_skips_tools PASSED
+tests/test_orchestrator_engine.py::test_live_data_plan_calls_the_chosen_tool_and_sanitizes_its_output PASSED
+tests/test_orchestrator_engine.py::test_both_specialists_run_when_the_plan_needs_both PASSED
+tests/test_orchestrator_engine.py::test_unknown_tool_name_is_skipped PASSED
+tests/test_orchestrator_engine.py::test_sheet_failure_is_reported_as_unavailable_not_raised PASSED
+tests/test_orchestrator_engine.py::test_empty_plan_falls_back_to_the_menu_agent PASSED
+tests/test_orchestrator_engine.py::test_ungrounded_answer_retries_synthesis_at_most_max_retries_times PASSED
+tests/test_orchestrator_engine.py::test_tools_are_discovered_from_the_mcp_server PASSED
+tests/test_orchestrator_engine.py::test_unknown_cuisine_raises PASSED
+tests/test_mcp_client.py::test_call_mcp_tool_returns_rows_as_dicts PASSED
+tests/test_mcp_client.py::test_call_mcp_tool_drops_none_args PASSED
+tests/test_mcp_client.py::test_call_mcp_tool_raises_runtime_error_on_tool_failure PASSED
+tests/test_mcp_client.py::test_list_mcp_tools_returns_function_schemas PASSED
+tests/test_mcp_client.py::test_call_mcp_tools_sanitizes_results_and_reports_errors PASSED
+
+15 passed</code></pre>
+
+<p><strong class="hl-title">2) See the tools the MCP agent discovers</strong> — real MCP protocol, in-process
+server, no sheet read:</p>
+<pre class="cmd"><code>python -c "
+import asyncio
+from core.mcp_client import list_mcp_tools
+for t in asyncio.run(list_mcp_tools()): print(t['function']['name'], '-', list(t['function']['parameters'].get('properties', {})))
+"</code></pre>
+<pre class="cmd"><code>daily_specials - ['day']
+hours_and_events - ['target_date']
+org_directory - ['type', 'name']
+company_items - ['category', 'tenant']</code></pre>
+
+<p><strong class="hl-title">3) CLI</strong> — with <code>DEBUG_MODE</code> on, pick engine <code>3</code>:</p>
+<pre class="cmd"><code>python3 engine_api.py
+Which engine? 1) plain_rag [default, press Enter]  2) LangGraph  3) Agentic RAG LG: 3
+[DEBUG] DEFAULT_ENGINE is 'plain_rag' - using engine: orchestrator</code></pre>
+<p>Or set <code>DEFAULT_ENGINE=orchestrator</code> in <code>.env</code>.</p>
+
+<p><strong class="hl-title">4) FastAPI</strong> — per-request override:</p>
+<pre class="cmd"><code>uvicorn engine_api:app --reload --port 8000
+curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json" \
+  -d '{"cuisine": "italian", "question": "How much is the Spaghetti Carbonara, and what are tomorrow'"'"'s specials?", "engine": "orchestrator"}'</code></pre>
+<p>A question like this needs both specialists: the menu agent supplies the Carbonara price from the PDF, the MCP
+agent calls <code>daily_specials</code> with tomorrow's weekday. The response carries
+<code>"engine": "orchestrator"</code>.</p>
+
+<p><strong class="hl-title">5) Evals</strong> — score it against the other engines (needs an API key):</p>
+<pre class="cmd"><code>python evaluation/run_evals.py --engine orchestrator</code></pre>
+
+<div class="note">
+<strong>Verification:</strong> ran method 1 for real — <code>15 passed</code>; full suite <code>pytest -q</code>
+— <code>85 passed</code>. Ran method 2 for real — the four tools above are the actual output of tool discovery
+against <code>api/mcp_server.py</code>. Methods 3–5 call the LLM and the Google Sheet and were not re-run for this
+write-up.
+</div>
+
+<p class="back-to-top"><a href="#f132">↑ Back to F13.2</a></p>
+<h3 id="f132-5">F13.2:5 Source Code Reference: engines/orchestrator_engine.py — full file</h3>
+<div class="code-block">
+<div class="code-block-title"><span>engines/orchestrator_engine.py</span><span class="role">Defines OrchestratorEngine (F13.2): guard, orchestrator, Menu RAG + MCP Tools agents, synthesize, verify — 234 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  # F13: Orchestrator Multi-Agent Engine - a third engine behind BaseMenuEngine (F12) that splits
+<span class="ln">  2</span>  # LangGraphEngine&#x27;s single pipeline into agents with their own role, responsibilities and goal:
+<span class="ln">  3</span>  #   1. Orchestrator   - plans which specialists a question needs, then merges their output
+<span class="ln">  4</span>  #   2. Menu RAG agent - grounded answers from the menu PDFs (F3/F10/F18 retriever)
+<span class="ln">  5</span>  #   3. MCP Tools agent - an MCP client of api/mcp_server.py (F8): discovers its tools over the
+<span class="ln">  6</span>  #                        protocol, lets the LLM pick tools + args, and calls them via MCP
+<span class="ln">  7</span>  #                        (core/mcp_client.py)
+<span class="ln">  8</span>  #   4. Guard/Verifier - intent gating on the way in (F19), grounding check on the way out
+<span class="ln">  9</span>  # Specialists 2 and 3 run in parallel (LangGraph fan-out/fan-in). langgraph_engine.py is left
+<span class="ln"> 10</span>  # untouched - this is selectable alongside it via get_engine(&quot;orchestrator&quot;).
+<span class="ln"> 11</span>  import asyncio
+<span class="ln"> 12</span>  import os
+<span class="ln"> 13</span>  from datetime import date
+<span class="ln"> 14</span>  from typing import Optional, TypedDict
+<span class="ln"> 15</span>  
+<span class="ln"> 16</span>  from dotenv import load_dotenv, find_dotenv
+<span class="ln"> 17</span>  from langchain_core.documents import Document
+<span class="ln"> 18</span>  from langchain_core.messages import HumanMessage, SystemMessage
+<span class="ln"> 19</span>  from langchain_core.prompts import ChatPromptTemplate  # F3.1
+<span class="ln"> 20</span>  from langchain_core.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate  # F3.1
+<span class="ln"> 21</span>  from langgraph.graph import StateGraph, END  # F13
+<span class="ln"> 22</span>  from pydantic import BaseModel, Field
+<span class="ln"> 23</span>  
+<span class="ln"> 24</span>  from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
+<span class="ln"> 25</span>  from core.llm import build_llm_and_embeddings  # F2/F12
+<span class="ln"> 26</span>  from core.mcp_client import list_mcp_tools, call_mcp_tools  # F8/F13
+<span class="ln"> 27</span>  from core.memory import wrap_with_memory  # F7
+<span class="ln"> 28</span>  from core.sanitize import INJECTION_DEFENSE_NOTICE, sanitize_content  # F22
+<span class="ln"> 29</span>  from core.vectorstore import get_retriever  # F3/F10/F12/F18/F22
+<span class="ln"> 30</span>  from engines.base import BaseMenuEngine  # F12
+<span class="ln"> 31</span>  
+<span class="ln"> 32</span>  load_dotenv(find_dotenv())
+<span class="ln"> 33</span>  
+<span class="ln"> 34</span>  AVAILABLE_CUISINES = [&quot;sushi&quot;, &quot;steak&quot;, &quot;italian&quot;]
+<span class="ln"> 35</span>  MAX_RETRIES = 2  # F13: bounded verify -&gt; re-synthesize loop
+<span class="ln"> 36</span>  MAX_TOOL_CALLS = 4  # F13: cap one planning turn&#x27;s tool calls, so a confused model can&#x27;t fan out unbounded sheet reads
+<span class="ln"> 37</span>  GUARDRAILS_ENABLED = os.environ.get(&quot;GUARDRAILS_ENABLED&quot;, &quot;true&quot;).lower() != &quot;false&quot;  # F19
+<span class="ln"> 38</span>  
+<span class="ln"> 39</span>  
+<span class="ln"> 40</span>  # ---- prompts / structured outputs ----
+<span class="ln"> 41</span>  
+<span class="ln"> 42</span>  PLAN_PROMPT = &quot;&quot;&quot;You are the orchestrator for a restaurant assistant. Decide which specialists
+<span class="ln"> 43</span>  this question needs (one or both):
+<span class="ln"> 44</span>  - menu: dishes, ingredients, prices, allergens, standard hours, and policies from the menu PDF.
+<span class="ln"> 45</span>  - live_data: daily specials, holiday hours/closures/events, the company org directory, or company
+<span class="ln"> 46</span>    items (announcements, system status, outages, promotions).
+<span class="ln"> 47</span>  
+<span class="ln"> 48</span>  Question: {question}&quot;&quot;&quot;
+<span class="ln"> 49</span>  
+<span class="ln"> 50</span>  MCP_AGENT_PROMPT = &quot;&quot;&quot;You are the live-data specialist. Call the tools needed to answer the
+<span class="ln"> 51</span>  question - nothing else. Today is {weekday}, {today}. Resolve relative dates (&quot;tomorrow&quot;,
+<span class="ln"> 52</span>  &quot;Friday&quot;) to an ISO date for hours_and_events, or a short weekday (&quot;Fri&quot;) for daily_specials.&quot;&quot;&quot;
+<span class="ln"> 53</span>  
+<span class="ln"> 54</span>  # F13: same persona/guardrail rules as langgraph_engine.py&#x27;s RAG_SYSTEM_PROMPT (F3.1), widened to
+<span class="ln"> 55</span>  # cover live-data tool results alongside menu chunks
+<span class="ln"> 56</span>  SYNTHESIZE_SYSTEM_PROMPT = &quot;&quot;&quot;You are a friendly, knowledgeable restaurant assistant. Answer guest questions
+<span class="ln"> 57</span>  using ONLY the menu excerpts and live-data results given in the context below - never invent
+<span class="ln"> 58</span>  dishes, prices, ingredients, allergens, hours, or policies that aren&#x27;t explicitly there.
+<span class="ln"> 59</span>  
+<span class="ln"> 60</span>  Guidelines:
+<span class="ln"> 61</span>  - If the answer isn&#x27;t in the provided context, say so plainly rather than guessing.
+<span class="ln"> 62</span>  - Keep answers concise and conversational, like speaking to a guest at the restaurant.
+<span class="ln"> 63</span>  - Mention prices when referencing specific dishes, if the context gives them.
+<span class="ln"> 64</span>  - Live-data results (specials, holiday hours, closures) override the menu&#x27;s standard info.
+<span class="ln"> 65</span>  
+<span class="ln"> 66</span>  &quot;&quot;&quot; + INJECTION_DEFENSE_NOTICE + &quot;&quot;&quot;
+<span class="ln"> 67</span>  ----------------
+<span class="ln"> 68</span>  {context}&quot;&quot;&quot;
+<span class="ln"> 69</span>  
+<span class="ln"> 70</span>  SYNTHESIZE_PROMPT = ChatPromptTemplate.from_messages([
+<span class="ln"> 71</span>      SystemMessagePromptTemplate.from_template(SYNTHESIZE_SYSTEM_PROMPT),
+<span class="ln"> 72</span>      HumanMessagePromptTemplate.from_template(&quot;{question}&quot;),
+<span class="ln"> 73</span>  ])
+<span class="ln"> 74</span>  
+<span class="ln"> 75</span>  
+<span class="ln"> 76</span>  class OrchestratorPlan(BaseModel):  # F13: orchestrator&#x27;s structured routing decision
+<span class="ln"> 77</span>      use_menu: bool = Field(description=&quot;true if the menu PDF specialist is needed&quot;)
+<span class="ln"> 78</span>      use_live_data: bool = Field(description=&quot;true if the live-data (MCP tools) specialist is needed&quot;)
+<span class="ln"> 79</span>      reasoning: str = Field(description=&quot;one short sentence justifying the plan&quot;)
+<span class="ln"> 80</span>  
+<span class="ln"> 81</span>  
+<span class="ln"> 82</span>  class VerifyDecision(BaseModel):  # F13: guard/verifier&#x27;s structured output
+<span class="ln"> 83</span>      grounded: bool
+<span class="ln"> 84</span>      reasoning: str
+<span class="ln"> 85</span>  
+<span class="ln"> 86</span>  
+<span class="ln"> 87</span>  class OrchestratorState(TypedDict):  # F13: state threaded through every agent node
+<span class="ln"> 88</span>      cuisine: str
+<span class="ln"> 89</span>      question: str
+<span class="ln"> 90</span>      on_topic: bool
+<span class="ln"> 91</span>      use_menu: bool
+<span class="ln"> 92</span>      use_live_data: bool
+<span class="ln"> 93</span>      documents: list[Document]  # written only by the menu agent
+<span class="ln"> 94</span>      tool_results: list[str]  # written only by the MCP agent - separate keys so parallel writes never collide
+<span class="ln"> 95</span>      answer: str
+<span class="ln"> 96</span>      grounded: bool
+<span class="ln"> 97</span>      verify_feedback: str
+<span class="ln"> 98</span>      attempts: int
+<span class="ln"> 99</span>  
+<span class="ln">100</span>  
+<span class="ln">101</span>  class OrchestratorEngine(BaseMenuEngine):  # F13: orchestrator + specialists, behind F12&#x27;s interface
+<span class="ln">102</span>      def __init__(self):
+<span class="ln">103</span>          self.llm, self.embeddings = build_llm_and_embeddings()  # F2/F12
+<span class="ln">104</span>          self.retrievers = {cuisine: get_retriever(cuisine, self.embeddings) for cuisine in AVAILABLE_CUISINES}
+<span class="ln">105</span>          self.mcp_tools = asyncio.run(list_mcp_tools())  # F13: discovered once at startup
+<span class="ln">106</span>          self.mcp_tool_names = {t[&quot;function&quot;][&quot;name&quot;] for t in self.mcp_tools}
+<span class="ln">107</span>          self.graph = self._build_graph()  # cuisine travels in state, so one graph serves all three menus
+<span class="ln">108</span>          self.chains_with_memory = {  # F7
+<span class="ln">109</span>              cuisine: wrap_with_memory(lambda q, cuisine=cuisine: self._invoke_graph(cuisine, q))
+<span class="ln">110</span>              for cuisine in AVAILABLE_CUISINES
+<span class="ln">111</span>          }
+<span class="ln">112</span>  
+<span class="ln">113</span>      # ---- agent 4 (in): guard ----
+<span class="ln">114</span>  
+<span class="ln">115</span>      def _guard_node(self, state: OrchestratorState) -&gt; dict:  # F19: reject off-topic before any agent spends a call
+<span class="ln">116</span>          if not GUARDRAILS_ENABLED:
+<span class="ln">117</span>              return {&quot;on_topic&quot;: True}
+<span class="ln">118</span>          return {&quot;on_topic&quot;: not is_off_topic(classify_intent(self.llm, state[&quot;question&quot;]))}
+<span class="ln">119</span>  
+<span class="ln">120</span>      # ---- agent 1: orchestrator ----
+<span class="ln">121</span>  
+<span class="ln">122</span>      def _plan_node(self, state: OrchestratorState) -&gt; dict:
+<span class="ln">123</span>          plan = self.llm.with_structured_output(OrchestratorPlan).invoke(PLAN_PROMPT.format(question=state[&quot;question&quot;]))
+<span class="ln">124</span>          if not plan.use_menu and not plan.use_live_data:  # an on-topic question always gets at least the menu
+<span class="ln">125</span>              return {&quot;use_menu&quot;: True, &quot;use_live_data&quot;: False}
+<span class="ln">126</span>          return {&quot;use_menu&quot;: plan.use_menu, &quot;use_live_data&quot;: plan.use_live_data}
+<span class="ln">127</span>  
+<span class="ln">128</span>      # ---- agent 2: menu RAG ----
+<span class="ln">129</span>  
+<span class="ln">130</span>      def _menu_agent_node(self, state: OrchestratorState) -&gt; dict:
+<span class="ln">131</span>          if not state[&quot;use_menu&quot;]:
+<span class="ln">132</span>              return {&quot;documents&quot;: []}
+<span class="ln">133</span>          return {&quot;documents&quot;: self.retrievers[state[&quot;cuisine&quot;]].invoke(state[&quot;question&quot;])}  # F22: already sanitized
+<span class="ln">134</span>  
+<span class="ln">135</span>      # ---- agent 3: MCP tools ----
+<span class="ln">136</span>  
+<span class="ln">137</span>      def _mcp_agent_node(self, state: OrchestratorState) -&gt; dict:
+<span class="ln">138</span>          if not state[&quot;use_live_data&quot;]:
+<span class="ln">139</span>              return {&quot;tool_results&quot;: []}
+<span class="ln">140</span>          today = date.today()
+<span class="ln">141</span>          response = self.llm.bind_tools(self.mcp_tools).invoke([
+<span class="ln">142</span>              SystemMessage(MCP_AGENT_PROMPT.format(weekday=today.strftime(&quot;%A&quot;), today=today.isoformat())),
+<span class="ln">143</span>              HumanMessage(state[&quot;question&quot;]),
+<span class="ln">144</span>          ])
+<span class="ln">145</span>          # skip hallucinated tool names rather than fail the request; cap the fan-out
+<span class="ln">146</span>          calls = [c for c in response.tool_calls if c[&quot;name&quot;] in self.mcp_tool_names][:MAX_TOOL_CALLS]
+<span class="ln">147</span>          results = asyncio.run(call_mcp_tools(calls)) if calls else []
+<span class="ln">148</span>          return {&quot;tool_results&quot;: results}
+<span class="ln">149</span>  
+<span class="ln">150</span>      # ---- agent 1 again: merge specialists&#x27; output ----
+<span class="ln">151</span>  
+<span class="ln">152</span>      def _synthesize_node(self, state: OrchestratorState) -&gt; dict:
+<span class="ln">153</span>          context = self._context(state)
+<span class="ln">154</span>          question = state[&quot;question&quot;]
+<span class="ln">155</span>          if state[&quot;attempts&quot;] &gt; 0 and state[&quot;verify_feedback&quot;]:  # F13: fold verifier feedback into the retry
+<span class="ln">156</span>              question = (
+<span class="ln">157</span>                  f&quot;{question}\n\n(Your previous answer was rejected: {state[&#x27;verify_feedback&#x27;]}. &quot;
+<span class="ln">158</span>                  &quot;Try again, using only the context below.)&quot;
+<span class="ln">159</span>              )
+<span class="ln">160</span>          response = self.llm.invoke(SYNTHESIZE_PROMPT.format_messages(context=context, question=question))
+<span class="ln">161</span>          return {&quot;answer&quot;: response.content}
+<span class="ln">162</span>  
+<span class="ln">163</span>      # ---- agent 4 (out): verifier ----
+<span class="ln">164</span>  
+<span class="ln">165</span>      def _verify_node(self, state: OrchestratorState) -&gt; dict:
+<span class="ln">166</span>          decision = self.llm.with_structured_output(VerifyDecision).invoke(
+<span class="ln">167</span>              f&quot;Context:\n{self._context(state)}\n\nQuestion: {state[&#x27;question&#x27;]}\n\nAnswer: {state[&#x27;answer&#x27;]}\n\n&quot;
+<span class="ln">168</span>              &quot;Is the answer fully supported by the context, with nothing invented?&quot;
+<span class="ln">169</span>          )
+<span class="ln">170</span>          return {&quot;grounded&quot;: decision.grounded, &quot;verify_feedback&quot;: decision.reasoning, &quot;attempts&quot;: state[&quot;attempts&quot;] + 1}
+<span class="ln">171</span>  
+<span class="ln">172</span>      def _redirect_node(self, state: OrchestratorState) -&gt; dict:  # F19: off-topic branch
+<span class="ln">173</span>          return {&quot;answer&quot;: OFF_TOPIC_MESSAGE, &quot;documents&quot;: [], &quot;tool_results&quot;: []}
+<span class="ln">174</span>  
+<span class="ln">175</span>      # ---- edges / wiring ----
+<span class="ln">176</span>  
+<span class="ln">177</span>      @staticmethod
+<span class="ln">178</span>      def _context(state: OrchestratorState) -&gt; str:
+<span class="ln">179</span>          menu = &quot;\n\n&quot;.join(doc.page_content for doc in state[&quot;documents&quot;])
+<span class="ln">180</span>          live = &quot;\n\n&quot;.join(state[&quot;tool_results&quot;])
+<span class="ln">181</span>          return f&quot;Menu excerpts:\n{menu or &#x27;(none)&#x27;}\n\nLive data:\n{live or &#x27;(none)&#x27;}&quot;
+<span class="ln">182</span>  
+<span class="ln">183</span>      def _after_guard(self, state: OrchestratorState) -&gt; str:
+<span class="ln">184</span>          return &quot;on_topic&quot; if state[&quot;on_topic&quot;] else &quot;off_topic&quot;
+<span class="ln">185</span>  
+<span class="ln">186</span>      def _after_verify(self, state: OrchestratorState) -&gt; str:  # F13: bounded retry loop
+<span class="ln">187</span>          if state[&quot;grounded&quot;] or state[&quot;attempts&quot;] &gt;= MAX_RETRIES:
+<span class="ln">188</span>              return &quot;done&quot;
+<span class="ln">189</span>          return &quot;retry&quot;
+<span class="ln">190</span>  
+<span class="ln">191</span>      def _build_graph(self):
+<span class="ln">192</span>          graph = StateGraph(OrchestratorState)
+<span class="ln">193</span>          graph.add_node(&quot;guard&quot;, self._guard_node)
+<span class="ln">194</span>          graph.add_node(&quot;plan&quot;, self._plan_node)
+<span class="ln">195</span>          graph.add_node(&quot;menu_agent&quot;, self._menu_agent_node)
+<span class="ln">196</span>          graph.add_node(&quot;mcp_agent&quot;, self._mcp_agent_node)
+<span class="ln">197</span>          graph.add_node(&quot;synthesize&quot;, self._synthesize_node)
+<span class="ln">198</span>          graph.add_node(&quot;verify&quot;, self._verify_node)
+<span class="ln">199</span>          graph.add_node(&quot;redirect&quot;, self._redirect_node)
+<span class="ln">200</span>  
+<span class="ln">201</span>          graph.set_entry_point(&quot;guard&quot;)
+<span class="ln">202</span>          graph.add_conditional_edges(&quot;guard&quot;, self._after_guard, {&quot;on_topic&quot;: &quot;plan&quot;, &quot;off_topic&quot;: &quot;redirect&quot;})
+<span class="ln">203</span>          graph.add_edge(&quot;plan&quot;, &quot;menu_agent&quot;)  # F13: fan-out - both specialists run in the same step
+<span class="ln">204</span>          graph.add_edge(&quot;plan&quot;, &quot;mcp_agent&quot;)
+<span class="ln">205</span>          graph.add_edge([&quot;menu_agent&quot;, &quot;mcp_agent&quot;], &quot;synthesize&quot;)  # F13: fan-in - waits for both
+<span class="ln">206</span>          graph.add_edge(&quot;synthesize&quot;, &quot;verify&quot;)
+<span class="ln">207</span>          graph.add_conditional_edges(&quot;verify&quot;, self._after_verify, {&quot;retry&quot;: &quot;synthesize&quot;, &quot;done&quot;: END})
+<span class="ln">208</span>          graph.add_edge(&quot;redirect&quot;, END)
+<span class="ln">209</span>          return graph.compile()
+<span class="ln">210</span>  
+<span class="ln">211</span>      def _invoke_graph(self, cuisine: str, question: str) -&gt; dict:
+<span class="ln">212</span>          result = self.graph.invoke({
+<span class="ln">213</span>              &quot;cuisine&quot;: cuisine,
+<span class="ln">214</span>              &quot;question&quot;: question,
+<span class="ln">215</span>              &quot;on_topic&quot;: True,
+<span class="ln">216</span>              &quot;use_menu&quot;: False,
+<span class="ln">217</span>              &quot;use_live_data&quot;: False,
+<span class="ln">218</span>              &quot;documents&quot;: [],
+<span class="ln">219</span>              &quot;tool_results&quot;: [],
+<span class="ln">220</span>              &quot;answer&quot;: &quot;&quot;,
+<span class="ln">221</span>              &quot;grounded&quot;: False,
+<span class="ln">222</span>              &quot;verify_feedback&quot;: &quot;&quot;,
+<span class="ln">223</span>              &quot;attempts&quot;: 0,
+<span class="ln">224</span>          })
+<span class="ln">225</span>          live_docs = [Document(page_content=r, metadata={&quot;source&quot;: &quot;mcp_tools&quot;}) for r in result[&quot;tool_results&quot;]]
+<span class="ln">226</span>          return {&quot;result&quot;: result[&quot;answer&quot;], &quot;source_documents&quot;: result[&quot;documents&quot;] + live_docs}
+<span class="ln">227</span>  
+<span class="ln">228</span>      def answer(self, cuisine: str, question: str, session_id: str, use_memory: bool = True) -&gt; dict:
+<span class="ln">229</span>          if cuisine not in self.retrievers:
+<span class="ln">230</span>              raise ValueError(f&quot;Unknown cuisine: {cuisine}&quot;)
+<span class="ln">231</span>          if not use_memory:
+<span class="ln">232</span>              return self._invoke_graph(cuisine, question)
+<span class="ln">233</span>          memory_config = {&quot;configurable&quot;: {&quot;session_id&quot;: f&quot;{cuisine}:{session_id}&quot;}}  # F7
+<span class="ln">234</span>          return self.chains_with_memory[cuisine].invoke({&quot;query&quot;: question}, config=memory_config)</code></pre>
+</div>
+
+<p class="back-to-top"><a href="#f132">↑ Back to F13.2</a></p>
+<h3 id="f132-6">F13.2:6 Source Code Reference: tests/test_orchestrator_engine.py — full file</h3>
+<div class="code-block">
+<div class="code-block-title"><span>tests/test_orchestrator_engine.py</span><span class="role">Mocked unit tests for engines/orchestrator_engine.py (F13.2) — 158 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  &quot;&quot;&quot;F23-style unit tests for F13&#x27;s orchestrator multi-agent engine - engines/orchestrator_engine.py -
+<span class="ln">  2</span>  with the LLM, retriever, and Google Sheet all mocked out so tests run with no API key and no network.
+<span class="ln">  3</span>  The MCP Tools agent talks to the real api/mcp_server.py over MCP&#x27;s in-memory transport - only the
+<span class="ln">  4</span>  sheet reads underneath it are mocked.
+<span class="ln">  5</span>  &quot;&quot;&quot;
+<span class="ln">  6</span>  from unittest.mock import MagicMock
+<span class="ln">  7</span>  
+<span class="ln">  8</span>  import pytest
+<span class="ln">  9</span>  from langchain_core.documents import Document
+<span class="ln"> 10</span>  from langchain_core.messages import AIMessage
+<span class="ln"> 11</span>  
+<span class="ln"> 12</span>  import api.mcp_server as mcp_server
+<span class="ln"> 13</span>  import engines.orchestrator_engine as orch
+<span class="ln"> 14</span>  from core.guardrails import IntentClassification, OFF_TOPIC_MESSAGE
+<span class="ln"> 15</span>  from core.sanitize import CONTEXT_START
+<span class="ln"> 16</span>  
+<span class="ln"> 17</span>  
+<span class="ln"> 18</span>  def fake_llm(intent=&quot;menu&quot;, use_menu=True, use_live_data=False, grounded=True, tool_calls=None):
+<span class="ln"> 19</span>      &quot;&quot;&quot;A fake LLM that answers each structured-output schema the engine asks for, plus bind_tools()
+<span class="ln"> 20</span>      for the MCP agent and a plain invoke() for synthesis.&quot;&quot;&quot;
+<span class="ln"> 21</span>      llm = MagicMock()
+<span class="ln"> 22</span>      by_schema = {
+<span class="ln"> 23</span>          IntentClassification: IntentClassification(intent=intent, reasoning=&quot;because&quot;),
+<span class="ln"> 24</span>          orch.OrchestratorPlan: orch.OrchestratorPlan(use_menu=use_menu, use_live_data=use_live_data, reasoning=&quot;plan&quot;),
+<span class="ln"> 25</span>          orch.VerifyDecision: orch.VerifyDecision(grounded=grounded, reasoning=&quot;missing price&quot;),
+<span class="ln"> 26</span>      }
+<span class="ln"> 27</span>  
+<span class="ln"> 28</span>      def with_structured_output(schema):
+<span class="ln"> 29</span>          structured = MagicMock()
+<span class="ln"> 30</span>          structured.invoke.return_value = by_schema[schema]
+<span class="ln"> 31</span>          return structured
+<span class="ln"> 32</span>  
+<span class="ln"> 33</span>      llm.with_structured_output.side_effect = with_structured_output
+<span class="ln"> 34</span>      llm.bind_tools.return_value.invoke.return_value = AIMessage(content=&quot;&quot;, tool_calls=tool_calls or [])
+<span class="ln"> 35</span>      llm.invoke.return_value = AIMessage(content=&quot;final answer&quot;)
+<span class="ln"> 36</span>      return llm
+<span class="ln"> 37</span>  
+<span class="ln"> 38</span>  
+<span class="ln"> 39</span>  @pytest.fixture
+<span class="ln"> 40</span>  def build_engine(monkeypatch):
+<span class="ln"> 41</span>      &quot;&quot;&quot;Builds an OrchestratorEngine around the given fake LLM, with a mocked retriever per cuisine.&quot;&quot;&quot;
+<span class="ln"> 42</span>      def _build(llm):
+<span class="ln"> 43</span>          retriever = MagicMock()
+<span class="ln"> 44</span>          retriever.invoke.return_value = [Document(page_content=&quot;menu chunk&quot;)]
+<span class="ln"> 45</span>          monkeypatch.setattr(orch, &quot;build_llm_and_embeddings&quot;, lambda: (llm, MagicMock()))
+<span class="ln"> 46</span>          monkeypatch.setattr(orch, &quot;get_retriever&quot;, lambda cuisine, embeddings: retriever)
+<span class="ln"> 47</span>          engine = orch.OrchestratorEngine()
+<span class="ln"> 48</span>          return engine, retriever
+<span class="ln"> 49</span>      return _build
+<span class="ln"> 50</span>  
+<span class="ln"> 51</span>  
+<span class="ln"> 52</span>  def test_off_topic_question_is_redirected_without_planning_or_retrieval(build_engine):
+<span class="ln"> 53</span>      llm = fake_llm(intent=&quot;off_topic&quot;)
+<span class="ln"> 54</span>      engine, retriever = build_engine(llm)
+<span class="ln"> 55</span>  
+<span class="ln"> 56</span>      result = engine.answer(&quot;sushi&quot;, &quot;Who won the World Cup?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln"> 57</span>  
+<span class="ln"> 58</span>      assert result == {&quot;result&quot;: OFF_TOPIC_MESSAGE, &quot;source_documents&quot;: []}
+<span class="ln"> 59</span>      retriever.invoke.assert_not_called()
+<span class="ln"> 60</span>      llm.bind_tools.assert_not_called()
+<span class="ln"> 61</span>  
+<span class="ln"> 62</span>  
+<span class="ln"> 63</span>  def test_menu_only_plan_uses_the_menu_agent_and_skips_tools(build_engine):
+<span class="ln"> 64</span>      llm = fake_llm(use_menu=True, use_live_data=False)
+<span class="ln"> 65</span>      engine, retriever = build_engine(llm)
+<span class="ln"> 66</span>  
+<span class="ln"> 67</span>      result = engine.answer(&quot;sushi&quot;, &quot;What&#x27;s in the Dragon Roll?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln"> 68</span>  
+<span class="ln"> 69</span>      assert result[&quot;result&quot;] == &quot;final answer&quot;
+<span class="ln"> 70</span>      assert [d.page_content for d in result[&quot;source_documents&quot;]] == [&quot;menu chunk&quot;]
+<span class="ln"> 71</span>      retriever.invoke.assert_called_once()
+<span class="ln"> 72</span>      llm.bind_tools.assert_not_called()
+<span class="ln"> 73</span>  
+<span class="ln"> 74</span>  
+<span class="ln"> 75</span>  def test_live_data_plan_calls_the_chosen_tool_and_sanitizes_its_output(build_engine, monkeypatch):
+<span class="ln"> 76</span>      monkeypatch.setattr(mcp_server, &quot;get_daily_specials&quot;, lambda day: [{&quot;Dish Name&quot;: &quot;Test Special&quot;, &quot;Day&quot;: day}])
+<span class="ln"> 77</span>      llm = fake_llm(use_menu=False, use_live_data=True,
+<span class="ln"> 78</span>                     tool_calls=[{&quot;name&quot;: &quot;daily_specials&quot;, &quot;args&quot;: {&quot;day&quot;: &quot;Fri&quot;}, &quot;id&quot;: &quot;c1&quot;}])
+<span class="ln"> 79</span>      engine, retriever = build_engine(llm)
+<span class="ln"> 80</span>  
+<span class="ln"> 81</span>      result = engine.answer(&quot;sushi&quot;, &quot;Any specials Friday?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln"> 82</span>  
+<span class="ln"> 83</span>      retriever.invoke.assert_not_called()
+<span class="ln"> 84</span>      [live_doc] = result[&quot;source_documents&quot;]
+<span class="ln"> 85</span>      assert live_doc.metadata == {&quot;source&quot;: &quot;mcp_tools&quot;}
+<span class="ln"> 86</span>      assert live_doc.page_content.startswith(CONTEXT_START)  # F22: tool output is delimiter-isolated
+<span class="ln"> 87</span>      assert &quot;Test Special&quot; in live_doc.page_content
+<span class="ln"> 88</span>  
+<span class="ln"> 89</span>  
+<span class="ln"> 90</span>  def test_both_specialists_run_when_the_plan_needs_both(build_engine, monkeypatch):
+<span class="ln"> 91</span>      monkeypatch.setattr(mcp_server, &quot;get_hours_and_events&quot;, lambda target_date: [{&quot;Status&quot;: &quot;Closed&quot;}])
+<span class="ln"> 92</span>      llm = fake_llm(use_menu=True, use_live_data=True,
+<span class="ln"> 93</span>                     tool_calls=[{&quot;name&quot;: &quot;hours_and_events&quot;, &quot;args&quot;: {&quot;target_date&quot;: &quot;2026-12-25&quot;}, &quot;id&quot;: &quot;c1&quot;}])
+<span class="ln"> 94</span>      engine, retriever = build_engine(llm)
+<span class="ln"> 95</span>  
+<span class="ln"> 96</span>      result = engine.answer(&quot;steak&quot;, &quot;Are you open Christmas, and do you have ribeye?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln"> 97</span>  
+<span class="ln"> 98</span>      retriever.invoke.assert_called_once()
+<span class="ln"> 99</span>      sources = [d.metadata.get(&quot;source&quot;) for d in result[&quot;source_documents&quot;]]
+<span class="ln">100</span>      assert sources == [None, &quot;mcp_tools&quot;]  # menu chunks first, then live data
+<span class="ln">101</span>  
+<span class="ln">102</span>  
+<span class="ln">103</span>  def test_unknown_tool_name_is_skipped(build_engine):
+<span class="ln">104</span>      llm = fake_llm(use_menu=False, use_live_data=True,
+<span class="ln">105</span>                     tool_calls=[{&quot;name&quot;: &quot;delete_everything&quot;, &quot;args&quot;: {}, &quot;id&quot;: &quot;c1&quot;}])
+<span class="ln">106</span>      engine, _ = build_engine(llm)
+<span class="ln">107</span>  
+<span class="ln">108</span>      result = engine.answer(&quot;sushi&quot;, &quot;Any specials?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln">109</span>  
+<span class="ln">110</span>      assert result[&quot;source_documents&quot;] == []
+<span class="ln">111</span>  
+<span class="ln">112</span>  
+<span class="ln">113</span>  def test_sheet_failure_is_reported_as_unavailable_not_raised(build_engine, monkeypatch):
+<span class="ln">114</span>      def broken(day):
+<span class="ln">115</span>          raise RuntimeError(&quot;sheet down&quot;)
+<span class="ln">116</span>      monkeypatch.setattr(mcp_server, &quot;get_daily_specials&quot;, broken)
+<span class="ln">117</span>      llm = fake_llm(use_menu=False, use_live_data=True,
+<span class="ln">118</span>                     tool_calls=[{&quot;name&quot;: &quot;daily_specials&quot;, &quot;args&quot;: {}, &quot;id&quot;: &quot;c1&quot;}])
+<span class="ln">119</span>      engine, _ = build_engine(llm)
+<span class="ln">120</span>  
+<span class="ln">121</span>      result = engine.answer(&quot;sushi&quot;, &quot;Any specials?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln">122</span>  
+<span class="ln">123</span>      content = result[&quot;source_documents&quot;][0].page_content
+<span class="ln">124</span>      assert &quot;unavailable (&quot; in content and &quot;sheet down&quot; in content
+<span class="ln">125</span>  
+<span class="ln">126</span>  
+<span class="ln">127</span>  def test_empty_plan_falls_back_to_the_menu_agent(build_engine):
+<span class="ln">128</span>      llm = fake_llm(use_menu=False, use_live_data=False)
+<span class="ln">129</span>      engine, retriever = build_engine(llm)
+<span class="ln">130</span>  
+<span class="ln">131</span>      engine.answer(&quot;italian&quot;, &quot;Do you have tiramisu?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln">132</span>  
+<span class="ln">133</span>      retriever.invoke.assert_called_once()
+<span class="ln">134</span>  
+<span class="ln">135</span>  
+<span class="ln">136</span>  def test_ungrounded_answer_retries_synthesis_at_most_max_retries_times(build_engine):
+<span class="ln">137</span>      llm = fake_llm(grounded=False)
+<span class="ln">138</span>      engine, retriever = build_engine(llm)
+<span class="ln">139</span>  
+<span class="ln">140</span>      engine.answer(&quot;sushi&quot;, &quot;What&#x27;s in the Dragon Roll?&quot;, &quot;s1&quot;, use_memory=False)
+<span class="ln">141</span>  
+<span class="ln">142</span>      assert llm.invoke.call_count == orch.MAX_RETRIES  # one synthesis per verify attempt
+<span class="ln">143</span>      retriever.invoke.assert_called_once()  # retries re-synthesize, they don&#x27;t re-retrieve
+<span class="ln">144</span>  
+<span class="ln">145</span>  
+<span class="ln">146</span>  def test_tools_are_discovered_from_the_mcp_server(build_engine):
+<span class="ln">147</span>      engine, _ = build_engine(fake_llm())
+<span class="ln">148</span>  
+<span class="ln">149</span>      assert engine.mcp_tool_names == {&quot;daily_specials&quot;, &quot;hours_and_events&quot;, &quot;org_directory&quot;, &quot;company_items&quot;}
+<span class="ln">150</span>      specials = next(t for t in engine.mcp_tools if t[&quot;function&quot;][&quot;name&quot;] == &quot;daily_specials&quot;)
+<span class="ln">151</span>      assert &quot;day&quot; in specials[&quot;function&quot;][&quot;parameters&quot;][&quot;properties&quot;]
+<span class="ln">152</span>  
+<span class="ln">153</span>  
+<span class="ln">154</span>  def test_unknown_cuisine_raises(build_engine):
+<span class="ln">155</span>      engine, _ = build_engine(fake_llm())
+<span class="ln">156</span>  
+<span class="ln">157</span>      with pytest.raises(ValueError):
+<span class="ln">158</span>          engine.answer(&quot;thai&quot;, &quot;anything&quot;, &quot;s1&quot;)</code></pre>
+</div>
+
+<h3 id="f132-7">F13.2:7 Line-by-Line Deep Dive: The Parts That Differ From F13.1</h3>
+
+<ul>
+  <li><strong><code>__init__</code></strong> — <code>asyncio.run(list_mcp_tools())</code> runs once at
+  construction; a tool added to <code>api/mcp_server.py</code> shows up after a restart with no engine change.</li>
+  <li><strong><code>_plan_node</code></strong> — if the model says neither specialist is needed for an on-topic
+  question, it falls back to the menu rather than synthesizing from nothing.</li>
+  <li><strong><code>_menu_agent_node</code> / <code>_mcp_agent_node</code></strong> — both always run (the graph
+  edges are unconditional) and each returns an empty list when the plan says skip. That keeps the fan-in simple:
+  <code>synthesize</code> always waits for exactly two predecessors.</li>
+  <li><strong><code>_mcp_agent_node</code></strong> — filters <code>response.tool_calls</code> to known tool names,
+  then slices to <code>MAX_TOOL_CALLS</code>; all calls share one MCP session in <code>call_mcp_tools()</code>.</li>
+  <li><strong><code>_synthesize_node</code></strong> — on a retry, appends the verifier's reasoning to the question
+  (same idea as F13.1's <code>_generate_node</code>), but loops back to <code>synthesize</code>, not to
+  retrieval — the specialists' output is reused.</li>
+  <li><strong><code>_context</code></strong> — one string with "Menu excerpts" and "Live data" sections, each
+  showing <code>(none)</code> when empty, used by both synthesis and verification.</li>
+  <li><strong><code>_invoke_graph</code></strong> — tool results become <code>Document</code>s tagged
+  <code>source: mcp_tools</code> so callers see them as sources.</li>
+</ul>
+
+<h3 id="f132-8">F13.2:8 Technical Deep Dive: What This Buys, and What It Costs</h3>
+
+<p><strong>The LLM routes, not a keyword list.</strong> F8's <code>detect_ops_intent()</code> is an honest
+stopgap; the orchestrator's plan and the MCP agent's tool choice replace it for this engine. The price is two
+extra LLM calls (plan, tool choice) before any answer is written.</p>
+
+<p><strong>Call budget.</strong> Best case on-topic: guard, plan, tool choice, synthesize, verify = 5 calls (4 if
+live data isn't needed). Worst case with a retry: 7 calls. Plain RAG is 1.</p>
+
+<p><strong>Sheet failures don't fail the request.</strong> <code>call_mcp_tools()</code> turns a tool error into
+<code>"unavailable (...)"</code> text, so the answer can say the live data is down while still answering from the
+menu. That is the graceful-degradation gap the System Design section lists for F13 ("F13 doesn't yet") —
+closed for F13.2, still open for F13.1.</p>
+
+<p><strong>Live data is untrusted too.</strong> Every tool result goes through <code>sanitize_content()</code>
+(F22) before it reaches a prompt, so a sheet cell can't inject instructions any more than a PDF chunk can.</p>
+
+<p><strong>Known limits.</strong> Same model plans, synthesizes and verifies (the self-grading bias F13.1 notes).
+<code>asyncio.run()</code> inside a node means the engine must be called from sync code (FastAPI runs sync
+endpoints in a worker thread, so it works there). Retries never re-plan or re-fetch.</p>
+
+<p class="tags"><strong>Tags:</strong> Agentic RAG, Multi-Agent Orchestration, MCP, Tool Calling, Fan-out/Fan-in, F13.2</p>
+
+<p><strong>What was built:</strong></p>
+<ul>
+  <li><code>engines/orchestrator_engine.py</code> — guard, orchestrator, Menu RAG and MCP Tools agents, synthesize,
+  verify</li>
+  <li><code>core/mcp_client.py</code> — tool discovery and calls over MCP, shared with <code>engine_api.py</code></li>
+  <li><code>get_engine("orchestrator")</code>, CLI option <code>3) Agentic RAG LG</code>,
+  <code>--engine orchestrator</code> in <code>run_evals.py</code></li>
+  <li>15 new mocked tests (10 engine, 5 MCP client); full suite 85 passed</li>
+</ul>
+
+<h3 id="f132-sysdesign">F13.2:9 System Design <a class="h3-up" href="#f132" title="Back to F13.2">↑ F13.2</a></h3>
+<p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
+<ul>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Orchestrator-worker pattern: one planner, two specialists with clear ownership (PDFs vs. live data), one merge step, one verifier.</li>
+  <li><strong><a href="#sd-agents">Agents</a>:</strong> Tools come from MCP discovery, not hard-coded — the agent sees whatever <code>api/mcp_server.py</code> exposes.</li>
+  <li><strong><a href="#sd-failure">Failure modes</a>:</strong> Hallucinated tool names are dropped, tool fan-out is capped, a sheet outage becomes "unavailable" text, and verify retries are bounded.</li>
+  <li><strong><a href="#sd-scale">Latency / cost / reliability</a>:</strong> Specialists run in parallel, so latency is the slower of the two, not the sum — but total LLM calls are 4–7 vs. 1 for plain RAG.</li>
+  <li><strong><a href="#sd-architecture">Systems design</a>:</strong> Behind F12's factory; <code>engine_api.py</code> only needed to know it routes itself.</li>
+</ul>
+
+<p><strong>Trade-offs:</strong></p>
+<table class="cost-table">
+  <tr><th>Decision</th><th>Pros</th><th>Cons</th><th>Alternative / when to switch</th></tr>
+  <tr><td>LLM plan instead of keyword routing</td><td>Handles phrasing like "what's good today?".</td><td>An extra LLM call; plans can be wrong.</td><td>Use F19's intent label as the plan when it's confident.</td></tr>
+  <tr><td>Both specialists always run (may no-op)</td><td>Simple fan-in; parallel latency.</td><td>Two extra graph steps even when one is skipped.</td><td>Conditional edges from <code>plan</code> with a join that handles one branch.</td></tr>
+  <tr><td>Retry re-synthesizes only</td><td>Cheap — no new retrieval or tool calls.</td><td>Missing data stays missing.</td><td>Retry to <code>plan</code> when the verifier says context is insufficient.</td></tr>
+  <tr><td>In-process MCP by default</td><td>Full protocol without a subprocess per call.</td><td>Not a real network hop in dev.</td><td>Set <code>MCP_SERVER</code> to a script path or http URL.</td></tr>
+</table>
 
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>

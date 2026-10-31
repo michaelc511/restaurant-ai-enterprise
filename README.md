@@ -13,9 +13,9 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `engine_api.py` | Parallel FastAPI entry point (`/ask`, `/specials`, `/hours`, `/org`, `/items`) that answers through the engine factory instead of an inline chain — `menu_api.py` stays untouched as the baseline — see `features.html` F12 |
 | `engines/base.py` | `BaseMenuEngine` interface + `get_engine()` factory (`plain_rag`, `langgraph`) — see `features.html` F12 |
 | `engines/plain_rag_engine.py` | Plain RetrievalQA engine — the default (`DEFAULT_ENGINE=plain_rag`) — see `features.html` F12 |
-| `engines/langgraph_engine.py` | LangGraph state-machine engine (route → retrieve → generate → verify) — see `features.html` F13 |
-| `core/mcp_client.py` | MCP client of `api/mcp_server.py` — every live-sheet read in `engine_api.py` (all engines) and the orchestrator's tool calls go over MCP (F8/F13) |
-| `engines/orchestrator_engine.py` | LangGraph multi-agent engine: guard → orchestrator → menu RAG + MCP-client agents in parallel (tools discovered from `api/mcp_server.py` over MCP) → synthesize → verify (`engine: "orchestrator"`) |
+| `engines/langgraph_engine.py` | LangGraph state-machine engine (route → retrieve → generate → verify) — see `features.html` F13.1 |
+| `core/mcp_client.py` | MCP client of `api/mcp_server.py` — every live-sheet read in `engine_api.py` (all engines) and the orchestrator's tool calls go over MCP (F8/F13.2) — see `features.html` F8:13 |
+| `engines/orchestrator_engine.py` | LangGraph multi-agent engine: guard → orchestrator → menu RAG + MCP-client agents in parallel (tools discovered from `api/mcp_server.py` over MCP) → synthesize → verify (`engine: "orchestrator"`, CLI option `3) Agentic RAG LG`) — see `features.html` F13.2 |
 | `core/llm.py` | Shared LLM/embeddings provider selection (OpenAI or Azure) used by every engine — see `features.html` F2 and F12 |
 | `core/guardrails.py` | Structured intent classifier that rejects off-topic questions before retrieval (`classify_intent`, `is_off_topic`) — see `features.html` F19 |
 | `core/sanitize.py` | Delimiter-wraps every retrieved chunk so its content is treated as data, not instructions (`SanitizingRetriever`) — see `features.html` F22 |
