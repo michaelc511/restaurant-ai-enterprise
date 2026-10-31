@@ -59,7 +59,7 @@
 <h2>Step 1: Semantic RAG and the Vector Store (F3)</h2>
 
 <ul>
-  <li><strong>Load:</strong> <code>PyPDFLoader</code> reads <code>menus/&lt;cuisine&gt;.pdf</code>.</li>
+  <li><strong>Load:</strong> <code>PyPDFLoader</code> reads <code>domains/restaurant/docs/&lt;cuisine&gt;.pdf</code>.</li>
   <li><strong>Chunk:</strong> <code>RecursiveCharacterTextSplitter</code> splits it into chunks of up to 500 characters with a 50-character overlap, so a dish description that straddles a boundary isn't cut in half with no context.</li>
   <li><strong>Embed and index:</strong> each chunk is embedded and stored in a FAISS index.</li>
   <li><strong>Cache to disk:</strong> the index is saved to <code>vectorstores/&lt;cuisine&gt;</code>. On the next start it's loaded instead of rebuilt, which skips the expensive embedding API calls.</li>

@@ -1,5 +1,8 @@
 """F23-style unit tests for F12's domain pack loader - core/domain.py - and the restaurant pack it
 loads by default. No API key or network."""
+import importlib
+from unittest.mock import MagicMock
+
 import pytest
 
 from core.domain import available_domains, domain, load_domain
@@ -49,3 +52,21 @@ def test_every_pack_defines_the_same_settings_as_restaurant():
     settings = {n for n in vars(restaurant) if n.isupper()}
     for name in available_domains():
         assert settings <= {n for n in vars(load_domain(name)) if n.isupper()}, name
+
+
+def test_live_data_tool_settings_match_the_registered_mcp_tools():
+    for name in available_domains():
+        pack = load_domain(name)
+        assert pack.COLLECTION_LABEL
+        registered = []
+        try:
+            importlib.import_module(f"domains.{name}.tools").register(MagicMock(tool=registered.append))
+        except ModuleNotFoundError:
+            pass
+        names = {fn.__name__ for fn in registered}
+        for tool in (pack.SPECIALS_TOOL, pack.HOURS_TOOL):
+            assert tool is None or tool in names, (name, tool)
+        if pack.SPECIALS_TOOL is None:
+            assert pack.SPECIALS_KEYWORDS == ()  # routing a specials question needs a specials tool
+        if pack.HOURS_TOOL is None:
+            assert pack.HOURS_KEYWORDS == ()

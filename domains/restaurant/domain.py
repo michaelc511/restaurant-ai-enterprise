@@ -3,6 +3,7 @@
 from pathlib import Path
 
 NAME = "restaurant"
+COLLECTION_LABEL = "cuisine"  # F12: what one collection is called in the CLI and UIs
 COLLECTIONS = ["sushi", "steak", "italian"]  # F12: one docs/<name>.pdf and one evals/<name>.json each
 DOCS_DIR = Path(__file__).resolve().parent / "docs"  # F3: source PDFs the retriever indexes
 EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtures
@@ -10,6 +11,8 @@ EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtu
 # F8: live-data settings - MCP server name, and the keywords core/sheets.py's detect_ops_intent()
 # routes to this domain's specials/hours tabs (empty tuples if a domain has neither)
 MCP_SERVER_NAME = "restaurant-ops-mcp"
+SPECIALS_TOOL = "daily_specials"  # F8: engine_api.py's specials routing and /specials endpoint call this tool
+HOURS_TOOL = "hours_and_events"  # F8: engine_api.py's hours append and /hours endpoint call this tool
 SPECIALS_KEYWORDS = ("special",)
 HOURS_KEYWORDS = ("hour", "open", "close", "holiday")
 

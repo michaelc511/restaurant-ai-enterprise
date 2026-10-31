@@ -3,6 +3,7 @@
 from pathlib import Path
 
 NAME = "hr"
+COLLECTION_LABEL = "department"  # F12: what one collection is called in the CLI and UIs
 COLLECTIONS = ["engineering", "sales", "operations"]  # F12: one docs/<name>.pdf and one evals/<name>.json each
 DOCS_DIR = Path(__file__).resolve().parent / "docs"  # F3: source PDFs the retriever indexes
 EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtures
@@ -10,6 +11,8 @@ EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtu
 # F8: no HR-only sheet tabs yet - only the shared org/items tools, so detect_ops_intent() never
 # routes to the restaurant specials/hours paths
 MCP_SERVER_NAME = "hr-ops-mcp"
+SPECIALS_TOOL = None
+HOURS_TOOL = None
 SPECIALS_KEYWORDS = ()
 HOURS_KEYWORDS = ()
 

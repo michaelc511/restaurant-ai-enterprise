@@ -1063,7 +1063,7 @@ gateway, Google Sheets via service account, and GitHub Actions for CI. A propose
   <tr><th>Concern</th><th>Today</th><th>AWS proposal</th></tr>
   <tr><td>API serving</td><td>uvicorn, single worker</td><td>ECS Fargate behind an Application Load Balancer</td></tr>
   <tr><td>Auth / rate limit (<a href="#f21">F21</a>)</td><td>none</td><td>API Gateway usage plans + API keys, WAF</td></tr>
-  <tr><td>Menus + vector index</td><td><code>menus/*.pdf</code>, <code>vectorstores/</code></td><td>S3; OpenSearch for managed BM25 + vector hybrid search</td></tr>
+  <tr><td>Menus + vector index</td><td><code>domains/restaurant/docs/*.pdf</code>, <code>vectorstores/</code></td><td>S3; OpenSearch for managed BM25 + vector hybrid search</td></tr>
   <tr><td>Chat history, usage log</td><td>SQLite (<a href="#f11">F11</a>, <a href="#f16">F16</a>)</td><td>DynamoDB (sessions), RDS Postgres (usage_log)</td></tr>
   <tr><td>LLM provider</td><td>OpenAI / Azure (<a href="#f2">F2</a>)</td><td>add Amazon Bedrock as a provider branch and fallback</td></tr>
   <tr><td>Secrets</td><td><code>.env</code>, <code>secrets/service_account.json</code></td><td>AWS Secrets Manager</td></tr>
@@ -1654,7 +1654,7 @@ plain readable Python) — this is the exact same pipeline, cell-for-cell, just 
 <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Which menu would you like (</span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">)? "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">cuisine</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_cuisines</span><span class="p">:</span>
     <span class="n">cuisine</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Please choose one of </span><span class="si">{</span><span class="s1">'/'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_cuisines</span><span class="p">)</span><span class="si">}</span><span class="s2">: "</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+<span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
 
 <span class="c1"># 2.1 Load and chunk PDFs using PyPDFLoader </span>
 <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="n">menu</span><span class="p">)</span>
@@ -2329,7 +2329,7 @@ Set <code>DEBUG_MODE=false</code> in <code>.env</code> and restart to confirm bo
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -3247,7 +3247,7 @@ not the intermediate chunks. Set <code>DEBUG_MODE=false</code> and re-run to con
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -4297,7 +4297,7 @@ response includes <code>answer</code> and <code>top_match</code>. Same endpoint 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -4836,7 +4836,7 @@ info when <code>DEBUG_MODE</code> is on.</p>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_specials</span><span class="p">(</span><span class="n">day</span><span class="p">):</span>
     <span class="c1"># F8: hits menu_api.py's /specials endpoint directly - core/sheets.py's live Google Sheet data,</span>
-    <span class="c1"># not the RAG chain, so this never touches menus/ or FAISS.</span>
+    <span class="c1"># not the RAG chain, so this never touches the menu PDFs or FAISS.</span>
     <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">API_URL</span><span class="si">}</span><span class="s2">/specials"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">"day"</span><span class="p">:</span> <span class="n">day</span><span class="p">}</span> <span class="k">if</span> <span class="n">day</span> <span class="k">else</span> <span class="p">{})</span>
     <span class="n">resp</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -6053,7 +6053,7 @@ lines print: <code>[F6] Tokens - ...</code> (this call) and <code>[F6] Session T
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -7420,7 +7420,7 @@ carry over, confirming sessions are isolated from each other.</p>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -9260,7 +9260,7 @@ strictly opt-in and adds nothing to the request path when it's off.</p>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -9901,7 +9901,7 @@ Updated for Modular Engine Strategy Factory (F12): <code>get_retriever()</code> 
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">index_path</span><span class="p">):</span>  <span class="c1"># F3: load a previously saved FAISS index...</span>
         <span class="n">vectorstore</span> <span class="o">=</span> <span class="n">FAISS</span><span class="o">.</span><span class="n">load_local</span><span class="p">(</span><span class="n">index_path</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">allow_dangerous_deserialization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># ...or build one from the PDF and save it</span>
-        <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">)</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">)</span>
         <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
         <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
         <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
@@ -10407,7 +10407,7 @@ Updated for Modular Engine Strategy Factory (F12): <code>get_retriever()</code> 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -11574,7 +11574,7 @@ both. (Don't type <code>tt</code> into either UI — see the note above.)</p>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -12715,7 +12715,7 @@ reality after <code>test_mcp_connection.py</code> caught the mismatch as a live 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_qa_chain</span><span class="p">(</span><span class="n">cuisine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span>
     <span class="c1"># Index path for the vectorstore</span>
     <span class="n">index_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VECTORSTORE_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">"</span>
 
@@ -14118,6 +14118,7 @@ Jump to:
 <a href="#f12-sec8">F12:8 Technical Deep Dive: TBA</a> ·
 <a href="#f12-sec9">F12:9 Source Code Reference (engines/plain_rag_engine.py)</a> ·
 <a href="#f12-sec10">F12:10 Source Code Reference (engine_api.py)</a> ·
+<a href="#f12-domains">F12:12 Domain Packs</a> ·
 <a href="#f12-sysdesign">F12:11 System Design</a>
 </p>
 
@@ -14281,7 +14282,7 @@ Modular Engine Strategy Factory (F12) doesn't replace any prior work — <code>P
   <rect x="90" y="202" width="580" height="56" rx="6" fill="#f7f7f9" stroke="#333" stroke-width="1.5"></rect>
   <text x="380" y="223" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1a1a">vectorstores/{cuisine}/</text>
   <text x="380" y="239" text-anchor="middle" font-size="11" fill="#666">load if the index is already on disk (F3),</text>
-  <text x="380" y="253" text-anchor="middle" font-size="11" fill="#666">else build from menus/{cuisine}.pdf and save it</text>
+  <text x="380" y="253" text-anchor="middle" font-size="11" fill="#666">else build from domains/restaurant/docs/{cuisine}.pdf and save it</text>
 </svg>
 
 <p><strong>Class: <code>BaseMenuEngine(ABC)</code></strong> — one abstract method: <code>answer(cuisine: str, question: str, session_id: str, use_memory: bool = True) -&gt; dict</code>, returning <code>{"result": str, "source_documents": [...]}</code> — the same shape <code>RetrievalQA.invoke()</code> already returns, so nothing downstream of an engine call needed to change shape.</p>
@@ -14314,7 +14315,7 @@ Modular Engine Strategy Factory (F12) doesn't replace any prior work — <code>P
         <ul>
           <li><code>core/vectorstore.py: get_retriever(cuisine, embeddings)</code>
             <ul>
-              <li>checks <code>vectorstores/{cuisine}/</code> on disk — exists → <code>FAISS.load_local(...)</code>; missing → <code>PyPDFLoader</code> on <code>menus/{cuisine}.pdf</code> → <code>RecursiveCharacterTextSplitter</code> → <code>FAISS.from_documents(...)</code> → <code>.save_local(...)</code></li>
+              <li>checks <code>vectorstores/&lt;DOMAIN&gt;/{cuisine}/</code> on disk — exists → <code>FAISS.load_local(...)</code>; missing → <code>PyPDFLoader</code> on <code>domains/restaurant/docs/{cuisine}.pdf</code> → <code>RecursiveCharacterTextSplitter</code> → <code>FAISS.from_documents(...)</code> → <code>.save_local(...)</code></li>
               <li><code>wrap_with_reranking(...)</code> → returns a <code>RerankingRetriever</code></li>
             </ul>
           </li>
@@ -15296,6 +15297,54 @@ replacement, delete <code>menu_api.py</code> once LangGraph State Machine Engine
 running both indefinitely.
 </div>
 </div>
+
+<p class="back-to-top"><a href="#f12">↑ Back to F12</a></p>
+<h3 id="f12-domains">F12:12 Domain Packs: One Codebase, Many Domains</h3>
+
+<p>F12's factory makes the <em>engine</em> swappable. Domain packs do the same for the <em>domain</em>: everything
+restaurant-specific moved out of the shared code into <code>domains/restaurant/</code>, and
+<code>core/domain.py</code> loads the active pack from the <code>DOMAIN</code> env var (default
+<code>restaurant</code>). A second pack, <code>domains/hr/</code> (Northwind Labs employee handbooks from the
+hr-assistant app), runs on the same engines with no engine changes. The alternative — copying the repo per domain —
+means every fix (F19, F22, F13.2…) has to be repeated in each copy.</p>
+
+<pre class="cmd"><code>core/  engines/  engine_api.py  api/mcp_server.py     ← shared, one copy
+core/domain.py                                         ← loads domains/&lt;DOMAIN&gt;/domain.py
+domains/
+  restaurant/  docs/*.pdf  evals/*.json  domain.py  sheets.py  tools.py
+  hr/          docs/*.pdf  evals/*.json  domain.py
+vectorstores/&lt;DOMAIN&gt;/&lt;collection&gt;/                  ← one FAISS folder per domain</code></pre>
+
+<ul>
+  <li><strong><code>domain.py</code></strong> — <code>NAME</code>, <code>COLLECTION_LABEL</code> ("cuisine" /
+  "department"), <code>COLLECTIONS</code>, <code>DOCS_DIR</code>, <code>EVALS_DIR</code>; prompts read by the
+  engines (<code>RAG_PERSONA</code> for F3.1, <code>ROUTE_QUESTION</code> for F13.1, <code>PLAN_PROMPT</code>,
+  <code>MCP_AGENT_PROMPT</code> and <code>SYNTHESIZE_PERSONA</code> for F13.2); F19's
+  <code>INTENT_LABELS</code>, <code>INTENT_PROMPT</code> and <code>OFF_TOPIC_MESSAGE</code>; and F8's live-data
+  settings (<code>MCP_SERVER_NAME</code>, <code>SPECIALS_TOOL</code>/<code>HOURS_TOOL</code> and their routing
+  keywords — <code>None</code> and <code>()</code> when a domain has neither).</li>
+  <li><strong><code>sheets.py</code> / <code>tools.py</code></strong> (optional) — domain-only Google Sheet tabs and
+  their MCP tools; <code>api/mcp_server.py</code> calls the pack's <code>register(mcp)</code>. The company-wide
+  <code>org</code> and <code>items</code> tabs stay shared in <code>core/sheets.py</code>.</li>
+  <li><strong><code>engine_api.py</code></strong> — <code>GET /collections</code> returns the pack's name, label and
+  collections; the Gradio and Streamlit UIs build their dropdown from it (falling back to the restaurant list when
+  pointed at <code>menu_api.py</code>). <code>/specials</code> and <code>/hours</code> return an error when the
+  domain has no such tool.</li>
+  <li><strong>Unchanged:</strong> the API's <code>cuisine</code> request field (it now means "collection"), and
+  <code>menu_api.py</code>, which stays restaurant-only apart from its PDF path.</li>
+</ul>
+
+<p><strong>Testing:</strong> <code>tests/test_domain.py</code> checks the loader, that every pack defines the
+restaurant pack's settings, that each collection has a PDF and an eval fixture, and that a pack's
+<code>SPECIALS_TOOL</code>/<code>HOURS_TOOL</code> are tools it actually registers. Verified live with
+<code>DOMAIN=hr</code>: all three engines answered "How many PTO days do engineers get per year?" with the
+handbook's 20 days, and an off-topic question got the HR redirect.</p>
+<pre class="cmd"><code>DOMAIN=hr uvicorn engine_api:app --reload --port 8000
+curl http://127.0.0.1:8000/collections
+{"domain": "hr", "label": "department", "collections": ["engineering", "sales", "operations"]}</code></pre>
+
+<p><strong>Adding a domain:</strong> see <code>domains/README.md</code> — copy a pack folder, swap the PDFs and
+fixtures, edit <code>domain.py</code>, run with <code>DOMAIN=&lt;name&gt;</code>.</p>
 
 <h3 id="f12-sysdesign">F12:11 System Design <a class="h3-up" href="#f12" title="Back to F12">↑ F12</a></h3>
 <p>Talking points for a system-design discussion, each linked to the matching part of the main <a href="#system-design">System Design</a> section.</p>
@@ -17134,7 +17183,7 @@ it the same way it already gates on <code>pytest</code> failing.</p>
 <p>Three pieces, run in sequence by one script:</p>
 
 <ul>
-  <li><strong>ground-truth dataset</strong> (<code>evaluation/fixtures/*.json</code>): a fixed set of 5 test
+  <li><strong>ground-truth dataset</strong> (<code>domains/restaurant/evals/*.json</code>): a fixed set of 5 test
   questions per cuisine, each paired with a known-good answer sourced straight from that cuisine's actual menu PDF
   (real prices, hours, and policy text — not placeholder copy) — checked into the repo like fixture data, not
   regenerated per run, so a score change means the system changed, not the test</li>
@@ -17200,7 +17249,7 @@ as its judge. The suite's only structural pieces:</p>
 <ul>
   <li><strong><code>evaluation/ground_truth.py</code></strong> — a two-item loader: <code>CUISINES</code> (the
   same three cuisines <code>engines/plain_rag_engine.py</code>'s <code>AVAILABLE_CUISINES</code> lists) and
-  <code>load_ground_truth(cuisine)</code>, which reads <code>evaluation/fixtures/&lt;cuisine&gt;.json</code> — a
+  <code>load_ground_truth(cuisine)</code>, which reads <code>domains/&lt;DOMAIN&gt;/evals/&lt;cuisine&gt;.json</code> — a
   plain list of <code>{"question", "expected_answer"}</code> pairs.</li>
   <li><strong><code>evaluation/scoring.py</code></strong> — three prompt templates
   (<code>FAITHFULNESS_PROMPT</code>, <code>ANSWER_RELEVANCY_PROMPT</code>, <code>CONTEXT_PRECISION_PROMPT</code>),
@@ -17253,7 +17302,7 @@ else below them is imported transitively, never invoked by hand:</p>
         </ul>
       </li>
       <li><code>evaluation.ground_truth</code> (<code>CUISINES</code>, <code>load_ground_truth</code>) — reads
-      <code>evaluation/fixtures/&lt;cuisine&gt;.json</code> (a file read, not an import)</li>
+      <code>domains/&lt;DOMAIN&gt;/evals/&lt;cuisine&gt;.json</code> (a file read, not an import)</li>
       <li><code>evaluation.scoring</code> (<code>EvalScore</code>, <code>score_answer</code>)
         <ul><li><code>pydantic</code> (<code>BaseModel</code>, <code>Field</code>)</li></ul>
       </li>
@@ -18214,7 +18263,7 @@ answers requests coming through the FastAPI route, not just the CLI path.
     <span class="c1"># F18: BM25 has no on-disk index of its own (langchain rebuilds it in memory from the raw</span>
     <span class="c1"># chunks each run), so parse + split the PDF unconditionally. This is cheap/local/no API</span>
     <span class="c1"># calls - the FAISS embedding step below is the expensive part the on-disk index still saves.</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="sa">f</span><span class="s2">"menus/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">PyPDFLoader</span><span class="p">(</span><span class="sa">f</span><span class="s2">"domains/restaurant/docs/</span><span class="si">{</span><span class="n">cuisine</span><span class="si">}</span><span class="s2">.pdf"</span><span class="p">)</span>
     <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
     <span class="n">text_splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
     <span class="n">docs</span> <span class="o">=</span> <span class="n">text_splitter</span><span class="o">.</span><span class="n">split_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
@@ -19208,7 +19257,7 @@ href="#f20-3">F20:3</a>) — a one-time step for whoever administers this reposi
 <span class="w">          </span><span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip</span>
 <span class="w">          </span><span class="nt">cache-dependency-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requirements.txt</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
-<span class="w">      </span><span class="c1"># menus/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh</span>
+<span class="w">      </span><span class="c1"># domains/restaurant/docs/*.pdf are checked in; vectorstores/ is gitignored, so this build is a fresh</span>
 <span class="w">      </span><span class="c1"># FAISS index from PDF on every run - see core/vectorstore.py's get_retriever().</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m evaluation.run_evals</span>
 </pre></div></td></tr></table></div>
@@ -19261,7 +19310,7 @@ turning that exit code into a check on a pull request instead of a number a pers
   future step (a cache warm, a smoke-test call) needed it too, without having to duplicate the line.</li>
   <li><strong>Line 45 (the vectorstores comment)</strong> &mdash; documents, not enforces: <code>vectorstores/</code>
   is in <code>.gitignore</code> (Test the chunking (RAG &amp; Vectorstore) (F3)), so every single
-  <code>eval-gate</code> run rebuilds all three cuisines' FAISS indexes from <code>menus/*.pdf</code> from scratch
+  <code>eval-gate</code> run rebuilds all three cuisines' FAISS indexes from <code>domains/restaurant/docs/*.pdf</code> from scratch
   &mdash; there's no persisted-index cache step in this workflow, unlike the pip cache two lines above. See <a
   href="#f20-8">F20:8</a> for why that's a deliberate omission, not an oversight.</li>
 </ul>
