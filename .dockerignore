@@ -1,0 +1,39 @@
+# secrets - never in the image
+.env
+.env.*
+!.env.example
+secrets/
+
+# local data - production keeps its SQLite on the Fly volume (/data)
+*.db
+*.db-journal
+
+# build leftovers
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+web-customer/node_modules/
+web-customer/dist/
+*.tsbuildinfo
+
+# not needed at runtime
+.git/
+.github/
+.claude/
+CLAUDE.md
+web-react/
+web-demo/
+images/
+blogs/
+tests/
+evaluation/
+features.html
+checklist.html
+checklist.csv
+project-notes.txt
+install.sh
+Archive.zip
+.DS_Store

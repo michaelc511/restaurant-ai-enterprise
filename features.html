@@ -4674,6 +4674,7 @@ Jump to:
 <a href="#f5-6">F5:6 Source Code Reference (web-demo/streamlit_app.py)</a> ·
 <a href="#f5-7">F5:7 Line-by-Line Deep Dive: TBA</a> ·
 <a href="#f5-8">F5:8 Technical Deep Dive: TBA</a> ·
+<a href="#f5-react">F5:10 React + TypeScript UI</a> ·
 <a href="#f5-sysdesign">F5:9 System Design</a>
 </p>
 
@@ -5071,6 +5072,267 @@ different UI paradigms — Gradio's callback-driven model vs. Streamlit's rerun-
 changes to <code>menu_api.py</code>, that's concrete evidence the API boundary is actually clean, not
 accidentally leaking frontend assumptions into the backend.
 </div>
+</div>
+
+<p class="back-to-top"><a href="#f5">↑ Back to F5</a></p>
+<h3 id="f5-react">F5:10 React + TypeScript UI (web-react/)</h3>
+
+<p>A third front end, built with <strong>React 18 + TypeScript + Vite</strong>, in <code>web-react/</code>. Like the
+Gradio and Streamlit UIs it is a thin HTTP client, but it talks to <code>engine_api.py</code> (not
+<code>legacy/menu_api.py</code>) and adds what those two don't have:</p>
+<ul>
+  <li><strong>Engine picker</strong> — Plain RAG, LangGraph (F13.1) or Agentic RAG LG (F13.2), sent per question as
+  <code>engine</code> in <code>POST /ask</code>.</li>
+  <li><strong>Domain-aware dropdown</strong> — collections and their label come from <code>GET /collections</code>
+  (F12:12), so <code>DOMAIN=hr</code> shows "Department: engineering / sales / operations" with no UI change.</li>
+  <li><strong>Chat history with per-answer metadata</strong> — engine, tokens and cost (F6), latency (F9), and the top
+  source chunk; one F7 memory session per browser tab.</li>
+  <li><strong>Daily specials panel</strong> (restaurant domain only) — live Google Sheet rows from
+  <code>/specials</code> (F8, over MCP).</li>
+</ul>
+
+<p><strong>Architecture:</strong> the Vite dev server proxies <code>/api/*</code> to <code>engine_api.py</code>
+(<code>vite.config.ts</code>), so the browser only ever talks to its own origin and the backend needs no CORS
+setup. <code>src/types.ts</code> holds the response shapes, <code>src/api.ts</code> the fetch wrappers (an
+<code>{"error": ...}</code> body becomes a thrown <code>Error</code>), and <code>src/App.tsx</code> the UI.
+Strict TypeScript (<code>strict</code>, <code>noUnusedLocals</code>) is checked on every build.</p>
+
+<p><strong class="hl-title">How to run:</strong></p>
+<pre class="cmd"><code>source venv/bin/activate
+uvicorn engine_api:app --reload --port 8000        # terminal 1: the API
+
+cd web-react
+npm install                                        # first time only
+npm run dev                                        # terminal 2: http://localhost:5173</code></pre>
+<p>API on another port: <code>API_URL=http://127.0.0.1:8001 npm run dev</code>. Production bundle:
+<code>npm run build</code> (type-checks, then writes <code>web-react/dist/</code>).</p>
+
+<div class="note">
+<strong>Verification:</strong> <code>npm run build</code> passes strict type-checking. Ran
+<code>engine_api.py</code> and the Vite dev server together and called through the proxy for real:
+<code>/api/collections</code> returned the restaurant pack, <code>/api/specials?day=Fri</code> returned the live
+sheet's two specials (Dragon Fire Maki, Smoked Salmon &amp; Caviar Roll), and <code>/api/ask</code> with
+<code>engine: "orchestrator"</code> answered "The Spaghetti Carbonara is priced at $21.00." with
+<code>usage</code> and <code>trace</code> attached. The page itself was not clicked through in a browser.
+</div>
+
+<h4>Source: web-react/src/App.tsx</h4>
+<div class="code-block">
+<div class="code-block-title"><span>web-react/src/App.tsx</span><span class="role">The UI: domain-aware dropdowns, engine picker, chat history, specials panel (F5) — 154 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  // F5: React + TypeScript UI over engine_api.py. Unlike the Gradio/Streamlit UIs it can pick the
+<span class="ln">  2</span>  // engine per question (F12/F13), and its collection dropdown comes from the active domain pack.
+<span class="ln">  3</span>  import { useEffect, useState } from &quot;react&quot;;
+<span class="ln">  4</span>  import { ask, ENGINES, getCollections, getSpecials, type EngineKey } from &quot;./api&quot;;
+<span class="ln">  5</span>  import type { AskResponse, CollectionsResponse, SheetRow } from &quot;./types&quot;;
+<span class="ln">  6</span>  
+<span class="ln">  7</span>  const WEEKDAYS = [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;, &quot;Sun&quot;];
+<span class="ln">  8</span>  const SESSION_ID = `web-react-${Math.random().toString(36).slice(2, 10)}`; // F7: one memory thread per tab
+<span class="ln">  9</span>  
+<span class="ln"> 10</span>  interface Turn {
+<span class="ln"> 11</span>    question: string;
+<span class="ln"> 12</span>    response?: AskResponse;
+<span class="ln"> 13</span>    error?: string;
+<span class="ln"> 14</span>  }
+<span class="ln"> 15</span>  
+<span class="ln"> 16</span>  export default function App() {
+<span class="ln"> 17</span>    const [domain, setDomain] = useState&lt;CollectionsResponse | null&gt;(null);
+<span class="ln"> 18</span>    const [loadError, setLoadError] = useState(&quot;&quot;);
+<span class="ln"> 19</span>    const [collection, setCollection] = useState(&quot;&quot;);
+<span class="ln"> 20</span>    const [engine, setEngine] = useState&lt;EngineKey&gt;(&quot;plain_rag&quot;);
+<span class="ln"> 21</span>    const [question, setQuestion] = useState(&quot;&quot;);
+<span class="ln"> 22</span>    const [turns, setTurns] = useState&lt;Turn[]&gt;([]);
+<span class="ln"> 23</span>    const [busy, setBusy] = useState(false);
+<span class="ln"> 24</span>  
+<span class="ln"> 25</span>    useEffect(() =&gt; {
+<span class="ln"> 26</span>      getCollections()
+<span class="ln"> 27</span>        .then((data) =&gt; {
+<span class="ln"> 28</span>          setDomain(data);
+<span class="ln"> 29</span>          setCollection(data.collections[0] ?? &quot;&quot;);
+<span class="ln"> 30</span>        })
+<span class="ln"> 31</span>        .catch((e: Error) =&gt; setLoadError(`${e.message} - is engine_api.py running on port 8000?`));
+<span class="ln"> 32</span>    }, []);
+<span class="ln"> 33</span>  
+<span class="ln"> 34</span>    async function submit(e: React.FormEvent) {
+<span class="ln"> 35</span>      e.preventDefault();
+<span class="ln"> 36</span>      const q = question.trim();
+<span class="ln"> 37</span>      if (!q || busy) return;
+<span class="ln"> 38</span>      setBusy(true);
+<span class="ln"> 39</span>      setQuestion(&quot;&quot;);
+<span class="ln"> 40</span>      try {
+<span class="ln"> 41</span>        const response = await ask(collection, q, engine, SESSION_ID);
+<span class="ln"> 42</span>        setTurns((t) =&gt; [...t, { question: q, response }]);
+<span class="ln"> 43</span>      } catch (err) {
+<span class="ln"> 44</span>        setTurns((t) =&gt; [...t, { question: q, error: (err as Error).message }]);
+<span class="ln"> 45</span>      } finally {
+<span class="ln"> 46</span>        setBusy(false);
+<span class="ln"> 47</span>      }
+<span class="ln"> 48</span>    }
+<span class="ln"> 49</span>  
+<span class="ln"> 50</span>    if (loadError) return &lt;main className=&quot;page&quot;&gt;&lt;p className=&quot;error&quot;&gt;{loadError}&lt;/p&gt;&lt;/main&gt;;
+<span class="ln"> 51</span>    if (!domain) return &lt;main className=&quot;page&quot;&gt;&lt;p&gt;Loading…&lt;/p&gt;&lt;/main&gt;;
+<span class="ln"> 52</span>  
+<span class="ln"> 53</span>    const label = domain.label.charAt(0).toUpperCase() + domain.label.slice(1);
+<span class="ln"> 54</span>  
+<span class="ln"> 55</span>    return (
+<span class="ln"> 56</span>      &lt;main className=&quot;page&quot;&gt;
+<span class="ln"> 57</span>        &lt;header&gt;
+<span class="ln"> 58</span>          &lt;h1&gt;RAG Assistant&lt;/h1&gt;
+<span class="ln"> 59</span>          &lt;span className=&quot;pill&quot;&gt;domain: {domain.domain}&lt;/span&gt;
+<span class="ln"> 60</span>        &lt;/header&gt;
+<span class="ln"> 61</span>  
+<span class="ln"> 62</span>        &lt;div className=&quot;controls&quot;&gt;
+<span class="ln"> 63</span>          &lt;label&gt;
+<span class="ln"> 64</span>            {label}
+<span class="ln"> 65</span>            &lt;select value={collection} onChange={(e) =&gt; setCollection(e.target.value)}&gt;
+<span class="ln"> 66</span>              {domain.collections.map((c) =&gt; &lt;option key={c} value={c}&gt;{c}&lt;/option&gt;)}
+<span class="ln"> 67</span>            &lt;/select&gt;
+<span class="ln"> 68</span>          &lt;/label&gt;
+<span class="ln"> 69</span>          &lt;label&gt;
+<span class="ln"> 70</span>            Engine
+<span class="ln"> 71</span>            &lt;select value={engine} onChange={(e) =&gt; setEngine(e.target.value as EngineKey)}&gt;
+<span class="ln"> 72</span>              {ENGINES.map((en) =&gt; &lt;option key={en.key} value={en.key}&gt;{en.label}&lt;/option&gt;)}
+<span class="ln"> 73</span>            &lt;/select&gt;
+<span class="ln"> 74</span>          &lt;/label&gt;
+<span class="ln"> 75</span>        &lt;/div&gt;
+<span class="ln"> 76</span>  
+<span class="ln"> 77</span>        &lt;section className=&quot;chat&quot;&gt;
+<span class="ln"> 78</span>          {turns.length === 0 &amp;&amp; &lt;p className=&quot;muted&quot;&gt;Ask a question about the {domain.label} documents.&lt;/p&gt;}
+<span class="ln"> 79</span>          {turns.map((turn, i) =&gt; &lt;TurnView key={i} turn={turn} /&gt;)}
+<span class="ln"> 80</span>          {busy &amp;&amp; &lt;p className=&quot;muted&quot;&gt;Thinking…&lt;/p&gt;}
+<span class="ln"> 81</span>        &lt;/section&gt;
+<span class="ln"> 82</span>  
+<span class="ln"> 83</span>        &lt;form className=&quot;ask&quot; onSubmit={submit}&gt;
+<span class="ln"> 84</span>          &lt;input value={question} onChange={(e) =&gt; setQuestion(e.target.value)} placeholder=&quot;Ask a question&quot; disabled={busy} /&gt;
+<span class="ln"> 85</span>          &lt;button type=&quot;submit&quot; disabled={busy || !question.trim()}&gt;Ask&lt;/button&gt;
+<span class="ln"> 86</span>        &lt;/form&gt;
+<span class="ln"> 87</span>  
+<span class="ln"> 88</span>        {domain.domain === &quot;restaurant&quot; &amp;&amp; &lt;Specials /&gt;}
+<span class="ln"> 89</span>      &lt;/main&gt;
+<span class="ln"> 90</span>    );
+<span class="ln"> 91</span>  }
+<span class="ln"> 92</span>  
+<span class="ln"> 93</span>  function TurnView({ turn }: { turn: Turn }) {
+<span class="ln"> 94</span>    const r = turn.response;
+<span class="ln"> 95</span>    return (
+<span class="ln"> 96</span>      &lt;div className=&quot;turn&quot;&gt;
+<span class="ln"> 97</span>        &lt;p className=&quot;q&quot;&gt;{turn.question}&lt;/p&gt;
+<span class="ln"> 98</span>        {turn.error &amp;&amp; &lt;p className=&quot;error&quot;&gt;{turn.error}&lt;/p&gt;}
+<span class="ln"> 99</span>        {r &amp;&amp; (
+<span class="ln">100</span>          &lt;&gt;
+<span class="ln">101</span>            &lt;p className=&quot;a&quot;&gt;{r.answer}&lt;/p&gt;
+<span class="ln">102</span>            &lt;p className=&quot;meta&quot;&gt;
+<span class="ln">103</span>              {r.engine ?? &quot;answered before the engine&quot;}
+<span class="ln">104</span>              {r.usage &amp;&amp; ` · ${r.usage.total_tokens} tokens · $${r.usage.total_cost_usd.toFixed(5)}`}
+<span class="ln">105</span>              {r.trace &amp;&amp; ` · ${Math.round(r.trace.total_ms)} ms`}
+<span class="ln">106</span>            &lt;/p&gt;
+<span class="ln">107</span>            {r.top_match &amp;&amp; (
+<span class="ln">108</span>              &lt;details&gt;
+<span class="ln">109</span>                &lt;summary&gt;Top source&lt;/summary&gt;
+<span class="ln">110</span>                &lt;pre&gt;{r.top_match}&lt;/pre&gt;
+<span class="ln">111</span>              &lt;/details&gt;
+<span class="ln">112</span>            )}
+<span class="ln">113</span>          &lt;/&gt;
+<span class="ln">114</span>        )}
+<span class="ln">115</span>      &lt;/div&gt;
+<span class="ln">116</span>    );
+<span class="ln">117</span>  }
+<span class="ln">118</span>  
+<span class="ln">119</span>  function Specials() {
+<span class="ln">120</span>    // F8: live rows from the Google Sheet through engine_api.py&#x27;s /specials (over MCP)
+<span class="ln">121</span>    const [day, setDay] = useState(WEEKDAYS[(new Date().getDay() + 6) % 7]);
+<span class="ln">122</span>    const [rows, setRows] = useState&lt;SheetRow[] | null&gt;(null);
+<span class="ln">123</span>    const [error, setError] = useState(&quot;&quot;);
+<span class="ln">124</span>  
+<span class="ln">125</span>    async function load() {
+<span class="ln">126</span>      setError(&quot;&quot;);
+<span class="ln">127</span>      try {
+<span class="ln">128</span>        setRows(await getSpecials(day));
+<span class="ln">129</span>      } catch (e) {
+<span class="ln">130</span>        setError((e as Error).message);
+<span class="ln">131</span>      }
+<span class="ln">132</span>    }
+<span class="ln">133</span>  
+<span class="ln">134</span>    return (
+<span class="ln">135</span>      &lt;section className=&quot;specials&quot;&gt;
+<span class="ln">136</span>        &lt;h2&gt;Daily specials&lt;/h2&gt;
+<span class="ln">137</span>        &lt;div className=&quot;controls&quot;&gt;
+<span class="ln">138</span>          &lt;select value={day} onChange={(e) =&gt; setDay(e.target.value)}&gt;
+<span class="ln">139</span>            {WEEKDAYS.map((d) =&gt; &lt;option key={d}&gt;{d}&lt;/option&gt;)}
+<span class="ln">140</span>          &lt;/select&gt;
+<span class="ln">141</span>          &lt;button onClick={load}&gt;Load&lt;/button&gt;
+<span class="ln">142</span>        &lt;/div&gt;
+<span class="ln">143</span>        {error &amp;&amp; &lt;p className=&quot;error&quot;&gt;{error}&lt;/p&gt;}
+<span class="ln">144</span>        {rows &amp;&amp; rows.length === 0 &amp;&amp; &lt;p className=&quot;muted&quot;&gt;No active specials.&lt;/p&gt;}
+<span class="ln">145</span>        {rows &amp;&amp; rows.length &gt; 0 &amp;&amp; (
+<span class="ln">146</span>          &lt;ul&gt;
+<span class="ln">147</span>            {rows.map((row, i) =&gt; (
+<span class="ln">148</span>              &lt;li key={i}&gt;&lt;strong&gt;{row[&quot;Dish Name&quot;]}&lt;/strong&gt; ({row[&quot;Price&quot;]}) — {row[&quot;Description&quot;]}&lt;/li&gt;
+<span class="ln">149</span>            ))}
+<span class="ln">150</span>          &lt;/ul&gt;
+<span class="ln">151</span>        )}
+<span class="ln">152</span>      &lt;/section&gt;
+<span class="ln">153</span>    );
+<span class="ln">154</span>  }</code></pre>
+</div>
+<h4>Source: web-react/src/api.ts</h4>
+<div class="code-block">
+<div class="code-block-title"><span>web-react/src/api.ts</span><span class="role">Fetch wrappers over engine_api.py through the /api proxy (F5) — 36 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  // F5: thin fetch wrappers over engine_api.py, reached through Vite&#x27;s /api proxy (vite.config.ts).
+<span class="ln">  2</span>  import type { AskResponse, CollectionsResponse, ErrorResponse, SheetRow } from &quot;./types&quot;;
+<span class="ln">  3</span>  
+<span class="ln">  4</span>  // F12/F13: engine keys engine_api.py accepts, labeled the same as its CLI menu
+<span class="ln">  5</span>  export const ENGINES = [
+<span class="ln">  6</span>    { key: &quot;plain_rag&quot;, label: &quot;Plain RAG&quot; },
+<span class="ln">  7</span>    { key: &quot;langgraph&quot;, label: &quot;LangGraph&quot; },
+<span class="ln">  8</span>    { key: &quot;orchestrator&quot;, label: &quot;Agentic RAG LG&quot; },
+<span class="ln">  9</span>  ] as const;
+<span class="ln"> 10</span>  
+<span class="ln"> 11</span>  export type EngineKey = (typeof ENGINES)[number][&quot;key&quot;];
+<span class="ln"> 12</span>  
+<span class="ln"> 13</span>  async function getJson&lt;T&gt;(path: string, init?: RequestInit): Promise&lt;T&gt; {
+<span class="ln"> 14</span>    const resp = await fetch(`/api${path}`, init);
+<span class="ln"> 15</span>    if (!resp.ok) throw new Error(`${path} failed: HTTP ${resp.status}`);
+<span class="ln"> 16</span>    const data = (await resp.json()) as T | ErrorResponse;
+<span class="ln"> 17</span>    if (typeof data === &quot;object&quot; &amp;&amp; data !== null &amp;&amp; &quot;error&quot; in data) throw new Error(data.error);
+<span class="ln"> 18</span>    return data as T;
+<span class="ln"> 19</span>  }
+<span class="ln"> 20</span>  
+<span class="ln"> 21</span>  export function getCollections(): Promise&lt;CollectionsResponse&gt; {
+<span class="ln"> 22</span>    return getJson&lt;CollectionsResponse&gt;(&quot;/collections&quot;);
+<span class="ln"> 23</span>  }
+<span class="ln"> 24</span>  
+<span class="ln"> 25</span>  export function ask(cuisine: string, question: string, engine: EngineKey, sessionId: string): Promise&lt;AskResponse&gt; {
+<span class="ln"> 26</span>    return getJson&lt;AskResponse&gt;(&quot;/ask&quot;, {
+<span class="ln"> 27</span>      method: &quot;POST&quot;,
+<span class="ln"> 28</span>      headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+<span class="ln"> 29</span>      body: JSON.stringify({ cuisine, question, engine, session_id: sessionId }),
+<span class="ln"> 30</span>    });
+<span class="ln"> 31</span>  }
+<span class="ln"> 32</span>  
+<span class="ln"> 33</span>  export async function getSpecials(day?: string): Promise&lt;SheetRow[]&gt; {
+<span class="ln"> 34</span>    const query = day ? `?day=${encodeURIComponent(day)}` : &quot;&quot;;
+<span class="ln"> 35</span>    return (await getJson&lt;{ specials: SheetRow[] }&gt;(`/specials${query}`)).specials;
+<span class="ln"> 36</span>  }</code></pre>
+</div>
+<h4>Source: web-react/vite.config.ts</h4>
+<div class="code-block">
+<div class="code-block-title"><span>web-react/vite.config.ts</span><span class="role">Dev server + /api proxy to engine_api.py (F5) — 16 lines</span></div>
+<pre class="plain-code"><code><span class="ln">  1</span>  // F5: dev server proxies /api to engine_api.py, so the browser never makes a cross-origin call and
+<span class="ln">  2</span>  // engine_api.py needs no CORS setup. Override the target with API_URL=http://host:port.
+<span class="ln">  3</span>  import { defineConfig } from &quot;vite&quot;;
+<span class="ln">  4</span>  import react from &quot;@vitejs/plugin-react&quot;;
+<span class="ln">  5</span>  
+<span class="ln">  6</span>  const API_URL = process.env.API_URL ?? &quot;http://127.0.0.1:8000&quot;;
+<span class="ln">  7</span>  
+<span class="ln">  8</span>  export default defineConfig({
+<span class="ln">  9</span>    plugins: [react()],
+<span class="ln"> 10</span>    server: {
+<span class="ln"> 11</span>      port: 5173,
+<span class="ln"> 12</span>      proxy: {
+<span class="ln"> 13</span>        &quot;/api&quot;: { target: API_URL, changeOrigin: true, rewrite: (path) =&gt; path.replace(/^\/api/, &quot;&quot;) },
+<span class="ln"> 14</span>      },
+<span class="ln"> 15</span>    },
+<span class="ln"> 16</span>  });</code></pre>
 </div>
 
 <h3 id="f5-sysdesign">F5:9 System Design <a class="h3-up" href="#f5" title="Back to F5">↑ F5</a></h3>
@@ -20348,7 +20610,10 @@ the frozen baseline. Run every command from the repo root.</p>
 │   ├── scoring.py, ground_truth.py
 │   └── test_mcp_connection.py #   live Google Sheet check over MCP
 ├── tests/                     # fully mocked pytest suite (F23) - no key, no network
-├── web-demo/                  # Gradio + Streamlit UIs; dropdown from GET /collections
+├── web-demo/                  # Gradio + Streamlit UIs; dropdown from GET /collections (F5)
+├── web-react/                 # React + TypeScript + Vite UI with engine picker (F5:10)
+│   ├── src/App.tsx, api.ts, types.ts
+│   └── vite.config.ts         #   proxies /api to engine_api.py
 ├── legacy/                    # frozen baseline - not developed further
 │   ├── menu_api.py            #   original FastAPI app (uvicorn legacy.menu_api:app)
 │   ├── menu_rag.py, menu_rag.ipynb   # original CLI script + notebook
@@ -20370,7 +20635,8 @@ the frozen baseline. Run every command from the repo root.</p>
 </table>
 
 <p>Gitignored and local only: <code>.env</code>, <code>secrets/</code> (Google service-account key),
-<code>vectorstores/</code>, <code>usage.db</code>, <code>chat_history.db</code>, <code>venv/</code>.</p>
+<code>vectorstores/</code>, <code>usage.db</code>, <code>chat_history.db</code>, <code>venv/</code>,
+<code>web-react/node_modules/</code>, <code>web-react/dist/</code>.</p>
 
 <p class="back-to-top"><a href="#top">↑ Back to top</a></p>
 

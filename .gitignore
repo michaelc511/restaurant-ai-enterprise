@@ -16,3 +16,6 @@ usage.db
 chat_history.db
 install.sh
 Archive.zip
+node_modules/
+*.tsbuildinfo
+.claude/skills/

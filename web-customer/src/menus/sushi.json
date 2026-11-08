@@ -1,0 +1,475 @@
+{
+  "_source": "Generated from domains/restaurant/docs/sushi.pdf by scripts/build_menus.py (F5)",
+  "info": {
+    "name": "Sakura Sushi & Izakaya Lounge",
+    "tagline": "Artisanal Omakase, Fresh Nigiri, and Robata Charcoal Grill",
+    "address": "512 Cherry Blossom Way, Downtown Arts District, Seattle, WA 98101",
+    "hours": "Tuesday–Thursday: 12:00 PM – 10:00 PM | Friday–Saturday: 12:00 PM – 11:00 PM | Sunday: 4:00 PM – 9:30 PM | Monday: Closed",
+    "payment": "All Major Credit Cards (Visa, MC, Amex), Contactless Tap-to-Pay, Apple Pay, and Cash. Maximum 4 card splits per party.",
+    "reservations": "Required for Omakase chef counter seating. Main dining room walk-ins welcome based on availability. 2-hour table seating policy.",
+    "takeout": "Omakase is dine-in only. Bento boxes, rolls, and hot entrees available for pickup via Toast Tab and delivery via Grubhub.",
+    "parking": "Valet parking available at entrance for $12 flat fee; validated garage parking across the street for up to 3 hours.",
+    "dress": "No strong personal perfumes or colognes permitted out of respect for delicate sushi aromas. Smart casual dress code.",
+    "alcohol": "Curated sake, Japanese craft beer, and Japanese whisky selection. 21+ photo ID strictly verified. Corkage fee is $30 per 720ml bottle."
+  },
+  "sections": [
+    {
+      "title": "Appetizers",
+      "items": [
+        {
+          "name": "Sea Salt Edamame",
+          "price": 6.5,
+          "tags": [
+            "Gluten-Free",
+            "Vegan",
+            "Mild"
+          ],
+          "description": "Steamed tender young soybean pods tossed in coarse Maldon sea salt."
+        },
+        {
+          "name": "Spicy Garlic Edamame",
+          "price": 8.0,
+          "tags": [
+            "Vegan",
+            "Spicy"
+          ],
+          "description": "Wok-charred soybeans tossed in sweet garlic soy sauce, chili sesame oil, and toasted sesame seeds."
+        },
+        {
+          "name": "Pork Gyoza 6 pcs",
+          "price": 9.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Pan-seared handmade dumplings filled with minced pork, scallions, cabbage, and ginger, served with spicy sesame ponzu."
+        },
+        {
+          "name": "Vegetable Tempura Medley",
+          "price": 11.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Light and airy tempura-battered sweet potato, lotus root, asparagus, and shiitake mushrooms with warm dashi dipping broth."
+        },
+        {
+          "name": "Hamachi Jalapeño Crudo",
+          "price": 16.5,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Thin slices of Pacific yellowtail sashimi topped with serrano chili slices, fresh cilantro, and citrus yuzu ponzu."
+        },
+        {
+          "name": "Tuna Tataki",
+          "price": 17.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Lightly seared sesame-crusted ahi tuna slices served over shredded daikon radish with house sweet ginger ponzu."
+        },
+        {
+          "name": "Agedashi Tofu",
+          "price": 8.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Crispy fried silken tofu cubes served in a warm savory dashi broth with bonito flakes, grated ginger, and scallions."
+        },
+        {
+          "name": "Takoyaki 5 pcs",
+          "price": 9.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Japanese street-style battered octopus balls drizzled with Japanese kewpie mayonnaise, savory takoyaki sauce, and bonito flakes."
+        },
+        {
+          "name": "Miso Glazed Eggplant Nasu Dengaku",
+          "price": 10.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Broiled Japanese eggplant brushed with caramelized sweet red miso sauce and toasted sesame seeds."
+        },
+        {
+          "name": "Soft Shell Crab Karaage",
+          "price": 15.5,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Crispy deep-fried whole soft shell crab served with a spicy yuzu dipping aioli and scallions."
+        }
+      ]
+    },
+    {
+      "title": "Entrées",
+      "items": [
+        {
+          "name": "Nigiri Tasting Flight 8 pcs",
+          "price": 34.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Chef choice selection of premium nigiri: Maguro, Sake, Hamachi, Tai, Unagi, Hotate, Shiro Maguro, and Ebi."
+        },
+        {
+          "name": "Sashimi Deluxe Platter 15 pcs",
+          "price": 42.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Artisanal thick cuts of seasonal fresh sashimi served over shaved ice with fresh grated wasabi root."
+        },
+        {
+          "name": "Dragon Roll",
+          "price": 18.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "BBQ freshwater eel and crisp cucumber inside, topped with thinly sliced avocado, sweet unagi glaze, and toasted sesame seeds."
+        },
+        {
+          "name": "Spicy Tuna Volcano Roll",
+          "price": 17.5,
+          "tags": [
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Spicy minced tuna and cucumber, topped with baked spicy crab salad, crispy tempura flakes, and sriracha unagi glaze."
+        },
+        {
+          "name": "Rainbow Roll",
+          "price": 19.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Crab salad and cucumber roll draped with fresh slices of raw Atlantic salmon, bigeye tuna, yellowtail, and avocado."
+        },
+        {
+          "name": "Salmon Lover Roll",
+          "price": 18.0,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Fresh salmon and avocado inside, topped with torched King salmon belly, spicy Japanese mayo, and ikura salmon roe."
+        },
+        {
+          "name": "Crispy Tiger Roll",
+          "price": 16.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Jumbo shrimp tempura and cucumber topped with steamed tiger shrimp, sliced avocado, and sweet tare glaze."
+        },
+        {
+          "name": "Truffle Yellowtail Roll",
+          "price": 20.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Yellowtail and asparagus wrapped inside, draped with torched hamachi belly, white truffle oil, and sea salt."
+        },
+        {
+          "name": "Spicy Scallop Hand Roll 2 pcs",
+          "price": 15.0,
+          "tags": [
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Chopped Hokkaido sea scallops tossed with spicy mayo, tobiko, and crispy shallots wrapped in crisp nori seaweed."
+        },
+        {
+          "name": "A5 Miyazaki Wagyu Roll",
+          "price": 28.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Asparagus and shiitake mushroom inside, wrapped with seared Japanese A5 Miyazaki Wagyu beef and sweet garlic tare sauce."
+        },
+        {
+          "name": "Chicken Teriyaki Dinner",
+          "price": 22.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Charcoal-grilled organic chicken breast brushed with signature house teriyaki glaze, served with steamed rice and wok greens."
+        },
+        {
+          "name": "Salmon Teriyaki Dinner",
+          "price": 25.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Pan-roasted Atlantic salmon glazed in sweet mirin teriyaki glaze, served with baby bok choy and jasmine rice."
+        },
+        {
+          "name": "Prime Tonkatsu Pork Cutlet",
+          "price": 21.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Panko-crusted deep-fried Berkshire pork loin served with shredded cabbage, sesame dressing, and fruit-infused tonkatsu sauce."
+        },
+        {
+          "name": "Chicken Katsu Curry",
+          "price": 22.5,
+          "tags": [
+            "Medium"
+          ],
+          "description": "Crispy chicken cutlet served over steamed white rice with rich aromatic Japanese brown curry and pickled fukujinzuke."
+        },
+        {
+          "name": "Tonkotsu Chashu Ramen",
+          "price": 17.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Rich 16-hour simmered pork bone broth, artisan ramen noodles, braised pork belly chashu, soft-boiled egg, and menma bamboo."
+        },
+        {
+          "name": "Spicy Miso Ramen",
+          "price": 18.0,
+          "tags": [
+            "Spicy"
+          ],
+          "description": "Rich fermented spicy miso broth, spiced ground pork, chili oil, sweet corn, scallions, and a seasoned soft-boiled egg."
+        },
+        {
+          "name": "Seafood Yaki Udon",
+          "price": 21.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Stir-fried thick udon noodles with black tiger shrimp, calamari rings, shredded cabbage, and savory dashi sauce."
+        },
+        {
+          "name": "Vegetable Tempura Udon Soup",
+          "price": 17.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Thick wheat noodles in a clear kombu dashi broth with scallions and wakame, served with a side of vegetable tempura."
+        },
+        {
+          "name": "Unagi Donburi",
+          "price": 26.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Charcoal-grilled BBQ freshwater eel fillets glazed with caramelized unagi sauce, served over seasoned steamed sushi rice."
+        },
+        {
+          "name": "Chirashi Rice Bowl",
+          "price": 32.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Assorted prime sashimi cuts, tamago sweet egg omelet, ikura, and Japanese pickles arranged over seasoned sushi rice."
+        },
+        {
+          "name": "Robata Grilled Salmon Belly",
+          "price": 19.5,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Charcoal-grilled fatty salmon belly skewered with sea salt and served with freshly squeezed lemon juice."
+        },
+        {
+          "name": "Robata Prime Beef Skewers 2 pcs",
+          "price": 16.0,
+          "tags": [
+            "Medium"
+          ],
+          "description": "Charcoal-grilled skirt steak skewers brushed with spicy garlic shoyu marinade and topped with scallions."
+        },
+        {
+          "name": "Grilled Kurobuta Sausage 3 pcs",
+          "price": 12.5,
+          "tags": [
+            "Medium"
+          ],
+          "description": "Japanese Berkshire pork sausages grilled crisp on the binchotan charcoal grill, served with hot Japanese mustard."
+        },
+        {
+          "name": "Saba Shioyaki",
+          "price": 18.5,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Traditional sea salt-grilled Atlantic mackerel fillet served with grated daikon radish and citrus ponzu."
+        },
+        {
+          "name": "Sesame Crusted Ahi Steak",
+          "price": 28.0,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Pan-seared sushi-grade ahi tuna cooked rare, served over wasabi mashed potatoes with ginger-soy glaze."
+        }
+      ]
+    },
+    {
+      "title": "Desserts",
+      "items": [
+        {
+          "name": "Matcha Green Tea Tiramisu",
+          "price": 9.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Ladyfinger sponge soaked in premium Uji green tea liqueur and layered with mascarpone custard."
+        },
+        {
+          "name": "Mochi Ice Cream Trio",
+          "price": 7.5,
+          "tags": [
+            "Gluten-Free",
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Sweet glutinous rice dough balls filled with ice cream in three flavors: Green Tea, Black Sesame, and Sweet Mango."
+        },
+        {
+          "name": "Black Sesame Panna Cotta",
+          "price": 8.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Silky roasted black sesame custard finished with a drizzle of kuromitsu Okinawa black sugar syrup."
+        },
+        {
+          "name": "Tempura Green Tea Ice Cream",
+          "price": 9.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Matcha ice cream wrapped in pound cake, flash-fried in crispy tempura batter and drizzled with chocolate sauce."
+        },
+        {
+          "name": "Yuzu Citrus Sorbet",
+          "price": 7.0,
+          "tags": [
+            "Gluten-Free",
+            "Vegan",
+            "Mild"
+          ],
+          "description": "Light, tart, and refreshing sorbet made from Japanese yuzu citrus fruit, garnished with fresh mint leaves."
+        }
+      ]
+    },
+    {
+      "title": "Beverages & Drinks",
+      "items": [
+        {
+          "name": "Iced Roasted Hojicha",
+          "price": 4.0,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Earthy, nutty roasted Japanese green tea brewed fresh and served chilled over ice."
+        },
+        {
+          "name": "Japanese Ramune Soda",
+          "price": 4.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Iconic Japanese marble glass bottle soda in classic sweet lemon-lime flavor."
+        },
+        {
+          "name": "Hot Genmaicha Green Tea",
+          "price": 3.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Premium Japanese green tea blended with toasted brown rice, served in a cast iron pot."
+        },
+        {
+          "name": "Yuzu Sparkling Lemonade",
+          "price": 5.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Refreshing handcrafted sparkling beverage made with freshly squeezed Japanese yuzu juice and cane sugar."
+        },
+        {
+          "name": "Sapporo Premium Draft Beer Pint",
+          "price": 7.5,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Crisp, clean, and refreshing iconic Japanese lager with a crisp finish."
+        },
+        {
+          "name": "Asahi Super Dry Bottle",
+          "price": 7.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Dry and light malt profile with a sharp, crisp palate-cleansing finish."
+        },
+        {
+          "name": "Dassai 23 Junmai Daiginjo 300ml",
+          "price": 48.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Ultra-premium sake milled to 23%, featuring delicate aromas of sweet melon, white peach, and velvety finish."
+        },
+        {
+          "name": "Kikusui Junmai Ginjo Glass",
+          "price": 12.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Light, pleasantly dry sake with delicate floral aromas and a clean mouthfeel."
+        },
+        {
+          "name": "Suntory Toki Highball",
+          "price": 13.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Suntory Toki Japanese whisky blended with high-pressure carbonated soda water and expressed grapefruit peel."
+        },
+        {
+          "name": "Plum Wine Umeshu on the Rocks",
+          "price": 9.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Sweet and aromatic traditional Japanese ume plum liqueur served over an artisan ice sphere."
+        }
+      ]
+    }
+  ]
+}

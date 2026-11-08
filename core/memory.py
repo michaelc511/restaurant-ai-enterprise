@@ -20,7 +20,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 
 DEBUG_MODE = os.environ.get("DEBUG_MODE", "true").lower() != "false"
 MEMORY_BACKEND = os.environ.get("MEMORY_BACKEND", "ephemeral").lower()  # F16: "ephemeral" (F7, RAM) or "persistent" (F16, SQLite)
-CHAT_HISTORY_DB_PATH = "chat_history.db"  # F16: only used when MEMORY_BACKEND=persistent
+CHAT_HISTORY_DB_PATH = os.path.join(os.environ.get("DATA_DIR", "."), "chat_history.db")  # F16: only used when MEMORY_BACKEND=persistent; DATA_DIR=/data on Fly
 
 MAX_HISTORY_TURNS = 5  # working context window - keep only the last N exchanges
 

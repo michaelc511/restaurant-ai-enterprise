@@ -2,12 +2,13 @@
 token/cost numbers survive process restarts. Also gives future text-to-SQL
 tooling a real table to query.
 """
+import os
 import sqlite3
 from datetime import datetime, timezone
 
 from core.telemetry import UsageInfo
 
-DB_PATH = "usage.db"
+DB_PATH = os.path.join(os.environ.get("DATA_DIR", "."), "usage.db")  # F11: DATA_DIR=/data on Fly keeps the log on the volume
 
 
 def init_db(db_path: str = DB_PATH):
