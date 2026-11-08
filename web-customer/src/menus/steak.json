@@ -1,0 +1,480 @@
+{
+  "_source": "Generated from domains/restaurant/docs/steak.pdf by scripts/build_menus.py (F5)",
+  "info": {
+    "name": "Prime & Ember Steakhouse",
+    "tagline": "USDA Prime Steaks, Hardwood Charbroil, and Fresh Seafood",
+    "address": "100 Grand Avenue, Financial Center, Chicago, IL 60611",
+    "hours": "Monday–Thursday: 4:30 PM – 10:00 PM | Friday–Saturday: 4:00 PM – 11:00 PM | Sunday: 4:00 PM – 9:00 PM",
+    "payment": "Visa, MasterCard, American Express, Diner's Club, Apple Pay, Google Pay (Strictly cashless establishment).",
+    "reservations": "Table reservations strongly advised via SevenRooms or telephone. A $25/person fee applies for cancellations within 24 hours.",
+    "takeout": "In-house curated pickup available for select steak and wine packages. No third-party delivery apps accepted.",
+    "parking": "Complimentary premier valet parking available at the porte-cochère during all operational hours.",
+    "dress": "Elegant business casual to formal attire strictly enforced. Collared shirts required for gentlemen; no athletic attire, flip-flops, or baseball caps.",
+    "alcohol": "Extensive 500+ bottle sommelier-curated cellar. 21+ photo ID strictly verified. Corkage fee is $45 per 750ml bottle (maximum 2 bottles)."
+  },
+  "sections": [
+    {
+      "title": "Appetizers",
+      "items": [
+        {
+          "name": "Jumbo Lump Crab Cake",
+          "price": 24.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Pan-seared jumbo Maryland lump blue crab served with whole grain Dijon mustard remoulade and microgreens."
+        },
+        {
+          "name": "Chilled Colossal Shrimp Cocktail",
+          "price": 22.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Four poached colossal black tiger prawns served chilled with spicy horseradish cocktail sauce and charred lemon."
+        },
+        {
+          "name": "Oysters Rockefeller 6 pcs",
+          "price": 23.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Fresh coastal oysters baked with creamed spinach, bacon lardons, pernod liqueur, and a golden parmesan crust."
+        },
+        {
+          "name": "Thick-Cut Nueske Bacon",
+          "price": 19.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Applewood smoked thick-cut pork belly slab glazed with small-batch bourbon maple syrup and cracked black pepper."
+        },
+        {
+          "name": "Prime Steak Tartare",
+          "price": 21.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Finely hand-chopped USDA Prime tenderloin, capers, shallots, Dijon mustard, and a fresh quail egg yolk, served with crostini."
+        },
+        {
+          "name": "Seared Hudson Valley Foie Gras",
+          "price": 28.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Pan-seared Grade-A foie gras served over toasted brioche with a blackberry-thyme reduction and toasted hazelnuts."
+        },
+        {
+          "name": "Lobster Bisque",
+          "price": 16.5,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Velvety lobster cream soup finished with VSOP cognac, crème fraîche, and tender butter-poached lobster morsels."
+        },
+        {
+          "name": "Classic French Onion Soup",
+          "price": 14.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Slow-caramelized sweet yellow onions in rich beef bone broth, topped with sourdough crouton and bubbly melted Gruyère."
+        },
+        {
+          "name": "Charred Spanish Octopus",
+          "price": 21.5,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Tender grilled octopus tentacle served over smoky Spanish paprika potato purée and finished with chorizo oil."
+        },
+        {
+          "name": "Artisan Burrata Salad",
+          "price": 16.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Imported burrata pugliese, roasted ruby beets, candied walnuts, baby arugula, and aged white balsamic glaze."
+        }
+      ]
+    },
+    {
+      "title": "Entrées",
+      "items": [
+        {
+          "name": "Prime Filet Mignon 8 oz",
+          "price": 54.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Center-cut USDA Prime beef tenderloin grilled over white oak hardwood, basted with roasted garlic herb butter."
+        },
+        {
+          "name": "Prime Filet Mignon 12 oz",
+          "price": 68.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Large center-cut Prime tenderloin charbroiled to order and seasoned with house signature sea salt blend."
+        },
+        {
+          "name": "Prime Bone-In Ribeye 20 oz",
+          "price": 72.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Heavily marbled bone-in ribeye steak charbroiled over hickory hardwood for exceptional tenderness and rich depth."
+        },
+        {
+          "name": "Dry-Aged Kansas City Strip 16 oz",
+          "price": 66.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "45-day in-house dry-aged bone-in New York strip offering a deep, concentrated nutty beef profile."
+        },
+        {
+          "name": "Tomahawk Ribeye Chop 38 oz",
+          "price": 145.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Massive long-bone Prime ribeye carved tableside, served with roasted herb bone marrow and chimichurri."
+        },
+        {
+          "name": "Prime Porterhouse for Two 40 oz",
+          "price": 150.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "The ultimate combination of tender tenderloin and robust strip loin grilled over oak coals, served sliced."
+        },
+        {
+          "name": "A5 Japanese Kobe Wagyu 6 oz",
+          "price": 135.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Authentic BMS 11 Japanese Wagyu striploin cooked over hot volcanic stones, served with black truffle salt."
+        },
+        {
+          "name": "Slow-Roasted Prime Rib 16 oz",
+          "price": 56.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Herb-crusted USDA Prime rib roasted slowly for 12 hours, served with rosemary au jus and creamy horseradish."
+        },
+        {
+          "name": "Australian Wagyu Flat Iron 10 oz",
+          "price": 49.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Intensely marbled crossbred Wagyu flat iron steak grilled medium-rare, served with charred chimichurri sauce."
+        },
+        {
+          "name": "Pan-Seared Chilean Sea Bass",
+          "price": 48.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Wild Chilean sea bass fillet served with sweet miso-ginger glaze over wild foraged mushroom broth."
+        },
+        {
+          "name": "Twin South African Lobster Tails",
+          "price": 75.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Two 8 oz cold-water lobster tails broiled with sweet paprika butter, served with drawn clarified butter."
+        },
+        {
+          "name": "Pan-Roasted Diver Scallops",
+          "price": 44.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Jumbo sea scallops seared golden over sweet corn purée with crispy pancetta lardons and herb oil."
+        },
+        {
+          "name": "Grilled King Salmon Fillet",
+          "price": 39.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Pacific wild king salmon grilled over aromatic cedar planks, glazed with whole grain Dijon wildflower honey."
+        },
+        {
+          "name": "Seafood Tower Platter for Two",
+          "price": 95.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Chilled half Maine lobster, Alaskan king crab legs, 6 oysters on half shell, 6 colossal prawns, and ahi tuna poke."
+        },
+        {
+          "name": "Braised Colorado Lamb Shank",
+          "price": 46.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Tender bone-in lamb shank slow-braised in Cabernet Sauvignon with mirepoix vegetables over creamy polenta."
+        },
+        {
+          "name": "Herb-Roasted Half Chicken",
+          "price": 32.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Organic free-range half chicken marinated in rosemary and garlic, served with roasted natural pan drippings."
+        },
+        {
+          "name": "Heritage Berkshire Pork Chop 14 oz",
+          "price": 38.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Thick-cut grilled heritage pork chop finished with a spiced apple-cider bourbon glaze and braised greens."
+        },
+        {
+          "name": "Black Truffle Wild Mushroom Tagliatelle",
+          "price": 32.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Handmade fresh egg tagliatelle tossed with wild chanterelles, shaved black truffles, and Parmigiano cream."
+        },
+        {
+          "name": "Surf and Turf Duo",
+          "price": 82.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "6 oz USDA Prime Filet Mignon paired with an 8 oz broiled South African cold-water lobster tail with clarified butter."
+        },
+        {
+          "name": "Prime Beef Short Rib",
+          "price": 42.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Boneless USDA Prime beef short rib braised for 10 hours in red wine jus, served over Yukon gold potato mousseline."
+        },
+        {
+          "name": "Grilled Veal Chop 14 oz",
+          "price": 58.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Center-cut milk-fed veal rib chop served with sautéed wild forest chanterelles and natural veal demi-glace."
+        },
+        {
+          "name": "Alaskan King Crab Legs 1 lb",
+          "price": 88.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Steamed and split jumbo red king crab legs served with drawn garlic butter and grilled lemons."
+        },
+        {
+          "name": "Blackened Ahi Tuna Steak",
+          "price": 41.0,
+          "tags": [
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Cajun-spiced rare sashimi-grade tuna steak served with fresh avocado mango salsa and sweet soy drizzle."
+        },
+        {
+          "name": "Prime Steakhouse Cheeseburger",
+          "price": 26.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Ground dry-aged Prime trimmings, aged white cheddar, bacon jam, and truffle aioli on brioche with hand-cut fries."
+        },
+        {
+          "name": "Roasted Cauliflower Steak",
+          "price": 27.0,
+          "tags": [
+            "Gluten-Free",
+            "Vegan",
+            "Mild"
+          ],
+          "description": "Thick-cut charred cauliflower steak served over romesco sauce, topped with toasted pine nuts and herbs."
+        }
+      ]
+    },
+    {
+      "title": "Desserts",
+      "items": [
+        {
+          "name": "Prime New York Cheesecake",
+          "price": 12.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Dense and creamy classic baked cheesecake served with warm macerated strawberry compote."
+        },
+        {
+          "name": "Warm Dark Chocolate Molten Soufflé",
+          "price": 14.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Freshly baked dark Valrhona chocolate soufflé served with house-spun vanilla bean gelato."
+        },
+        {
+          "name": "Tahitian Vanilla Crème Brûlée",
+          "price": 11.5,
+          "tags": [
+            "Gluten-Free",
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Rich custard infused with Tahitian vanilla beans beneath a brittle caramelized sugar crust with raspberries."
+        },
+        {
+          "name": "Key Lime Pie",
+          "price": 11.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Authentic Florida Key lime custard in a buttery graham cracker crust topped with whipped vanilla chantilly."
+        },
+        {
+          "name": "Grand Marnier Bread Pudding",
+          "price": 12.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Brioche bread pudding infused with citrus Grand Marnier custard, finished with warm bourbon caramel sauce."
+        }
+      ]
+    },
+    {
+      "title": "Beverages & Drinks",
+      "items": [
+        {
+          "name": "Evian Natural Spring Water 750ml",
+          "price": 6.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Premium still natural mineral water sourced from the French Alps."
+        },
+        {
+          "name": "Sparkling Acqua Panna 750ml",
+          "price": 6.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Smooth Italian natural sparkling mineral water served chilled with fresh lime."
+        },
+        {
+          "name": "Artisanal French Press Coffee",
+          "price": 5.0,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Custom roasted dark roast beans steeped and served tableside in a copper French press."
+        },
+        {
+          "name": "Blackberry Thyme Mocktail",
+          "price": 8.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Muddled wild blackberries, fresh garden thyme, freshly squeezed lemon juice, and club soda."
+        },
+        {
+          "name": "Smoked Old Fashioned",
+          "price": 18.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Woodford Reserve Bourbon, Angostura bitters, and turbinado sugar, smoked tableside with cherry wood chips."
+        },
+        {
+          "name": "Prime Dry Martini",
+          "price": 17.5,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Monkey 47 Gin or Grey Goose Vodka, dry vermouth, served ice-cold with blue-cheese-stuffed Spanish olives."
+        },
+        {
+          "name": "Cabernet Sauvignon, Napa Valley Glass",
+          "price": 22.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Full-bodied Napa red wine displaying notes of cassis, blackcurrant, French oak, and structured tannins."
+        },
+        {
+          "name": "Russian River Valley Pinot Noir Glass",
+          "price": 18.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Elegant, silky red wine offering notes of dark cherries, forest floor, and baking spices."
+        },
+        {
+          "name": "Sonoma Coast Chardonnay Glass",
+          "price": 16.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Medium-to-full bodied white wine with notes of crisp green apple, lemon curd, and toasted brioche."
+        },
+        {
+          "name": "Veuve Clicquot Yellow Label Glass",
+          "price": 26.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Prestigious French Brut Champagne offering crisp acidity, delicate fine bubbles, and ripe pear notes."
+        }
+      ]
+    }
+  ]
+}

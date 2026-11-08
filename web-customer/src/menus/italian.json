@@ -1,0 +1,470 @@
+{
+  "_source": "Generated from domains/restaurant/docs/italian.pdf by scripts/build_menus.py (F5)",
+  "info": {
+    "name": "Bella Vista Italian Trattoria",
+    "tagline": "Authentic Tuscan Flavors & Wood-Fired Specialties",
+    "address": "742 Evergreen Terrace, Suite 100, Springfield, OR 97477",
+    "hours": "Monday–Thursday: 11:30 AM – 9:30 PM | Friday–Saturday: 11:30 AM – 10:30 PM | Sunday: 12:00 PM – 9:00 PM",
+    "payment": "Visa, MasterCard, American Express, Discover, Apple Pay, Google Pay, and Cash (No personal checks).",
+    "reservations": "Recommended for parties of 5 or more via OpenTable or phone. 15-minute grace period before table release.",
+    "takeout": "Online curbside takeout available. Delivery supported via DoorDash and Uber Eats within an 8-mile radius.",
+    "parking": "Complimentary 2-hour parking in rear garage with validation stamp; street metered parking available.",
+    "dress": "Smart casual dress required. No sleeveless athletic shirts, swimwear, or bare feet permitted.",
+    "alcohol": "Full bar available. Valid government-issued 21+ ID required. Corkage fee is $25 per 750ml bottle (maximum 2 bottles)."
+  },
+  "sections": [
+    {
+      "title": "Appetizers",
+      "items": [
+        {
+          "name": "Classic Bruschetta",
+          "price": 11.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Toasted rustic ciabatta topped with diced Roma tomatoes, fresh basil, garlic, extra virgin olive oil, and aged balsamic glaze."
+        },
+        {
+          "name": "Crispy Calamari Fritti",
+          "price": 15.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Wild-caught squid lightly dusted in seasoned semolina flour, flash-fried, served with house marinara and lemon-caper aioli."
+        },
+        {
+          "name": "Caprese Salad",
+          "price": 13.5,
+          "tags": [
+            "Gluten-Free",
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Thick slices of fresh buffalo mozzarella, vine-ripened heirloom tomatoes, sweet basil leaves, coarse sea salt, and aged balsamic reduction."
+        },
+        {
+          "name": "Stuffed Portobello Caps",
+          "price": 14.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Oven-roasted portobello mushrooms stuffed with sweet Italian sausage, breadcrumbs, herbs, and melted fontina cheese."
+        },
+        {
+          "name": "Garlic Herb Focaccia",
+          "price": 8.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "House-baked rosemary and sea salt focaccia served warm with whipped roasted garlic parmesan butter."
+        },
+        {
+          "name": "Prosciutto-Wrapped Asparagus",
+          "price": 13.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Fresh jumbo asparagus spears wrapped in 18-month aged Prosciutto di Parma, grilled and finished with lemon zest."
+        },
+        {
+          "name": "Arancini Siciliani",
+          "price": 12.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Crispy golden risotto balls stuffed with bolognese meat sauce, sweet peas, and smoked mozzarella, served over tomato coulis."
+        },
+        {
+          "name": "Steamed Mediterranean Mussels",
+          "price": 16.5,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "PEI mussels steamed in a broth of pinot grigio, shallots, garlic, crushed red pepper flakes, and fresh parsley with grilled bread."
+        },
+        {
+          "name": "Truffle Whipped Ricotta",
+          "price": 12.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Creamy house-made whole milk ricotta whipped with black truffle oil and wildflower honey, served with toasted crostini."
+        },
+        {
+          "name": "Beef Carpaccio",
+          "price": 17.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Thinly sliced raw beef tenderloin, baby arugula, shaved Parmigiano-Reggiano, capers, and a drizzle of white truffle olive oil."
+        }
+      ]
+    },
+    {
+      "title": "Entrées",
+      "items": [
+        {
+          "name": "Spaghetti Carbonara",
+          "price": 21.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Traditional pasta tossed with crisp guanciale, farm-fresh egg yolks, Pecorino Romano cheese, and freshly cracked black peppercorn."
+        },
+        {
+          "name": "Fettuccine Alfredo con Pollo",
+          "price": 23.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "House-made egg fettuccine tossed in a rich butter, garlic, and Parmigiano-Reggiano cream sauce, topped with grilled chicken breast."
+        },
+        {
+          "name": "Classic Lasagna Bolognese",
+          "price": 22.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Layered fresh pasta sheets with slow-simmered beef and pork ragù, creamy bechamel, ricotta, and melted mozzarella."
+        },
+        {
+          "name": "Penne alla Vodka",
+          "price": 19.5,
+          "tags": [
+            "Vegetarian",
+            "Medium"
+          ],
+          "description": "Penne pasta tossed in a velvety tomato-cream sauce with crushed red pepper, finished with fresh sweet peas and shaved parmesan."
+        },
+        {
+          "name": "Chicken Parmigiana",
+          "price": 24.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Breaded crispy chicken cutlet baked with rustic tomato sauce, melted mozzarella, served alongside garlic spaghetti."
+        },
+        {
+          "name": "Chicken Piccata",
+          "price": 24.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Pan-seared chicken breast simmered in a white wine, lemon juice, butter, and caper sauce over angel hair pasta."
+        },
+        {
+          "name": "Chicken Marsala",
+          "price": 25.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Tender chicken scallopini sautéed with wild cremini mushrooms in a rich sweet Marsala wine reduction with whipped potatoes."
+        },
+        {
+          "name": "Veal Saltimbocca",
+          "price": 29.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Tender veal cutlets topped with fresh sage and prosciutto, sautéed in white wine butter sauce, served with roasted fingerling potatoes."
+        },
+        {
+          "name": "Veal Parmigiana",
+          "price": 28.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Tender breaded milk-fed veal cutlet baked with San Marzano marinara sauce and fresh provolone, served over linguine."
+        },
+        {
+          "name": "Eggplant Rollatini",
+          "price": 20.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Thinly sliced roasted eggplant rolled with seasoned ricotta and spinach, baked under marinara sauce and mozzarella cheese."
+        },
+        {
+          "name": "Gnocchi Sorrentina",
+          "price": 20.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Hand-rolled potato gnocchi baked in a San Marzano tomato sauce with fresh basil, topped with bubbling melted mozzarella."
+        },
+        {
+          "name": "Lobster Ravioli",
+          "price": 28.0,
+          "tags": [
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Jumbo ravioli stuffed with North Atlantic lobster and ricotta, finished in a sherry saffron tomato cream reduction with sautéed cherry tomatoes."
+        },
+        {
+          "name": "Linguine alle Vongole",
+          "price": 25.5,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Manila clams steamed in garlic, white wine, extra virgin olive oil, and red pepper flakes over a bed of linguine pasta."
+        },
+        {
+          "name": "Grilled Chilean Sea Bass",
+          "price": 36.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Mild"
+          ],
+          "description": "Pan-roasted sea bass fillet served over creamy saffron risotto and topped with warm olive and caper tapenade."
+        },
+        {
+          "name": "Pan-Seared Salmon Piccante",
+          "price": 27.0,
+          "tags": [
+            "Gluten-Free",
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Wild Atlantic salmon fillet seared crispy, glazed with a spicy Calabrian chili and orange glaze, served with sautéed broccolini."
+        },
+        {
+          "name": "Shrimp Fra Diavolo",
+          "price": 26.0,
+          "tags": [
+            "Pescatarian",
+            "Spicy"
+          ],
+          "description": "Jumbo black tiger shrimp simmered in a spicy garlic marinara sauce over fettuccine with fresh torn basil."
+        },
+        {
+          "name": "Cioppino Seafood Stew",
+          "price": 32.0,
+          "tags": [
+            "Pescatarian",
+            "Medium"
+          ],
+          "description": "Hearty seafood stew featuring clams, mussels, shrimp, and white fish in a fennel-scented tomato-wine broth with garlic crostini."
+        },
+        {
+          "name": "Osso Buco alla Milanese",
+          "price": 38.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Slow-braised veal shank in vegetable and white wine broth, served over classic saffron risotto and finished with gremolata."
+        },
+        {
+          "name": "Grilled Prime Ribeye 14 oz",
+          "price": 42.0,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "USDA Prime ribeye steak grilled with rosemary butter, served with truffle parmesan roasted potatoes and asparagus."
+        },
+        {
+          "name": "Beef Short Rib Ragu",
+          "price": 27.5,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Boneless beef short rib braised for 8 hours in Chianti wine, shredded over wide pappardelle ribbons with shaved pecorino."
+        },
+        {
+          "name": "Wild Mushroom Risotto",
+          "price": 22.5,
+          "tags": [
+            "Gluten-Free",
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Slow-cooked Arborio rice with porcini, shiitake, and cremini mushrooms, finished with butter, white truffle oil, and parmesan."
+        },
+        {
+          "name": "Pistachio-Crusted Lamb Chops",
+          "price": 35.0,
+          "tags": [
+            "Mild"
+          ],
+          "description": "Grilled lamb chops crusted with crushed pistachios, served with garlic mash and a rosemary red wine reduction."
+        },
+        {
+          "name": "Margherita Pizza",
+          "price": 18.0,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Wood-fired thin crust pizza topped with San Marzano tomato sauce, fresh mozzarella di bufala, basil, and extra virgin olive oil."
+        },
+        {
+          "name": "Quattro Formaggi Pizza",
+          "price": 19.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Hand-tossed pizza base with roasted garlic olive oil, mozzarella, gorgonzola dolce, fontina, and parmigiano-reggiano."
+        },
+        {
+          "name": "Tuscan Braised Pork Chop",
+          "price": 26.5,
+          "tags": [
+            "Gluten-Free",
+            "Mild"
+          ],
+          "description": "Thick bone-in heritage pork chop pan-roasted with sweet peppers, onions, and garlic in a light balsamic jus."
+        }
+      ]
+    },
+    {
+      "title": "Desserts",
+      "items": [
+        {
+          "name": "Classic Tiramisu",
+          "price": 9.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Espresso-soaked ladyfingers layered with sweet mascarpone cream, dusted with dark Dutch cocoa powder."
+        },
+        {
+          "name": "Sicilian Cannoli Trio",
+          "price": 8.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Crispy pastry shells filled with sweet whipped ricotta, mini chocolate chips, and crushed pistachios."
+        },
+        {
+          "name": "Vanilla Bean Panna Cotta",
+          "price": 9.0,
+          "tags": [
+            "Gluten-Free",
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Chilled silky sweet cream custard infused with Madagascar vanilla beans, topped with a fresh strawberry-basil compote."
+        },
+        {
+          "name": "Molten Chocolate Lava Cake",
+          "price": 10.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Rich dark chocolate cake with a molten center, served with a scoop of vanilla bean gelato."
+        },
+        {
+          "name": "Lemon Ricotta Cheesecake",
+          "price": 9.5,
+          "tags": [
+            "Vegetarian",
+            "Mild"
+          ],
+          "description": "Light and airy baked cheesecake infused with fresh lemon zest and limoncello, with a graham cracker crust."
+        }
+      ]
+    },
+    {
+      "title": "Beverages & Drinks",
+      "items": [
+        {
+          "name": "San Pellegrino Sparkling Water 750ml",
+          "price": 5.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Crisp natural mineral sparkling water served chilled with lemon or lime slice."
+        },
+        {
+          "name": "San Pellegrino Aranciata",
+          "price": 4.0,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Sparkling Italian orange soda made with real Mediterranean fruit juice."
+        },
+        {
+          "name": "Freshly Brewed Iced Tea",
+          "price": 3.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Classic unsweetened black tea brewed daily, served with fresh lemon."
+        },
+        {
+          "name": "Classic Italian Espresso",
+          "price": 3.5,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Rich and bold single or double shot of dark roast espresso with golden crema."
+        },
+        {
+          "name": "Vanilla Bean Cappuccino",
+          "price": 5.0,
+          "tags": [
+            "Non-Alcoholic"
+          ],
+          "description": "Steamed milk and espresso topped with dense foam, dusted with cinnamon and vanilla bean powder."
+        },
+        {
+          "name": "Classic Aperol Spritz",
+          "price": 12.5,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Aperol liqueur, crisp Prosecco, and a splash of club soda, served over ice with a fresh orange slice."
+        },
+        {
+          "name": "Negroni Classico",
+          "price": 13.5,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Equal parts London Dry gin, Campari bitter, and sweet red vermouth, served on the rocks with an orange peel."
+        },
+        {
+          "name": "Chianti Classico DOCG Glass",
+          "price": 11.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Medium-bodied dry Tuscan red wine with notes of red cherries, cedar, and earthy spice."
+        },
+        {
+          "name": "Pinot Grigio delle Venezie Glass",
+          "price": 10.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Crisp, refreshing dry white wine with bright citrus, green apple, and subtle floral notes."
+        },
+        {
+          "name": "House-Made Limoncello Shot",
+          "price": 8.0,
+          "tags": [
+            "Alcoholic"
+          ],
+          "description": "Chilled signature digestif liqueur crafted with organic lemon peels and pure cane sugar."
+        }
+      ]
+    }
+  ]
+}

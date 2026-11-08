@@ -7,12 +7,16 @@
 # (F8) helpers and routes rather than importing from it.
 import os
 from dotenv import load_dotenv, find_dotenv
+from pathlib import Path
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
-from core.database import init_db, log_call, get_session_totals  # F11
+from core.database import DB_PATH, init_db, log_call, get_session_totals  # F11
+from core import limits  # F21
 from core.sheets import find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days  # F8: pure helpers, no sheet reads
 from core.mcp_client import call_mcp_tool  # F8: every live-sheet read goes over MCP via api/mcp_server.py
 from core.domain import domain  # F12
@@ -26,11 +30,21 @@ DEBUG_MODE = os.environ.get("DEBUG_MODE", "true").lower() != "false"
 METRICS = os.environ.get("METRICS", "true").lower() != "false"  # F6/F9/F11: track + persist regardless of DEBUG_MODE; DEBUG_MODE only gates the console prints
 DEFAULT_ENGINE = os.environ.get("DEFAULT_ENGINE", "plain_rag")  # F12: which engine answers by default
 GUARDRAILS_ENABLED = os.environ.get("GUARDRAILS_ENABLED", "true").lower() != "false"  # F19
+SHEETS_ENABLED = os.environ.get("SHEETS_ENABLED", "true").lower() != "false"  # F8: false = skip live Google Sheets lookups (e.g. a deploy without the service account)
 
 AVAILABLE_CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
 SELF_ROUTING_ENGINES = {"orchestrator"}  # F13: engines with their own guard + live-data agents - skip F19/F8 routing here
 
 app = FastAPI()
+
+
+@app.middleware("http")
+async def strip_api_prefix(request: Request, call_next):  # F5: one container serves the UI at / and this API at /api/*, matching the web UIs' Vite /api proxy
+    path = request.scope["path"]
+    if path == "/api" or path.startswith("/api/"):
+        request.scope["path"] = path[4:] or "/"
+    return await call_next(request)
+
 
 guardrails_llm, _ = build_llm_and_embeddings()  # F19: same provider selection as every engine; embeddings unused here
 
@@ -118,8 +132,17 @@ def with_date_context(question: str) -> str:  # F8: shared by /ask and the CLI
     return prefix + question
 
 
+def _client_ip(http_request: Request) -> str:  # F21: Fly's proxy sets Fly-Client-IP and overwrites any client-sent value
+    return http_request.headers.get("fly-client-ip") or (http_request.client.host if http_request.client else "unknown")
+
+
 @app.post("/ask")
-def ask(request: AskRequest):
+def ask(request: AskRequest, http_request: Request):
+    try:  # F21: per-visitor rate limit, then the daily OpenAI budget - both before any LLM call
+        limits.check_rate(_client_ip(http_request))
+        limits.check_budget(DB_PATH)
+    except limits.LimitExceeded as e:
+        return JSONResponse(status_code=429, content={"error": str(e)})
     cuisine = request.cuisine.strip().lower()
     if cuisine not in AVAILABLE_CUISINES:
         return {"error": f"Unknown {domain.COLLECTION_LABEL}. Choose one of {AVAILABLE_CUISINES}"}
@@ -137,7 +160,7 @@ def ask(request: AskRequest):
         if is_off_topic(classification):
             return {"cuisine": cuisine, "answer": OFF_TOPIC_MESSAGE, "top_match": "(F19) Rejected - off-topic"}
 
-    ops_intent = None if self_routing else detect_ops_intent(request.question)  # F8: route obvious specials/hours questions to the live sheet
+    ops_intent = None if self_routing or not SHEETS_ENABLED else detect_ops_intent(request.question)  # F8: route obvious specials/hours questions to the live sheet
     if ops_intent == "specials":  # F8: specials only ever live in the sheet, never in the PDF menus - go straight there
         if DEBUG_MODE:
             print("\n[F8] Accessing MCP data source (Google Sheets) - question routed to specials...")
@@ -263,6 +286,13 @@ def items(category: Optional[str] = None, tenant: Optional[str] = None):  # F8: 
         return {"items": call_mcp_tool("company_items", {"category": category, "tenant": tenant})}
     except RuntimeError as e:
         return {"error": str(e)}
+
+
+# F5: serve the built customer site (web-customer/dist) at / when it exists - the Docker image builds it.
+# Mounted after every route above, so API paths win; html=True returns index.html for /.
+WEB_DIST = Path(__file__).resolve().parent / "web-customer" / "dist"
+if (WEB_DIST / "index.html").exists():
+    app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web-customer")
 
 
 # Only runs when this file is executed directly (python3 engine_api.py),

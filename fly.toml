@@ -1,0 +1,41 @@
+# Fly.io config for the restaurant customer site + engine_api.py (Phase 11 deploy).
+# `fly launch --no-deploy --copy-config` uses this; change app/region there if the name is taken.
+app = "restaurant-ai-platform"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # F21 usage limits (core/limits.py); override with `fly secrets set NAME=value`
+  DAILY_BUDGET_USD = "1.00"
+  RATE_LIMIT_PER_MINUTE = "5"
+  RATE_LIMIT_PER_DAY = "50"
+  DEFAULT_ENGINE = "langgraph"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 20
+    hard_limit = 25
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/api/collections"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "30s"
+
+[mounts]
+  source = "rest_data"
+  destination = "/data"
+
+[[vm]]
+  memory = "1gb"
+  cpus = 1

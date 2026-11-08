@@ -6,6 +6,7 @@ langchain-community
 langchain-classic
 langchain-text-splitters
 sqlalchemy
+greenlet  # F16: SQLAlchemy asyncio import used by SQLChatMessageHistory needs it (missing on fresh installs)
 langgraph
 faiss-cpu
 flashrank

@@ -41,6 +41,12 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `vectorstores/` | Cached FAISS indexes per cuisine (auto-generated, gitignored — see Notes) |
 | `web-demo/gradio_app.py` | Gradio UI, calls `menu_api.py` over HTTP |
 | `web-demo/streamlit_app.py` | Streamlit UI, calls `menu_api.py` over HTTP |
+| `web-react/` | React + TypeScript + Vite UI over `engine_api.py` — engine picker, domain-aware dropdown, chat history, specials panel; `npm run dev` on port 5173 — see `features.html` F5:10 |
+| `web-customer/` | Customer-facing restaurant site (React + TypeScript + Vite) over `engine_api.py` for sushi, steak and italian: menus parsed from `domains/restaurant/docs/*.pdf` into `src/menus/*.json` by `scripts/build_menus.py`, dietary filters, a link to each menu PDF, original SVG illustrations and an AI host chat (LangGraph engine, F13). `?r=steak` / `?r=italian` picks the restaurant (default sushi); `?debug=1` shows a private panel to switch restaurant and engine and see engine, tokens, cost and timing (`?debug=0` hides it). `npm run dev` on port 5174 (with `engine_api.py` running) |
+| `core/limits.py` | F21 (rate-limiting half; API-key auth not built): per-visitor `/ask` limit and daily OpenAI budget from F11's `usage_log`; over a limit returns HTTP 429 |
+| `Dockerfile` | One container for Fly.io: stage 1 builds `web-customer`, stage 2 runs `engine_api.py` serving the site at `/` and the API at `/api`; pre-downloads the F10 re-ranking model |
+| `.dockerignore` | Keeps `.env`, `secrets/`, local `*.db` files and dev-only folders out of the image |
+| `fly.toml` | Fly.io config: 1 machine, 1 GB, `rest_data` volume at `/data`, health check on `/api/collections`, auto-stop, F21 limits |
 | `project-notes.txt` | Project report (intro, implementation, metrics, conclusion) |
 
 ## Prerequisites
@@ -120,6 +126,15 @@ curl -X POST http://127.0.0.1:8000/ask \
 
 **Test it — auto-generated docs:** open `http://127.0.0.1:8000/docs` in a browser and try `/ask` right from the page.
 
+## Deploying — Fly.io (one container)
+
+`engine_api.py` also answers under `/api/*` (same paths the web UIs' Vite proxy uses) and, when
+`web-customer/dist` exists, serves the customer site at `/`. Build and test the image locally with
+`docker build -t rest-local .`, then deploy from this folder with the Fly.io walkthrough
+(`fly launch --no-deploy --copy-config`, `fly volumes create rest_data`, the `OPENAI_API_KEY` secret,
+`fly deploy --ha=false`). Deploys run from the terminal: `vectorstores/` is gitignored, so the image
+is built from the local folder.
+
 ## Running — engine API (F12)
 
 Same idea as the FastAPI section above, but answers go through `engines/base.py`'s `get_engine()` factory, so you can switch engines without touching the API:
@@ -154,6 +169,10 @@ Set in `.env`. Toggles default to on — set to `false` to turn off.
 | `DOMAIN` | `restaurant` | Which `domains/<name>/` pack is active — `restaurant` or `hr`; FAISS indexes go in `vectorstores/<DOMAIN>/` — docs, eval fixtures, prompts and intents (see `domains/README.md`) |
 | `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag`, `langgraph`, or `orchestrator` (F12/F13); `orchestrator` does its own guardrails and live-data routing, so `engine_api.py` skips its F19/F8 pre-routing for it |
 | `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
+| `SHEETS_ENABLED` | `true` | Live Google Sheets lookups for specials/hours/org/items (F8); `false` skips them, e.g. a deploy without `secrets/service_account.json` (the Docker image sets `false`) |
+| `DATA_DIR` | `.` | Folder for `usage.db` (F11) and `chat_history.db` (F16); the Docker image sets `/data`, the Fly volume |
+| `RATE_LIMIT_PER_MINUTE` / `RATE_LIMIT_PER_DAY` | `5` / `50` | F21: `/ask` calls per visitor IP; `0` switches a limit off |
+| `DAILY_BUDGET_USD` | `1.00` | F21: refuse `/ask` (HTTP 429) once today's logged OpenAI cost reaches this; `0` switches it off |
 
 ## Tests & evals
 
@@ -179,6 +198,16 @@ Opens automatically at `http://127.0.0.1:7860`.
 streamlit run web-demo/streamlit_app.py
 ```
 Opens automatically at `http://localhost:8501`.
+
+### React + TypeScript UI
+
+With `uvicorn engine_api:app --reload --port 8000` running:
+
+```bash
+cd web-react
+npm install      # first time only
+npm run dev      # http://localhost:5173 - proxies /api to engine_api.py (API_URL to override)
+```
 
 Both UIs are just front ends — they call `menu_api.py`'s `/ask` endpoint, so the FastAPI server must be running first or requests will fail.
 
