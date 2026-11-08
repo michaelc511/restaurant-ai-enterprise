@@ -55,7 +55,7 @@ a { color: var(--accent); }
 .btn:hover { background: var(--accent-dark); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .5; cursor: default; }
-.btn.small { padding: 8px 14px; font-size: 14px; }
+.btn.small { padding: 8px 14px; font-size: 14px; white-space: nowrap; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
 .btn.ghost:hover { background: var(--ink); color: #fff; }
 button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
@@ -68,7 +68,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font-size: 22px; font-weight: 700; }
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--ink); text-decoration: none; font-size: 22px; font-weight: 700; white-space: nowrap; }
+.brand span { overflow: hidden; text-overflow: ellipsis; }
 .nav nav { display: flex; align-items: center; gap: clamp(10px, 2vw, 22px); }
 .nav nav a { color: var(--ink-soft); text-decoration: none; font-weight: 500; font-size: 15px; }
 .nav nav a:hover { color: var(--accent); }
@@ -224,7 +225,13 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .hero-art { order: -1; max-width: 460px; margin: 0 auto; }
   .hero-art .board { margin-top: 40px; }
   .facts { grid-template-columns: 1fr; }
-  .nav nav a:not(:last-of-type) { display: none; }
+  /* F5: phones keep just the brand and the Ask AI button; Menu, Visit and the PDF link are in the page and footer */
+  .nav nav a { display: none; }
+  .brand { font-size: 19px; }
+}
+@media (max-width: 360px) {
+  .brand { font-size: 17px; }
+  .nav { padding: 10px 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
