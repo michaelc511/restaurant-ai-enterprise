@@ -25,6 +25,7 @@ RAG (Retrieval-Augmented Generation) FAQ agent built on LangChain, using OpenAI 
 | `tests/` | Fully mocked unit tests for the core modules (no API key, no network) — see `features.html` F23 |
 | `core/telemetry.py` | Token/cost tracking (`track_usage`, `log_usage`, F6) and step-latency/error-rate tracing (`trace_call`, `log_trace`, F9) — see `features.html` F6 and F9 |
 | `core/memory.py` | Ephemeral per-session chat memory (`wrap_with_memory`) — see `features.html` F7 |
+| `core/tracing.py` | LangSmith run names and tags per engine: cuisine, model, prompt version, `prod`/`local` (`trace_config`, F9) — see `features.html` F9 |
 | `core/vectorstore.py` | Cross-encoder re-ranking of retrieved chunks (`wrap_with_reranking`) — see `features.html` F10 |
 | `core/database.py` | Durable per-call usage log + session totals in SQLite (`log_call`, `get_session_totals`) — see `features.html` F11 |
 | `core/sheets.py` | Live daily specials / hours & events, plus the company org directory and items list, read from the `org` Google Sheet (`get_daily_specials`, `get_hours_and_events`, `get_org`, `get_items`) — see `features.html` F8 |

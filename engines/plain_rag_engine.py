@@ -12,12 +12,14 @@ from core.domain import domain  # F12
 from core.llm import build_llm_and_embeddings  # F2/F12
 from core.memory import wrap_with_memory  # F7
 from core.sanitize import INJECTION_DEFENSE_NOTICE  # F22
+from core.tracing import trace_config  # F9
 from core.vectorstore import get_retriever  # F3/F10/F12/F22
 from engines.base import BaseMenuEngine  # F12
 
 load_dotenv(find_dotenv())
 
 AVAILABLE_CUISINES = domain.COLLECTIONS  # F12: from the active domain pack
+RUN_NAME = "menu-plain-rag"  # F9: LangSmith run name for this engine
 
 # F3.1/F12: the domain's persona + guidelines, plus F22's notice and the retrieved context
 RAG_SYSTEM_PROMPT = domain.RAG_PERSONA + INJECTION_DEFENSE_NOTICE + """
@@ -55,6 +57,7 @@ class PlainRagEngine(BaseMenuEngine):  # F12: today's RetrievalQA logic, behind 
         if cuisine not in self.qa_chains:
             raise ValueError(f"Unknown cuisine: {cuisine}")
         if not use_memory:  # F8: hours questions bypass memory, same reasoning as menu_api.py
-            return self.qa_chains[cuisine].invoke({"query": question})
-        memory_config = {"configurable": {"session_id": f"{cuisine}:{session_id}"}}  # F7
+            return self.qa_chains[cuisine].invoke({"query": question}, config=trace_config(RUN_NAME, cuisine, self.llm))  # F9
+        memory_config = trace_config(RUN_NAME, cuisine, self.llm,  # F7 + F9: session id plus run name/tags
+                                     {"configurable": {"session_id": f"{cuisine}:{session_id}"}})
         return self.qa_chains_with_memory[cuisine].invoke({"query": question}, config=memory_config)

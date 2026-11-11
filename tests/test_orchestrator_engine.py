@@ -157,3 +157,19 @@ def test_unknown_cuisine_raises(build_engine):
 
     with pytest.raises(ValueError):
         engine.answer("thai", "anything", "s1")
+
+
+def test_top_level_run_gets_name_and_tags(build_engine, monkeypatch):
+    # F9: the graph call carries a clear LangSmith run name and cuisine tag instead of "LangGraph"
+    engine, _ = build_engine(fake_llm())
+    seen = {}
+    real_invoke = engine.graph.invoke
+
+    def spy(state, config=None):
+        seen["config"] = config
+        return real_invoke(state, config=config)
+
+    monkeypatch.setattr(engine.graph, "invoke", spy)
+    engine.answer("sushi", "What's in the Dragon Roll?", "s1", use_memory=False)
+    assert seen["config"]["run_name"] == "menu-orchestrator"
+    assert "cuisine:sushi" in seen["config"]["tags"]

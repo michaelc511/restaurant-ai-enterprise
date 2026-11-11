@@ -28,6 +28,7 @@ from core.mcp_client import list_mcp_tools, call_mcp_tools  # F8/F13
 from core.memory import wrap_with_memory  # F7
 from core.sanitize import INJECTION_DEFENSE_NOTICE, sanitize_content  # F22
 from core.vectorstore import get_retriever  # F3/F10/F12/F18/F22
+from core.tracing import trace_config  # F9
 from engines.base import BaseMenuEngine  # F12
 
 load_dotenv(find_dotenv())
@@ -53,6 +54,9 @@ SYNTHESIZE_PROMPT = ChatPromptTemplate.from_messages([
     SystemMessagePromptTemplate.from_template(SYNTHESIZE_SYSTEM_PROMPT),
     HumanMessagePromptTemplate.from_template("{question}"),
 ])
+
+
+RUN_NAME = "menu-orchestrator"  # F9: LangSmith run name for this engine
 
 
 class OrchestratorPlan(BaseModel):  # F13: orchestrator's structured routing decision
@@ -190,7 +194,7 @@ class OrchestratorEngine(BaseMenuEngine):  # F13: orchestrator + specialists, be
         graph.add_edge("redirect", END)
         return graph.compile()
 
-    def _invoke_graph(self, cuisine: str, question: str) -> dict:
+    def _invoke_graph(self, cuisine: str, question: str, config: dict | None = None) -> dict:
         result = self.graph.invoke({
             "cuisine": cuisine,
             "question": question,
@@ -203,7 +207,7 @@ class OrchestratorEngine(BaseMenuEngine):  # F13: orchestrator + specialists, be
             "grounded": False,
             "verify_feedback": "",
             "attempts": 0,
-        })
+        }, config=config)  # F9: run name/tags only on the top-level call; under F7 the memory run carries them
         live_docs = [Document(page_content=r, metadata={"source": "mcp_tools"}) for r in result["tool_results"]]
         return {"result": result["answer"], "source_documents": result["documents"] + live_docs}
 
@@ -211,6 +215,7 @@ class OrchestratorEngine(BaseMenuEngine):  # F13: orchestrator + specialists, be
         if cuisine not in self.retrievers:
             raise ValueError(f"Unknown cuisine: {cuisine}")
         if not use_memory:
-            return self._invoke_graph(cuisine, question)
-        memory_config = {"configurable": {"session_id": f"{cuisine}:{session_id}"}}  # F7
+            return self._invoke_graph(cuisine, question, trace_config(RUN_NAME, cuisine, self.llm))  # F9
+        memory_config = trace_config(RUN_NAME, cuisine, self.llm,  # F7 + F9: session id plus run name/tags
+                                     {"configurable": {"session_id": f"{cuisine}:{session_id}"}})
         return self.chains_with_memory[cuisine].invoke({"query": question}, config=memory_config)
