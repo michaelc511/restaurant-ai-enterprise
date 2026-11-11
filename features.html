@@ -8565,6 +8565,12 @@ LANGSMITH_PROJECT=restaurant-ai-platform</code></pre>
 project, with the retriever and LLM steps broken out per run. No dashboard setup beyond picking that project
 name; LangChain creates it the first time a trace is sent.</p>
 
+<p><strong>Run names and tags.</strong> By default a LangGraph trace is just called <code>LangGraph</code>, which makes three
+engines and three menus hard to tell apart. <code>core/tracing.py</code>'s <code>trace_config()</code> gives each engine's top-level
+run its own name (<code>menu-plain-rag</code>, <code>menu-langgraph</code>, <code>menu-orchestrator</code>) and tags it with
+<code>cuisine:&lt;name&gt;</code>, <code>model:&lt;model&gt;</code>, <code>prompt:&lt;version&gt;</code> and <code>env:prod</code> on Fly.io
+(<code>FLY_APP_NAME</code> is set) or <code>env:local</code> otherwise. It's plain config: with tracing off, LangChain ignores it.</p>
+
 <h4>Reading the Trace: A Quick Tour of the LangSmith Dashboard</h4>
 
 <ol>
