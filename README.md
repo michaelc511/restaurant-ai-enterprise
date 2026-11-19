@@ -237,29 +237,14 @@ npm run dev      # http://localhost:5173 - proxies /api to engine_api.py (API_UR
 
 Both UIs are just front ends — they call `menu_api.py`'s `/ask` endpoint, so the FastAPI server must be running first or requests will fail.
 
-## Fixes — 2026-11-19 (branch `feature/f3.1-call-staff-fallback`)
+## Answer behavior and data notes
 
-| Fix | Feature | Files | What it does now |
-|---|---|---|---|
-| Call-our-staff hand-off | F3.1, F13.2 | `domains/restaurant/domain.py` | When the menu doesn't say (seating, ambiance, date spot, sourcing), the bot answers "I don't have the details on that here, but please give our staff a call…" instead of "I don't have that information". Partial facts in dish descriptions (e.g. "Atlantic mackerel") are shared first. |
-| Dining-experience questions are on-topic | F19, F13.1 | `domains/restaurant/domain.py` | Seating, ambiance, occasions, sourcing and cuisine style no longer get rejected as off-topic. |
-| New off-topic message | F19 | `domains/restaurant/domain.py` | "I'm only able to help with questions about our restaurant, like the menu, specials, happy hour, or hours. For anything else, please contact our staff and they'll be glad to help." |
-| Orchestrator accepts the staff hand-off | F13 | `engines/orchestrator_engine.py` | The verifier no longer rejects "contact staff" as an invented fact (it was retrying until it gave up). |
-| Happy hour from the specials tab | F8 | `domains/restaurant/domain.py`, `core/sheets.py`, `engine_api.py`, `domains/restaurant/tools.py` | "happy hour" routes to specials, not hours. A question naming a sheet Category (e.g. "Happy Hour") returns every day it runs. Answers show the sheet's `Hours` column. |
-| Day ranges in the specials tab | F8 | `domains/restaurant/sheets.py` | `Day` can be a weekday (`Tue`, `Tues`, `Tuesday`), `All Week`, or a range like `Tues - Fri` / `Tue-Sat` (wraps, e.g. `Fri - Mon`). |
-| One dish per chunk | F3 | `core/vectorstore.py`, `domains/restaurant/domain.py` (`CHUNK_SEPARATORS`) | Menu PDFs split at each `●`/`•` bullet, so a description is never cut in half. Fixed the Dragon Roll getting the Rainbow Roll's "raw Atlantic salmon". The hr pack sets `CHUNK_SEPARATORS = ()` and keeps the old split. |
-| Case-insensitive keyword search | F18 | `core/vectorstore.py` | BM25 lower-cases and drops punctuation, so "dragon roll" finds "Dragon Roll,". Only for packs that set `CHUNK_SEPARATORS`. |
-| Terminal defaults + history | F12, F13 | `engine_api.py` | Enter or `s` → sushi; Enter or `2` → LangGraph; ↑/↓ recall earlier inputs. |
+- **Missing info:** when the menu doesn't say (seating, ambiance, date spot, sourcing), the bot shares any partial facts from dish descriptions, then suggests calling the staff (F3.1). Off-topic questions get a message pointing to the staff too (F19).
+- **Specials tab columns:** `Day`, `Hours`, `Dish Name`, `Category`, `Description`, `Price`, `Allergens`, `Is Active`. `Day` is a weekday (`Tue`, `Tues`, `Tuesday`), `All Week`, or a range like `Tues - Fri`. Happy hour rows use Category `Happy Hour`; a question naming a Category returns every day it runs (F8).
+- **Chunking:** the restaurant pack's `CHUNK_SEPARATORS` makes each menu bullet its own chunk, with case-insensitive keyword search (F3/F18); the hr pack keeps the original split. Changing `CHUNK_SEPARATORS` or `split_into_chunks()` means deleting `vectorstores/restaurant/` so FAISS is rebuilt from the same chunks BM25 uses.
+- **Known gaps:** the orchestrator engine hands off "is there happy hour on Saturday?" and "hours on Friday" to staff.
 
-**Specials tab columns:** `Day`, `Hours`, `Dish Name`, `Category`, `Description`, `Price`, `Allergens`, `Is Active`. Happy hour rows use Category `Happy Hour`.
-
-**Rebuild after a chunking change:** changing `CHUNK_SEPARATORS` or `split_into_chunks()` means deleting `vectorstores/restaurant/` so FAISS is rebuilt from the same chunks BM25 uses. The Fly image copies the local `vectorstores/`, so deploy only from a branch whose code matches the local index.
-
-**Evals (langgraph):** 7/15 on `main` → 12/16 after these fixes. Remaining fails are low context precision (Friday hours, cash, delivery) and "Where is the fish from?".
-
-**Known gaps:**
-- Specials and happy hour on Fly need the `GOOGLE_SERVICE_ACCOUNT_JSON` Fly secret (see Deploying); `fly.toml` sets `SHEETS_ENABLED = 'true'`.
-- Orchestrator: "is there happy hour on Saturday?" and "hours on Friday" get the staff hand-off (Friday also fails on `main`).
+Change history and eval results for these fixes: `docs/retro/2026-11-19-1130-restaurant-ai-platform.md`.
 
 ## Notes
 
