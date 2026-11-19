@@ -133,8 +133,32 @@ curl -X POST http://127.0.0.1:8000/ask \
 `web-customer/dist` exists, serves the customer site at `/`. Build and test the image locally with
 `docker build -t rest-local .`, then deploy from this folder with the Fly.io walkthrough
 (`fly launch --no-deploy --copy-config`, `fly volumes create rest_data`, the `OPENAI_API_KEY` secret,
-`fly deploy --ha=false`). For live specials/hours/org/items (F8), store the sheet key as a secret once: `fly secrets set GOOGLE_SERVICE_ACCOUNT_JSON="$(cat secrets/service_account.json)"`. Deploys run from the terminal: `vectorstores/` is gitignored, so the image
-is built from the local folder.
+`fly deploy --ha=false`). Deploys run from the terminal: `vectorstores/` is gitignored, so the image
+is built from the local folder (deploy from the branch whose code matches the local index).
+
+**Sheet key for live specials/hours/org/items (F8), once**, from this folder:
+
+```
+fly secrets set --stage GOOGLE_SERVICE_ACCOUNT_JSON="$(cat secrets/service_account.json)"
+fly deploy --ha=false
+```
+
+`--stage` saves the secret without a restart; "Secrets have been staged, but not set on VMs" is
+expected, and the `fly deploy` applies it.
+
+**Live check after deploy:**
+
+```
+curl -s -X POST https://restaurant-ai-platform.fly.dev/api/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"cuisine":"sushi","question":"happy hours and times"}'
+```
+
+Expected: the sheet's happy hour rows, e.g. `[Tues - Fri, 3:00 PM - 7:00 PM] Spicy Tuna ($5.00) - Tuna fish spicy`.
+Also try `"question":"dragon roll"`, which should give BBQ freshwater eel and cucumber, topped with
+avocado, sweet unagi glaze and toasted sesame seeds ($18.50). The first request can take a few
+seconds while the stopped machine starts; Fly's limit is 5 questions a minute and 50 a day.
+If the sheet errors, check `fly logs`.
 
 ## Running — engine API (F12)
 
