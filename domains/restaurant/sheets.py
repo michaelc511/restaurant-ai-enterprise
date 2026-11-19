@@ -14,11 +14,12 @@ def get_daily_specials(day: Optional[str] = None) -> list[dict]:
 
     Args:
         day: A weekday like "Mon", "Fri", or "All Week". If omitted, returns every
-            active special regardless of day.
+            active special regardless of day. Sheet rows may use ranges like
+            "Tues - Fri", which match every day in the range.
 
     Returns:
         A list of dicts, one per active special, with keys matching the sheet's
-        columns: Day, Dish Name, Category, Description, Price, Allergens.
+        columns: Day, Hours, Dish Name, Category, Description, Price, Allergens.
 
     Raises:
         RuntimeError: if the sheet/tab can't be reached (missing, renamed, a
@@ -27,12 +28,25 @@ def get_daily_specials(day: Optional[str] = None) -> list[dict]:
     rows = sheets._open_tab(DAILY_SPECIALS_TAB).get_all_records()
     specials = [row for row in rows if sheets._is_active(row.get("Is Active", ""))]
     if day and day.strip().lower() != "all week":
-        wanted = day.strip().lower()
-        specials = [
-            row for row in specials
-            if str(row.get("Day", "")).strip().lower() in (wanted, "all week")
-        ]
+        specials = [row for row in specials if _day_matches(str(row.get("Day", "")), day)]
     return specials
+
+
+_WEEKDAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+
+
+def _day_matches(cell: str, day: str) -> bool:  # F8: a sheet Day cell is "All Week", a weekday, or a range like "Tues - Fri"
+    cell = cell.strip().lower()
+    wanted = day.strip().lower()[:3]
+    if cell == "all week":
+        return True
+    if "-" not in cell:
+        return cell[:3] == wanted  # F8: "Tue" / "Tues" / "Tuesday" all match "Tue"
+    start, _, end = (part.strip()[:3] for part in cell.partition("-"))
+    if start not in _WEEKDAYS or end not in _WEEKDAYS or wanted not in _WEEKDAYS:
+        return False
+    i, j, k = _WEEKDAYS.index(start), _WEEKDAYS.index(end), _WEEKDAYS.index(wanted)
+    return i <= k <= j if i <= j else k >= i or k <= j  # F8: wraps, e.g. "Fri - Mon"
 
 
 # F8 FastMCP Server Endpoint

@@ -151,7 +151,8 @@ class OrchestratorEngine(BaseMenuEngine):  # F13: orchestrator + specialists, be
     def _verify_node(self, state: OrchestratorState) -> dict:
         decision = self.llm.with_structured_output(VerifyDecision).invoke(
             f"Context:\n{self._context(state)}\n\nQuestion: {state['question']}\n\nAnswer: {state['answer']}\n\n"
-            "Is the answer fully supported by the context, with nothing invented?"
+            "Is the answer fully supported by the context, with nothing invented? A suggestion to "
+            "contact staff for more details is allowed and is not an invented fact."  # F13/F3.1: else the hand-off fails every retry
         )
         return {"grounded": decision.grounded, "verify_feedback": decision.reasoning, "attempts": state["attempts"] + 1}
 

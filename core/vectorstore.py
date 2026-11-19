@@ -9,6 +9,7 @@ before get_retriever() returns them, so retrieved menu content is never handed t
 prompt without an explicit data/instruction boundary around it.
 """
 import os
+import re
 from typing import List
 
 from flashrank import Ranker, RerankRequest
@@ -60,6 +61,34 @@ def wrap_with_reranking(base_retriever: BaseRetriever, top_k: int = 3) -> Rerank
     return RerankingRetriever(base_retriever=base_retriever, top_k=top_k)
 
 
+def split_into_chunks(documents: List[Document]) -> List[Document]:
+    # F3: a domain pack can set CHUNK_SEPARATORS (e.g. the restaurant menus' dish bullets) so each item
+    # stays whole in one chunk - a fixed 500-char cut split "topped with thinly | sliced avocado..." and
+    # the LLM filled the gap from a neighbouring dish. Packs without it (hr) keep the original split.
+    separators = getattr(domain, "CHUNK_SEPARATORS", None)
+    if not separators:
+        return RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(documents)
+    # F3: exactly one item per chunk - packing two dishes into one chunk let the first dish dominate its
+    # embedding, so "dragon roll" missed a chunk that started with the Sashimi Deluxe Platter
+    item_start = re.compile("(?=" + "|".join(re.escape(s) for s in separators) + ")")
+    long_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50, separators=[". ", " "])
+    chunks = []
+    for doc in documents:
+        text = re.sub(r"\s+", " ", doc.page_content)  # F3: PyPDFLoader puts each word on its own line
+        for piece in (p.strip() for p in item_start.split(text)):
+            if not piece:
+                continue
+            if len(piece) <= 500:
+                chunks.append(Document(page_content=piece, metadata=dict(doc.metadata)))
+            else:  # F3: long non-item text (address, policies) still gets a size-based split
+                chunks.extend(long_splitter.split_documents([Document(page_content=piece, metadata=dict(doc.metadata))]))
+    return chunks
+
+
+def _bm25_tokens(text: str) -> List[str]:  # F18: case- and punctuation-insensitive, so "dragon roll" matches "Dragon Roll,"
+    return re.findall(r"\w+", text.lower())
+
+
 def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> SanitizingRetriever:
     """F3/F10/F12/F18/F22: load a cuisine's FAISS index from disk if it's already built, or build +
     save one, then fuse it with a BM25 keyword retriever, wrap the fused result with cross-encoder
@@ -72,9 +101,7 @@ def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> SanitizingRetriev
     # chunks each run), so parse + split the PDF unconditionally. This is cheap/local/no API
     # calls - the FAISS embedding step below is the expensive part the on-disk index still saves.
     loader = PyPDFLoader(str(domain.DOCS_DIR / f"{cuisine}.pdf"))  # F12: the active domain's docs
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    docs = text_splitter.split_documents(documents)
+    docs = split_into_chunks(loader.load())
 
     if os.path.exists(index_path):  # F3: load a previously saved FAISS index...
         vectorstore = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
@@ -83,7 +110,10 @@ def get_retriever(cuisine: str, embeddings, top_k: int = 3) -> SanitizingRetriev
         vectorstore.save_local(index_path)
 
     faiss_retriever = vectorstore.as_retriever(search_kwargs={"k": top_k})  # F3: dense/semantic
-    bm25_retriever = BM25Retriever.from_documents(docs)  # F18: sparse/keyword
+    if getattr(domain, "CHUNK_SEPARATORS", None):  # F18/F3: packs that opted into item chunking also get case-insensitive keywords
+        bm25_retriever = BM25Retriever.from_documents(docs, preprocess_func=_bm25_tokens)  # F18: sparse/keyword
+    else:  # F18: hr keeps the original whitespace tokenizer
+        bm25_retriever = BM25Retriever.from_documents(docs)
     bm25_retriever.k = top_k
 
     hybrid_retriever = EnsembleRetriever(  # F18: reciprocal rank fusion across both result lists
