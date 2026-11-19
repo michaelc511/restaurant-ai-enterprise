@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from core.telemetry import UsageInfo, new_session_totals, track_usage, new_trace_totals, trace_call, log_trace  # F6, F9
 from core.database import DB_PATH, init_db, log_call, get_session_totals  # F11
 from core import limits  # F21
-from core.sheets import find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days  # F8: pure helpers, no sheet reads
+from core.sheets import find_org_rows, find_item_rows, detect_ops_intent, resolve_target_days, rows_for_named_category  # F8: pure helpers, no sheet reads
 from core.mcp_client import call_mcp_tool  # F8: every live-sheet read goes over MCP via api/mcp_server.py
 from core.domain import domain  # F12
 from core.guardrails import classify_intent, is_off_topic, OFF_TOPIC_MESSAGE  # F19
@@ -63,7 +63,11 @@ class AskRequest(BaseModel):
 def format_specials_answer(rows: list[dict]) -> str:  # F8: shared by /ask and the CLI
     if not rows:
         return "There are no active specials for that day."
-    lines = [f"[{row['Day']}] {row['Dish Name']} ({row['Price']}) - {row['Description']}" for row in rows]
+    lines = [
+        f"[{row['Day']}{', ' + row['Hours'] if row.get('Hours') else ''}] "  # F8: optional Hours column, e.g. happy hour times
+        f"{row['Dish Name']} ({row['Price']}) - {row['Description']}"
+        for row in rows
+    ]
     return "Specials:\n" + "\n".join(lines)
 
 
@@ -105,6 +109,9 @@ def sheet_rows_for_intent(ops_intent: Optional[str], question: str) -> list[dict
 
 
 def specials_for_question(question: str) -> list[dict]:  # F8: resolves tomorrow/weekend/a weekday/etc., dedupes "All Week" rows
+    named = rows_for_named_category(question, call_mcp_tool(domain.SPECIALS_TOOL, {}))  # F8: "happy hour" -> every day it runs
+    if named:
+        return named
     rows, seen = [], set()
     for d in resolve_target_days(question):
         for row in call_mcp_tool(domain.SPECIALS_TOOL, {"day": d.strftime("%a")}):  # F12: the domain's specials tool
@@ -298,16 +305,24 @@ if (WEB_DIST / "index.html").exists():
 # Only runs when this file is executed directly (python3 engine_api.py),
 # not when uvicorn imports it to serve the API
 if __name__ == "__main__":
-    cuisine = input(f"Which {domain.COLLECTION_LABEL} would you like ({'/'.join(AVAILABLE_CUISINES)})? ").strip().lower()
+    import readline  # noqa: F401 - F12: importing it gives input() up/down history and line editing in the terminal loop
+
+    # F12: Enter, the default's first letter ("s") or its name picks the first collection (sushi)
+    default_cuisine = AVAILABLE_CUISINES[0]
+    cuisine_prompt = f"Which {domain.COLLECTION_LABEL} would you like ({'/'.join(AVAILABLE_CUISINES)}) [default {default_cuisine}, press Enter]? "
+    cuisine = input(cuisine_prompt).strip().lower()
     while cuisine not in AVAILABLE_CUISINES:
-        cuisine = input(f"Please choose one of {'/'.join(AVAILABLE_CUISINES)}: ").strip().lower()
+        if cuisine in ("", default_cuisine[0]):
+            cuisine = default_cuisine
+            break
+        cuisine = input(f"Please choose one of {'/'.join(AVAILABLE_CUISINES)} (Enter for {default_cuisine}): ").strip().lower()
 
     cli_session_id = "cli"
     if DEBUG_MODE:  # F13: let a developer override DEFAULT_ENGINE per run, for testing F12's factory
         engine_choice = input(
-            f"\nWhich engine? 1) {DEFAULT_ENGINE} [default, press Enter]  2) LangGraph  3) Agentic RAG LG: "
+            "\nWhich engine? 1) plain_rag  2) LangGraph [default, press Enter]  3) Agentic RAG LG: "
         ).strip()
-        cli_engine_name = {"2": "langgraph", "3": "orchestrator"}.get(engine_choice, DEFAULT_ENGINE)  # F13
+        cli_engine_name = {"1": "plain_rag", "3": "orchestrator"}.get(engine_choice, "langgraph")  # F13: Enter/2 -> langgraph, same as Fly
         print(f"[DEBUG] DEFAULT_ENGINE is '{DEFAULT_ENGINE}' - using engine: {cli_engine_name}")
     else:
         cli_engine_name = DEFAULT_ENGINE  # F12: no prompt outside DEBUG_MODE, always the .env default

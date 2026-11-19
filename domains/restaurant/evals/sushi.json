@@ -18,5 +18,9 @@
   {
     "question": "How much is valet parking?",
     "expected_answer": "Valet parking is a $12 flat fee; validated garage parking across the street is also available for up to 3 hours."
+  },
+  {
+    "question": "Where is the fish from?",
+    "expected_answer": "The menu names Atlantic salmon (e.g. in the Salmon Teriyaki Dinner, $25.00), Atlantic mackerel in the Saba Shioyaki ($18.50), and Hokkaido sea scallops in the Spicy Scallop Hand Roll ($15.00); for other sourcing details, call the staff."
   }
 ]

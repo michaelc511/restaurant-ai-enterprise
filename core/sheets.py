@@ -36,6 +36,13 @@ WEEKDAY_NAMES = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturd
 _client_cache: Optional[gspread.Client] = None
 
 
+def rows_for_named_category(question: str, rows: list[dict]) -> list[dict]:  # F8: pure helper, no sheet reads
+    # F8: "when is happy hour?" names a Category ("Happy Hour"), so it wants every day that category runs,
+    # not just today's rows - [] when the question names no category, so callers fall back to day lookup
+    q = question.strip().lower()
+    return [row for row in rows if str(row.get("Category", "")).strip() and str(row["Category"]).strip().lower() in q]
+
+
 # F8 FastMCP Server Endpoint
 def resolve_target_days(question: str) -> list[date]:
     """Heuristic relative-date parser: figures out which calendar day(s) a question

@@ -13,6 +13,7 @@ EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtu
 MCP_SERVER_NAME = "hr-ops-mcp"
 SPECIALS_TOOL = None
 HOURS_TOOL = None
+CHUNK_SEPARATORS = ()  # F3: empty - keep the original fixed-size split (see core/vectorstore.py)
 SPECIALS_KEYWORDS = ()
 HOURS_KEYWORDS = ()
 

@@ -92,6 +92,20 @@ def test_detect_ops_intent_specials_takes_priority_over_hours():
     assert sheets.detect_ops_intent("any specials during holiday hours?") == "specials"
 
 
+def test_detect_ops_intent_happy_hour_is_specials_not_hours():  # F8: "happy hour" contains "hour"
+    assert sheets.detect_ops_intent("happy hours and times") == "specials"
+
+
+def test_rows_for_named_category_matches_category_in_question():  # F8
+    rows = [
+        {"Dish Name": "Edamame", "Category": "Happy Hour"},
+        {"Dish Name": "Dragon Fire Maki", "Category": "Specialty Roll"},
+        {"Dish Name": "No Category", "Category": ""},
+    ]
+    assert [r["Dish Name"] for r in sheets.rows_for_named_category("When is happy hour?", rows)] == ["Edamame"]
+    assert sheets.rows_for_named_category("what are today's specials?", rows) == []
+
+
 # --- _is_active ----------------------------------------------------------------
 
 @pytest.mark.parametrize(
@@ -270,3 +284,33 @@ def test_open_tab_wraps_gspread_errors_as_runtime_error(monkeypatch, exc):
 
     with pytest.raises(RuntimeError):
         sheets._open_tab("specials")
+
+
+def test_get_daily_specials_matches_day_ranges(monkeypatch):  # F8: sheet Day cells like "Tues - Fri"
+    rows = [
+        {"Day": "Tues - Fri", "Dish Name": "Happy Hour Edamame", "Is Active": "true"},
+        {"Day": "Tue-Sat", "Dish Name": "Caviar Roll", "Is Active": "true"},
+        {"Day": "Fri - Mon", "Dish Name": "Weekend Wrap", "Is Active": "true"},
+        {"Day": "Thu", "Dish Name": "Thursday Only", "Is Active": "true"},
+    ]
+    monkeypatch.setattr(sheets, "_open_tab", lambda tab: FakeWorksheet(rows))
+
+    assert {s["Dish Name"] for s in restaurant_sheets.get_daily_specials(day="Thu")} == {
+        "Happy Hour Edamame", "Caviar Roll", "Thursday Only"}
+    assert {s["Dish Name"] for s in restaurant_sheets.get_daily_specials(day="Sun")} == {"Weekend Wrap"}
+    assert {s["Dish Name"] for s in restaurant_sheets.get_daily_specials(day="Mon")} == {"Weekend Wrap"}
+
+
+@pytest.mark.parametrize("cell, day, expected", [
+    ("All Week", "Mon", True),
+    ("Tues", "Tue", True),
+    ("Tuesday", "Tue", True),
+    ("Mon", "Tue", False),
+    ("Tues - Fri", "Thu", True),
+    ("Tues - Fri", "Mon", False),
+    ("Fri - Mon", "Sun", True),
+    ("Fri - Mon", "Wed", False),
+    ("Someday - Later", "Mon", False),
+])
+def test_day_matches(cell, day, expected):  # F8
+    assert restaurant_sheets._day_matches(cell, day) is expected

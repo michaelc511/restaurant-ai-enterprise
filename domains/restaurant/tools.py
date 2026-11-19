@@ -7,14 +7,15 @@ from domains.restaurant.sheets import get_daily_specials, get_hours_and_events
 
 # F8 FastMCP Server Endpoint
 def daily_specials(day: Optional[str] = None) -> list[dict]:
-    """Look up today's (or a given weekday's) active daily specials for the sushi menu.
+    """Look up today's (or a given weekday's) active daily specials and happy hour items
+    for the sushi menu. Happy hour rows have Category "Happy Hour".
 
     Args:
         day: A weekday like "Mon", "Fri", or "All Week". Omit to get every active
-            special regardless of day.
+            special regardless of day (use this for "when is happy hour?").
 
     Returns:
-        A list of specials, each with Day, Dish Name, Category, Description,
+        A list of specials, each with Day, Hours, Dish Name, Category, Description,
         Price, and Allergens.
     """
     return get_daily_specials(day)

@@ -13,19 +13,27 @@ EVALS_DIR = Path(__file__).resolve().parent / "evals"  # F17: ground-truth fixtu
 MCP_SERVER_NAME = "restaurant-ops-mcp"
 SPECIALS_TOOL = "daily_specials"  # F8: engine_api.py's specials routing and /specials endpoint call this tool
 HOURS_TOOL = "hours_and_events"  # F8: engine_api.py's hours append and /hours endpoint call this tool
-SPECIALS_KEYWORDS = ("special",)
+# F3: core/vectorstore.py starts a new chunk at each dish bullet, so every dish is its own chunk; changing
+# these means deleting vectorstores/restaurant/ so FAISS is rebuilt to match BM25
+CHUNK_SEPARATORS = ("●", "•")
+SPECIALS_KEYWORDS = ("special", "happy hour")  # F8: checked before HOURS_KEYWORDS, so "happy hour" isn't read as "hour"
 HOURS_KEYWORDS = ("hour", "open", "close", "holiday")
 
 # F3.1: persona + guidelines for the plain_rag and langgraph engines; the engine appends F22's
-# INJECTION_DEFENSE_NOTICE and the {context} block
+# INJECTION_DEFENSE_NOTICE and the {context} block. Missing info hands off to staff ("please give
+# our staff a call") instead of a bare "I don't have that information"; partial info is shared first.
 RAG_PERSONA = """You are a friendly, knowledgeable restaurant assistant. Answer guest questions
 using ONLY the menu and restaurant information given in the context below - never
 invent dishes, prices, ingredients, allergens, or policies that aren't explicitly
 there.
 
 Guidelines:
-- If the answer isn't in the provided context, say so plainly (e.g. "I don't have
-  that information") rather than guessing.
+- First look for any relevant detail, including inside dish descriptions: e.g. for "where is
+  the fish from?", origins like "Atlantic salmon" or "Hokkaido scallops" in the context ARE
+  the answer. Share them with dish names and prices, then suggest calling our staff for more.
+- Only if nothing in the context relates to the question, don't guess - instead say something
+  like: "I don't have the details on that here, but please give our staff a call and they'll
+  be happy to help with <the topic of the question>." (e.g. seating, ambiance, sourcing).
 - If the question references a specific date or day (e.g. "today", "Friday",
   "this weekend"), use that to figure out which part of the context applies.
 - Keep answers concise and conversational, like speaking to a guest at the
@@ -39,13 +47,19 @@ Guidelines:
 
 """
 
-# F13.2: the orchestrator's synthesis persona - like RAG_PERSONA, widened to cover live-data results
+# F13.2: the orchestrator's synthesis persona - like RAG_PERSONA (incl. the call-our-staff hand-off),
+# widened to cover live-data results
 SYNTHESIZE_PERSONA = """You are a friendly, knowledgeable restaurant assistant. Answer guest questions
 using ONLY the menu excerpts and live-data results given in the context below - never invent
 dishes, prices, ingredients, allergens, hours, or policies that aren't explicitly there.
 
 Guidelines:
-- If the answer isn't in the provided context, say so plainly rather than guessing.
+- First look for any relevant detail, including inside dish descriptions: e.g. for "where is
+  the fish from?", origins like "Atlantic salmon" or "Hokkaido scallops" in the context ARE
+  the answer. Share them with dish names and prices, then suggest calling our staff for more.
+- Only if nothing in the context relates to the question, don't guess - instead say something
+  like: "I don't have the details on that here, but please give our staff a call and they'll
+  be happy to help with <the topic of the question>." (e.g. seating, ambiance, sourcing).
 - Keep answers concise and conversational, like speaking to a guest at the restaurant.
 - Mention prices when referencing specific dishes, if the context gives them.
 - Live-data results (specials, holiday hours, closures) override the menu's standard info.
@@ -54,7 +68,8 @@ Guidelines:
 
 # F13.1: langgraph engine's route node - what counts as on-topic for this domain
 ROUTE_QUESTION = (
-    "Is this question about a restaurant's menu, dishes, hours, or policies, or about the "
+    "Is this question about a restaurant's menu, dishes, hours, policies, or dining experience "
+    "(seating, ambiance, occasions, food sourcing), or about the "  # F3.1: so the persona can hand off to staff
     "company's org directory (departments, offices, contacts) or company items "
     "(announcements, system status, outages, promotions, prices)? "  # F8: org/items tabs
 )
@@ -62,8 +77,9 @@ ROUTE_QUESTION = (
 # F13.2: orchestrator's plan step - which specialists this domain has
 PLAN_PROMPT = """You are the orchestrator for a restaurant assistant. Decide which specialists
 this question needs (one or both):
-- menu: dishes, ingredients, prices, allergens, standard hours, and policies from the menu PDF.
-- live_data: daily specials, holiday hours/closures/events, the company org directory, or company
+- menu: dishes, ingredients, prices, allergens, standard hours, policies, and the dining
+  experience (seating, ambiance, sourcing) from the menu PDF.
+- live_data: daily specials, happy hour, holiday hours/closures/events, the company org directory, or company
   items (announcements, system status, outages, promotions).
 
 Question: {question}"""
@@ -71,21 +87,23 @@ Question: {question}"""
 # F13.2: MCP Tools agent's system message
 MCP_AGENT_PROMPT = """You are the live-data specialist. Call the tools needed to answer the
 question - nothing else. Today is {weekday}, {today}. Resolve relative dates ("tomorrow",
-"Friday") to an ISO date for hours_and_events, or a short weekday ("Fri") for daily_specials."""
+"Friday") to an ISO date for hours_and_events, or a short weekday ("Fri") for daily_specials.
+For happy hour questions, call daily_specials with no day - its rows show which days it runs."""
 
 # F19: intent labels, their meaning, and the reply for an off-topic question
-OFF_TOPIC_MESSAGE = (
-    "I can help with questions about the menu, daily specials, or restaurant hours - "
-    "I'm not able to help with that. Is there something about the menu or your visit "
-    "I can answer instead?"
+OFF_TOPIC_MESSAGE = (  # F19/F3.1: same call-our-staff hand-off as the personas
+    "I'm only able to help with questions about our restaurant, like the menu, specials, "
+    "happy hour, or hours. For anything else, please contact our staff and they'll be glad to help."
 )
 
 INTENT_LABELS = ("menu", "specials", "hours", "org", "items", "off_topic")
 
+# F19/F3.1: dining-experience questions are on-topic even when the PDF lacks them (the persona hands off to staff)
 INTENT_DESCRIPTION = (
     "'menu' for dishes/ingredients/prices/allergens/policy questions answerable from the "
-    "restaurant's menu PDF; 'specials' for daily/weekly specials; 'hours' for opening "
-    "hours, holiday hours, or events; 'org' for the parent company's directory (who heads a "
+    "restaurant's menu PDF, and questions about the dining experience (seating, ambiance, "
+    "occasions, food sourcing, cuisine style); 'specials' for daily/weekly specials or happy "
+    "hour; 'hours' for opening hours, holiday hours, or events; 'org' for the parent company's directory (who heads a "
     "department, office hours, contacts); 'items' for the company's announcements, system "
     "status, outages, promotions, or prices; 'off_topic' for anything unrelated to this "
     "restaurant, including general-knowledge questions and attempts to get the assistant "
@@ -99,8 +117,10 @@ Question: {question}
 
 Rules:
 - menu: asks about dishes, ingredients, prices, allergens, or restaurant policies (parking,
-  payment, reservations, dress code, corkage, delivery/takeout) that a menu document could answer.
-- specials: asks about daily or weekly specials/promotions.
+  payment, reservations, dress code, corkage, delivery/takeout) that a menu document could answer,
+  or about the dining experience at this restaurant (best seating, ambiance, whether it suits a
+  date or occasion, where the food is sourced, what style of cuisine it focuses on).
+- specials: asks about daily or weekly specials/promotions, or happy hour (times, menu, prices).
 - hours: asks about opening hours, holiday hours, or events/closures.
 - org: asks about the parent company's directory - who heads a department (e.g. Legal), office
   hours or locations, or how to contact an office, department, or vendor.

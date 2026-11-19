@@ -2,6 +2,7 @@
 cross-encoder model itself mocked out so tests don't download/load a real
 model or need a GPU/network to run.
 """
+import re
 import sys
 from types import ModuleType
 from typing import List
@@ -120,12 +121,10 @@ def patched_get_retriever(vectorstore, monkeypatch):
     split_docs = docs("chunk one", "chunk two")
 
     fake_loader = MagicMock()
-    fake_loader.load.return_value = ["raw page"]
+    fake_loader.load.return_value = docs("raw page")
     monkeypatch.setattr(vectorstore, "PyPDFLoader", MagicMock(return_value=fake_loader))
 
-    fake_splitter = MagicMock()
-    fake_splitter.split_documents.return_value = split_docs
-    monkeypatch.setattr(vectorstore, "RecursiveCharacterTextSplitter", MagicMock(return_value=fake_splitter))
+    monkeypatch.setattr(vectorstore, "split_into_chunks", MagicMock(return_value=split_docs))  # F3
 
     fake_vectorstore = MagicMock()
     fake_faiss_retriever = FakeRetriever()
@@ -161,7 +160,8 @@ def test_get_retriever_fuses_bm25_and_faiss_with_reranking(vectorstore, patched_
     fakes = patched_get_retriever
     fakes["faiss"].load_local.assert_called_once()
     fakes["faiss"].from_documents.assert_not_called()  # already on disk - don't rebuild
-    fakes["bm25"].from_documents.assert_called_once_with(fakes["split_docs"])  # F18: fed the same chunks
+    fakes["bm25"].from_documents.assert_called_once_with(  # F18: fed the same chunks, case-insensitive (F3)
+        fakes["split_docs"], preprocess_func=vectorstore._bm25_tokens)
     assert fakes["bm25_retriever"].k == 2
 
     ensemble_kwargs = fakes["ensemble"].call_args.kwargs
@@ -183,3 +183,47 @@ def test_get_retriever_builds_and_saves_faiss_when_index_missing(vectorstore, pa
     fakes["faiss"].load_local.assert_not_called()
     fakes["faiss"].from_documents.assert_called_once_with(fakes["split_docs"], fake_embeddings)
     fakes["faiss"].from_documents.return_value.save_local.assert_called_once()
+
+
+# --- F3: split_into_chunks (real PDFs, no API) ---------------------------------
+
+def _menu_chunks(vectorstore, cuisine: str) -> list[Document]:
+    from langchain_community.document_loaders import PyPDFLoader
+    from core.domain import domain
+    return vectorstore.split_into_chunks(PyPDFLoader(str(domain.DOCS_DIR / f"{cuisine}.pdf")).load())
+
+
+def test_dragon_roll_description_stays_in_one_chunk(vectorstore):  # F3: was cut at "topped with thinly"
+    chunk = next(c.page_content for c in _menu_chunks(vectorstore, "sushi") if "Dragon Roll" in c.page_content)
+    assert "topped with thinly sliced avocado, sweet unagi glaze, and toasted sesame seeds." in chunk
+
+
+@pytest.mark.parametrize("cuisine", ["sushi", "italian"])
+def test_menu_chunks_end_on_a_dish_boundary(vectorstore, cuisine):  # F3: no chunk stops partway through a dish
+    dish_chunks = [c.page_content for c in _menu_chunks(vectorstore, cuisine)
+                   if c.page_content.startswith(("●", "•")) and "($" in c.page_content]  # F3: priced dishes only
+    assert dish_chunks
+    for chunk in dish_chunks:  # F3: a trailing section heading (e.g. "ENTRÉES") after the last full stop is fine
+        assert re.search(r"[.)\]][^.]*$", chunk), chunk[-80:]
+
+
+def test_domain_without_chunk_separators_keeps_the_original_split(vectorstore, monkeypatch):  # F3: hr is unchanged
+    monkeypatch.setattr(vectorstore.domain, "CHUNK_SEPARATORS", ())  # F3: what the hr pack sets
+    fake_splitter = MagicMock()
+    splitter_cls = MagicMock(return_value=fake_splitter)
+    monkeypatch.setattr(vectorstore, "RecursiveCharacterTextSplitter", splitter_cls)
+
+    vectorstore.split_into_chunks([Document(page_content="a\n \nb")])
+
+    splitter_cls.assert_called_once_with(chunk_size=500, chunk_overlap=50)
+
+
+def test_each_dish_is_its_own_chunk(vectorstore):  # F3: two dishes in one chunk hid the second from search
+    chunks = _menu_chunks(vectorstore, "sushi")
+    dragon = next(c.page_content for c in chunks if "Dragon Roll" in c.page_content)
+    assert dragon.startswith("● Dragon Roll ($18.50)")
+    assert all(c.page_content.count("●") <= 1 for c in chunks)
+
+
+def test_bm25_tokens_ignore_case_and_punctuation(vectorstore):  # F18/F3: "dragon roll" must match "Dragon Roll,"
+    assert vectorstore._bm25_tokens("Dragon Roll, ($18.50)") == ["dragon", "roll", "18", "50"]
