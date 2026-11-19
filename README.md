@@ -133,7 +133,7 @@ curl -X POST http://127.0.0.1:8000/ask \
 `web-customer/dist` exists, serves the customer site at `/`. Build and test the image locally with
 `docker build -t rest-local .`, then deploy from this folder with the Fly.io walkthrough
 (`fly launch --no-deploy --copy-config`, `fly volumes create rest_data`, the `OPENAI_API_KEY` secret,
-`fly deploy --ha=false`). Deploys run from the terminal: `vectorstores/` is gitignored, so the image
+`fly deploy --ha=false`). For live specials/hours/org/items (F8), store the sheet key as a secret once: `fly secrets set GOOGLE_SERVICE_ACCOUNT_JSON="$(cat secrets/service_account.json)"`. Deploys run from the terminal: `vectorstores/` is gitignored, so the image
 is built from the local folder.
 
 ## Running — engine API (F12)
@@ -170,7 +170,8 @@ Set in `.env`. Toggles default to on — set to `false` to turn off.
 | `DOMAIN` | `restaurant` | Which `domains/<name>/` pack is active — `restaurant` or `hr`; FAISS indexes go in `vectorstores/<DOMAIN>/` — docs, eval fixtures, prompts and intents (see `domains/README.md`) |
 | `DEFAULT_ENGINE` | `plain_rag` | Engine `engine_api.py` uses — `plain_rag`, `langgraph`, or `orchestrator` (F12/F13); `orchestrator` does its own guardrails and live-data routing, so `engine_api.py` skips its F19/F8 pre-routing for it |
 | `MEMORY_BACKEND` | `ephemeral` | Chat memory in RAM (F7), or `persistent` for SQLite-backed history that survives a restart (F16) |
-| `SHEETS_ENABLED` | `true` | Live Google Sheets lookups for specials/hours/org/items (F8); `false` skips them, e.g. a deploy without `secrets/service_account.json` (the Docker image sets `false`) |
+| `SHEETS_ENABLED` | `true` | Live Google Sheets lookups for specials/hours/org/items (F8); `false` skips them, e.g. a deploy without `secrets/service_account.json` (the Docker image sets `false`; `fly.toml` turns it back on) |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | unset | The Google service-account JSON itself, for deploys with no `secrets/` folder (Fly secret, F8); when set it is used instead of `secrets/service_account.json` |
 | `DATA_DIR` | `.` | Folder for `usage.db` (F11) and `chat_history.db` (F16); the Docker image sets `/data`, the Fly volume |
 | `RATE_LIMIT_PER_MINUTE` / `RATE_LIMIT_PER_DAY` | `5` / `50` | F21: `/ask` calls per visitor IP; `0` switches a limit off |
 | `DAILY_BUDGET_USD` | `1.00` | F21: refuse `/ask` (HTTP 429) once today's logged OpenAI cost reaches this; `0` switches it off |
@@ -233,7 +234,7 @@ Both UIs are just front ends — they call `menu_api.py`'s `/ask` endpoint, so t
 **Evals (langgraph):** 7/15 on `main` → 12/16 after these fixes. Remaining fails are low context precision (Friday hours, cash, delivery) and "Where is the fish from?".
 
 **Known gaps:**
-- Fly runs with `SHEETS_ENABLED=false` (set in the `Dockerfile`) and no `secrets/service_account.json`, so specials and happy hour don't work on Fly until both are set up.
+- Specials and happy hour on Fly need the `GOOGLE_SERVICE_ACCOUNT_JSON` Fly secret (see Deploying); `fly.toml` sets `SHEETS_ENABLED = 'true'`.
 - Orchestrator: "is there happy hour on Saturday?" and "hours on Friday" get the staff hand-off (Friday also fails on `main`).
 
 ## Notes

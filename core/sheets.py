@@ -4,6 +4,8 @@ resolution and keyword routing. Domain-specific tabs live in the domain pack (F1
 domains/restaurant/sheets.py for specials and hours & events). Shared by
 api/mcp_server.py (exposed as MCP tools for agents) and menu_api.py (called directly).
 """
+import json
+import os
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -16,6 +18,7 @@ from core.domain import domain  # F12
 
 SPREADSHEET_NAME = "org"
 SERVICE_ACCOUNT_PATH = Path(__file__).resolve().parent.parent / "secrets" / "service_account.json"
+SERVICE_ACCOUNT_ENV = "GOOGLE_SERVICE_ACCOUNT_JSON"  # F8: the same JSON as a Fly secret; wins over the file when set
 
 ORG_TAB = "org"  # F8: company directory - offices, departments, vendors, etc. with a contact each
 ITEMS_TAB = "items"  # F8: non-date facts per App/Tenant - announcements, statuses, prices, promotions
@@ -120,7 +123,13 @@ def _get_client() -> gspread.Client:
     """
     global _client_cache
     if _client_cache is None:
-        _client_cache = gspread.service_account(filename=str(SERVICE_ACCOUNT_PATH))
+        # F8: Fly has no secrets/ folder (.dockerignore), so the key comes from a Fly secret holding the
+        # same JSON; local runs keep reading the file
+        service_account_json = os.environ.get(SERVICE_ACCOUNT_ENV, "").strip()
+        if service_account_json:
+            _client_cache = gspread.service_account_from_dict(json.loads(service_account_json))
+        else:
+            _client_cache = gspread.service_account(filename=str(SERVICE_ACCOUNT_PATH))
     return _client_cache
 
 
