@@ -314,3 +314,27 @@ def test_get_daily_specials_matches_day_ranges(monkeypatch):  # F8: sheet Day ce
 ])
 def test_day_matches(cell, day, expected):  # F8
     assert restaurant_sheets._day_matches(cell, day) is expected
+
+
+# --- F8: _get_client credentials (file locally, Fly secret on Fly) -------------
+
+def test_get_client_reads_service_account_from_env_when_set(monkeypatch):
+    calls = {}
+    monkeypatch.setattr(sheets, "_client_cache", None)
+    monkeypatch.setenv(sheets.SERVICE_ACCOUNT_ENV, '{"type": "service_account", "client_email": "x@y.z"}')
+    monkeypatch.setattr(sheets.gspread, "service_account_from_dict", lambda info: calls.setdefault("dict", info) and "env-client")
+    monkeypatch.setattr(sheets.gspread, "service_account", lambda filename: calls.setdefault("file", filename))
+
+    assert sheets._get_client() == "env-client"
+    assert calls == {"dict": {"type": "service_account", "client_email": "x@y.z"}}
+
+
+def test_get_client_falls_back_to_the_file_without_the_env_var(monkeypatch):
+    calls = {}
+    monkeypatch.setattr(sheets, "_client_cache", None)
+    monkeypatch.delenv(sheets.SERVICE_ACCOUNT_ENV, raising=False)
+    monkeypatch.setattr(sheets.gspread, "service_account_from_dict", lambda info: calls.setdefault("dict", info))
+    monkeypatch.setattr(sheets.gspread, "service_account", lambda filename: calls.setdefault("file", filename) and "file-client")
+
+    assert sheets._get_client() == "file-client"
+    assert calls == {"file": str(sheets.SERVICE_ACCOUNT_PATH)}

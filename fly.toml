@@ -14,6 +14,7 @@ primary_region = 'sjc'
   DEFAULT_ENGINE = 'langgraph'
   RATE_LIMIT_PER_DAY = '50'
   RATE_LIMIT_PER_MINUTE = '5'
+  SHEETS_ENABLED = 'true'
 
 [[mounts]]
   source = 'rest_data'
